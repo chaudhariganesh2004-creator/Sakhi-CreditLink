@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+dist-ssr/
+*.local
+
+# Vite / TypeScript
+.vite/
+*.tsbuildinfo
+
+# Environment & secret files
+.env
+.env.local
+.env.*.local
+*.exv
+
+# Confidential product blueprint / strategy docs
+Sakhi_CreditLink_Complete_Product_Blueprint_and_Stack_UI_Prompt (1).md
+
+# Editor & OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.log
+npm-debug.log*
