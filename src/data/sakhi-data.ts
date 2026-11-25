@@ -1,4 +1,6 @@
 export type NavScreenId =
+  | "shg-intake"
+  | "role-profit-dashboard"
   | "command-centre"
   | "shg-directory"
   | "finance-passport"

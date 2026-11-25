@@ -6,6 +6,7 @@ import {
   Download,
   FileCheck,
   MessageSquare,
+  Printer,
   Send,
 } from "lucide-react";
 import {
@@ -236,8 +237,14 @@ export const ApplicationPackScreen: React.FC<ApplicationPackProps> = ({
               {showPackModal ? "Hide Preview" : "Preview Summary"}
             </button>
             <button
+              onClick={() => window.print()}
+              className="inline-flex items-center gap-2 rounded-xl border border-[var(--sakhi-border)] bg-white px-4 py-2.5 text-[13px] font-medium text-[var(--sakhi-slate)] transition-colors hover:bg-[var(--sakhi-surface)] no-print"
+            >
+              <Printer className="h-4 w-4 text-[var(--sakhi-forest)]" /> Print / Save PDF
+            </button>
+            <button
               onClick={handleDownloadPack}
-              className="inline-flex items-center gap-2 rounded-xl border border-[var(--sakhi-border)] bg-white px-4 py-2.5 text-[13px] font-medium text-[var(--sakhi-slate)] transition-colors hover:bg-[var(--sakhi-surface)]"
+              className="inline-flex items-center gap-2 rounded-xl border border-[var(--sakhi-border)] bg-white px-4 py-2.5 text-[13px] font-medium text-[var(--sakhi-slate)] transition-colors hover:bg-[var(--sakhi-surface)] no-print"
             >
               <Download className="h-4 w-4 text-[var(--sakhi-forest)]" /> Download JSON
             </button>
