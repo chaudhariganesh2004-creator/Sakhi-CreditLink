@@ -19,6 +19,9 @@ export interface LokOSRegistryRecord {
 
 export type LokOSAdapterMode = "cluster-snapshot" | "official-api";
 
+export const LOKOS_STORAGE_KEY = "sakhi-creditlink:lokos:v1";
+const LOKOS_STORAGE_VERSION = 1;
+
 const INITIAL_SNAPSHOT: Record<string, LokOSRegistryRecord> = {
   "GJ-AND-042-SHG-1189": {
     lokosId: "GJ-AND-042-SHG-1189",
@@ -58,9 +61,90 @@ const INITIAL_SNAPSHOT: Record<string, LokOSRegistryRecord> = {
   },
 };
 
-let snapshotStore: Record<string, LokOSRegistryRecord> = { ...INITIAL_SNAPSHOT };
-let currentMode: LokOSAdapterMode = "cluster-snapshot";
-let lastSyncTimestamp = "Today · GLPC Anand/Kheda Block Export";
+interface PersistedLokOSPayload {
+  version: number;
+  mode: LokOSAdapterMode;
+  lastSyncTimestamp: string;
+  snapshotStore: Record<string, LokOSRegistryRecord>;
+}
+
+const DEFAULT_SYNC_LABEL = "Seeded · GLPC Anand/Kheda Block Export";
+
+function loadLokOSFromStorage(): {
+  snapshotStore: Record<string, LokOSRegistryRecord>;
+  mode: LokOSAdapterMode;
+  lastSyncTimestamp: string;
+} {
+  try {
+    if (typeof window === "undefined" || !window.localStorage) {
+      return {
+        snapshotStore: { ...INITIAL_SNAPSHOT },
+        mode: "cluster-snapshot",
+        lastSyncTimestamp: DEFAULT_SYNC_LABEL,
+      };
+    }
+    const raw = window.localStorage.getItem(LOKOS_STORAGE_KEY);
+    if (!raw) {
+      return {
+        snapshotStore: { ...INITIAL_SNAPSHOT },
+        mode: "cluster-snapshot",
+        lastSyncTimestamp: DEFAULT_SYNC_LABEL,
+      };
+    }
+    const parsed = JSON.parse(raw) as Partial<PersistedLokOSPayload>;
+    if (
+      !parsed ||
+      parsed.version !== LOKOS_STORAGE_VERSION ||
+      !parsed.snapshotStore ||
+      typeof parsed.snapshotStore !== "object" ||
+      Object.keys(parsed.snapshotStore).length === 0
+    ) {
+      return {
+        snapshotStore: { ...INITIAL_SNAPSHOT },
+        mode: "cluster-snapshot",
+        lastSyncTimestamp: DEFAULT_SYNC_LABEL,
+      };
+    }
+    return {
+      snapshotStore: parsed.snapshotStore,
+      mode: parsed.mode === "official-api" ? "official-api" : "cluster-snapshot",
+      lastSyncTimestamp:
+        typeof parsed.lastSyncTimestamp === "string"
+          ? parsed.lastSyncTimestamp
+          : DEFAULT_SYNC_LABEL,
+    };
+  } catch {
+    return {
+      snapshotStore: { ...INITIAL_SNAPSHOT },
+      mode: "cluster-snapshot",
+      lastSyncTimestamp: DEFAULT_SYNC_LABEL,
+    };
+  }
+}
+
+function saveLokOSToStorage(
+  snapshotStoreToSave: Record<string, LokOSRegistryRecord>,
+  modeToSave: LokOSAdapterMode,
+  syncLabel: string
+): void {
+  try {
+    if (typeof window === "undefined" || !window.localStorage) return;
+    const payload: PersistedLokOSPayload = {
+      version: LOKOS_STORAGE_VERSION,
+      mode: modeToSave,
+      lastSyncTimestamp: syncLabel,
+      snapshotStore: snapshotStoreToSave,
+    };
+    window.localStorage.setItem(LOKOS_STORAGE_KEY, JSON.stringify(payload));
+  } catch {
+    // Ignore storage write errors
+  }
+}
+
+const initialState = loadLokOSFromStorage();
+let snapshotStore: Record<string, LokOSRegistryRecord> = initialState.snapshotStore;
+let currentMode: LokOSAdapterMode = initialState.mode;
+let lastSyncTimestamp = initialState.lastSyncTimestamp;
 
 export function getLokOSAdapterState() {
   return {
@@ -73,6 +157,20 @@ export function getLokOSAdapterState() {
 
 export function setLokOSAdapterMode(mode: LokOSAdapterMode) {
   currentMode = mode;
+  saveLokOSToStorage(snapshotStore, currentMode, lastSyncTimestamp);
+}
+
+export function resetLokOSSnapshotStorage(): void {
+  snapshotStore = { ...INITIAL_SNAPSHOT };
+  currentMode = "cluster-snapshot";
+  lastSyncTimestamp = DEFAULT_SYNC_LABEL;
+  try {
+    if (typeof window !== "undefined" && window.localStorage) {
+      window.localStorage.removeItem(LOKOS_STORAGE_KEY);
+    }
+  } catch {
+    // Ignore
+  }
 }
 
 /**
@@ -90,7 +188,7 @@ export function importLokOSSnapshotCSV(csvText: string): number {
     const cols = line.split(",").map((c) => c.trim());
     if (cols.length < 2) continue;
     const rawId = cols[0].toUpperCase();
-    if (rawId === "LOKOSID" || rawId === "LOKOS_ID") continue; // skip header
+    if (rawId === "LOKOSID" || rawId === "LOKOS_ID") continue;
 
     snapshotStore[rawId] = {
       lokosId: rawId,
@@ -115,6 +213,7 @@ export function importLokOSSnapshotCSV(csvText: string): number {
 
   if (added > 0) {
     lastSyncTimestamp = `Synced ${added} SHG(s) just now`;
+    saveLokOSToStorage(snapshotStore, currentMode, lastSyncTimestamp);
   }
   return added;
 }

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Activity,
   BadgeIndianRupee,
@@ -14,6 +14,7 @@ import {
   LayoutDashboard,
   LogOut,
   PlusCircle,
+  RotateCcw,
   Scale,
   Search,
   Shield,
@@ -30,6 +31,12 @@ import {
   type SHGCase,
   type UserRole,
 } from "@/data/sakhi-data";
+import {
+  clearCasesStorage,
+  loadCasesState,
+  saveCasesState,
+} from "@/lib/storage";
+import { resetLokOSSnapshotStorage } from "@/lib/lokos-adapter";
 import { SHGIntakeScreen } from "@/screens/SHGIntakeScreen";
 import { RoleProfitDashboardScreen } from "@/screens/RoleProfitDashboardScreen";
 import { CommandCentreScreen } from "@/screens/CommandCentreScreen";
@@ -122,9 +129,10 @@ const PROCESS_CATEGORIES: ProcessCategory[] = [
 ];
 
 export function App() {
+  const initialStored = useMemo(() => loadCasesState(), []);
   const [appView, setAppView] = useState<AppView>("landing");
-  const [cases, setCases] = useState<SHGCase[]>(SHG_CASES_DEMO);
-  const [activeCaseId, setActiveCaseId] = useState<string>(SHG_CASES_DEMO[0].id);
+  const [cases, setCases] = useState<SHGCase[]>(initialStored.cases);
+  const [activeCaseId, setActiveCaseId] = useState<string>(initialStored.activeCaseId);
   const [screen, setScreen] = useState<NavScreenId>("shg-intake");
   const [role, setRole] = useState<UserRole>("shg-leader");
   const [language, setLanguage] = useState<AppLanguage>("en");
@@ -132,6 +140,21 @@ export function App() {
   const [globalSearch, setGlobalSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const [showCaseSwitcher, setShowCaseSwitcher] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
+
+  useEffect(() => {
+    saveCasesState(cases, activeCaseId);
+  }, [cases, activeCaseId]);
+
+  const handleResetDemo = () => {
+    clearCasesStorage();
+    resetLokOSSnapshotStorage();
+    setCases(SHG_CASES_DEMO);
+    setActiveCaseId(SHG_CASES_DEMO[0].id);
+    setSelectedLenderId("off-bob");
+    setConfirmReset(false);
+    setScreen("shg-intake");
+  };
 
   const activeCase = useMemo(
     () => cases.find((c) => c.id === activeCaseId) ?? cases[0],
@@ -432,6 +455,36 @@ export function App() {
                 ))}
               </select>
             </div>
+
+            {confirmReset ? (
+              <div className="flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2 py-1 text-[11.5px]">
+                <span className="font-semibold text-red-700">Reset demo?</span>
+                <button
+                  type="button"
+                  onClick={handleResetDemo}
+                  className="rounded bg-red-600 px-2 py-0.5 font-semibold text-white hover:bg-red-700"
+                >
+                  Yes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmReset(false)}
+                  className="rounded px-1.5 py-0.5 font-medium text-slate-600 hover:bg-white"
+                >
+                  Cancel
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmReset(true)}
+                className="inline-flex h-8 items-center gap-1 rounded-lg border border-[var(--sakhi-border)] bg-white px-2.5 text-[11.5px] font-medium text-[var(--sakhi-muted)] transition-colors hover:bg-amber-50 hover:text-amber-800 hover:border-amber-200"
+                title="Reset demo data to initial seed"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                <span className="hidden md:inline">Reset demo</span>
+              </button>
+            )}
 
             <button
               onClick={() => setAppView("landing")}
