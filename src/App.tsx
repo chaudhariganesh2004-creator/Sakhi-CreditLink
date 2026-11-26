@@ -1,33 +1,17 @@
-import React, { Suspense, lazy, useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import {
-  Activity,
-  BadgeIndianRupee,
-  BarChart3,
-  BookOpenCheck,
-  Building2,
+  ArrowRight,
   ChevronDown,
-  ClipboardCheck,
-  Compass,
-  FileSpreadsheet,
-  FolderCheck,
-  Languages,
-  LayoutDashboard,
   LogOut,
-  PlusCircle,
   RotateCcw,
-  Scale,
   Search,
-  Shield,
-  ShieldCheck,
-  Sparkles,
-  Users,
   X,
 } from "lucide-react";
 import {
-  ROLE_META,
   SHG_CASES_DEMO,
   type AppLanguage,
   type NavScreenId,
+  type PortalRole,
   type SHGCase,
   type UserRole,
 } from "@/data/sakhi-data";
@@ -37,7 +21,8 @@ import {
   saveCasesState,
 } from "@/lib/storage";
 import { resetLokOSSnapshotStorage } from "@/lib/lokos-adapter";
-import { DemoBadge } from "@/components/shared/ui-primitives";
+import { SimulatedBadge } from "@/components/shared/ui-primitives";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const LandingPage = lazy(() =>
@@ -46,33 +31,16 @@ const LandingPage = lazy(() =>
 const SHGIntakeScreen = lazy(() =>
   import("@/screens/SHGIntakeScreen").then((m) => ({ default: m.SHGIntakeScreen }))
 );
-const RoleProfitDashboardScreen = lazy(() =>
-  import("@/screens/RoleProfitDashboardScreen").then((m) => ({
-    default: m.RoleProfitDashboardScreen,
-  }))
-);
-const CommandCentreScreen = lazy(() =>
-  import("@/screens/CommandCentreScreen").then((m) => ({ default: m.CommandCentreScreen }))
-);
-const DirectoryScreen = lazy(() =>
-  import("@/screens/DirectoryScreen").then((m) => ({ default: m.DirectoryScreen }))
-);
 const FinancePassportScreen = lazy(() =>
   import("@/screens/FinancePassportScreen").then((m) => ({ default: m.FinancePassportScreen }))
 );
-const CreditDemandScreen = lazy(() =>
-  import("@/screens/CreditDemandScreen").then((m) => ({ default: m.CreditDemandScreen }))
-);
-const FinancingBlueprintScreen = lazy(() =>
-  import("@/screens/FinancingBlueprintScreen").then((m) => ({
-    default: m.FinancingBlueprintScreen,
+const CashFlowBlueprintStepper = lazy(() =>
+  import("@/screens/CashFlowBlueprintStepper").then((m) => ({
+    default: m.CashFlowBlueprintStepper,
   }))
 );
 const SchemeMatchScreen = lazy(() =>
   import("@/screens/SchemeMatchScreen").then((m) => ({ default: m.SchemeMatchScreen }))
-);
-const OfferComparisonScreen = lazy(() =>
-  import("@/screens/OfferComparisonScreen").then((m) => ({ default: m.OfferComparisonScreen }))
 );
 const ApplicationPackScreen = lazy(() =>
   import("@/screens/ApplicationPackScreen").then((m) => ({ default: m.ApplicationPackScreen }))
@@ -82,116 +50,126 @@ const PostDisbursementGuardScreen = lazy(() =>
     default: m.PostDisbursementGuardScreen,
   }))
 );
-const LivelihoodEvidenceScreen = lazy(() =>
-  import("@/screens/LivelihoodEvidenceScreen").then((m) => ({
-    default: m.LivelihoodEvidenceScreen,
+const BankQueuePlaceholderScreen = lazy(() =>
+  import("@/screens/BankQueuePlaceholderScreen").then((m) => ({
+    default: m.BankQueuePlaceholderScreen,
   }))
 );
-const FieldFollowupsScreen = lazy(() =>
-  import("@/screens/FieldFollowupsScreen").then((m) => ({ default: m.FieldFollowupsScreen }))
+const OfferComparisonScreen = lazy(() =>
+  import("@/screens/OfferComparisonScreen").then((m) => ({ default: m.OfferComparisonScreen }))
+);
+const CommandCentreScreen = lazy(() =>
+  import("@/screens/CommandCentreScreen").then((m) => ({ default: m.CommandCentreScreen }))
 );
 const ProgrammeInsightsScreen = lazy(() =>
   import("@/screens/ProgrammeInsightsScreen").then((m) => ({
     default: m.ProgrammeInsightsScreen,
   }))
 );
+const DirectoryScreen = lazy(() =>
+  import("@/screens/DirectoryScreen").then((m) => ({ default: m.DirectoryScreen }))
+);
+const FieldFollowupsScreen = lazy(() =>
+  import("@/screens/FieldFollowupsScreen").then((m) => ({ default: m.FieldFollowupsScreen }))
+);
+const RoleProfitDashboardScreen = lazy(() =>
+  import("@/screens/RoleProfitDashboardScreen").then((m) => ({
+    default: m.RoleProfitDashboardScreen,
+  }))
+);
+
+type AppView = "landing" | "portal";
+
+interface RoleNavConfig {
+  label: string;
+  legacyRole: UserRole;
+  defaultScreen: NavScreenId;
+  navItems: { id: NavScreenId; label: string; labelGu: string }[];
+}
+
+const ROLE_CONFIGS: Record<PortalRole, RoleNavConfig> = {
+  "shg-sakhi": {
+    label: "SHG / Bank Sakhi",
+    legacyRole: "bank-sakhi",
+    defaultScreen: "shg-intake",
+    navItems: [
+      { id: "shg-intake", label: "Intake", labelGu: "અરજી દાખલ" },
+      { id: "finance-passport", label: "Finance Passport", labelGu: "ફાઇનાન્સ પાસપોર્ટ" },
+      { id: "cashflow-blueprint", label: "Cash-flow blueprint", labelGu: "રોકડ પ્રવાહ" },
+      { id: "scheme-match", label: "Scheme Match", labelGu: "યોજના મેચિંગ" },
+      { id: "application-pack", label: "Application Pack", labelGu: "અરજી પેક" },
+      { id: "post-disbursement", label: "0% Subvention Guard", labelGu: "૦% વ્યાજ રક્ષક" },
+    ],
+  },
+  "bank-branch": {
+    label: "Bank Branch",
+    legacyRole: "bank-officer",
+    defaultScreen: "bank-queue",
+    navItems: [
+      { id: "bank-queue", label: "Queue", labelGu: "બેંક કતાર" },
+      { id: "offer-comparison", label: "Offer Comparison", labelGu: "બેંક શરતો" },
+    ],
+  },
+  "district-official": {
+    label: "District Official",
+    legacyRole: "glpc-officer",
+    defaultScreen: "command-centre",
+    navItems: [
+      { id: "command-centre", label: "Command Centre", labelGu: "કમાન્ડ સેન્ટર" },
+      { id: "programme-insights", label: "Programme Insights", labelGu: "કાર્યક્રમ વિશ્લેષણ" },
+      { id: "shg-directory", label: "Directory", labelGu: "જૂથ ડિરેક્ટરી" },
+      { id: "field-followups", label: "Field Follow-ups", labelGu: "ફીલ્ડ ફોલો-અપ" },
+      { id: "role-profit-dashboard", label: "Sustainability and pilot assumptions", labelGu: "પાયલોટ અને ટકાઉપણું" },
+    ],
+  },
+};
+
+function parseHashRoute(): { view: AppView; role: PortalRole; screen: NavScreenId } {
+  if (typeof window === "undefined") {
+    return { view: "landing", role: "shg-sakhi", screen: "shg-intake" };
+  }
+  const raw = window.location.hash.replace(/^#\/?/, "").trim();
+  if (!raw) {
+    return { view: "landing", role: "shg-sakhi", screen: "shg-intake" };
+  }
+  const [rolePart, screenPart] = raw.split("/");
+  if (rolePart && rolePart in ROLE_CONFIGS) {
+    const validRole = rolePart as PortalRole;
+    const cfg = ROLE_CONFIGS[validRole];
+    const allowed = cfg.navItems.some((item) => item.id === screenPart);
+    return {
+      view: "portal",
+      role: validRole,
+      screen: allowed ? (screenPart as NavScreenId) : cfg.defaultScreen,
+    };
+  }
+  return { view: "landing", role: "shg-sakhi", screen: "shg-intake" };
+}
 
 function ScreenSkeleton() {
   return (
-    <div className="space-y-4 py-4 animate-pulse" aria-busy="true" aria-label="Loading view">
-      <div className="h-8 w-64 rounded-lg bg-slate-200/80" />
-      <div className="h-4 w-96 max-w-full rounded bg-slate-200/60" />
+    <div className="space-y-4 py-4" aria-busy="true" aria-label="Loading view">
+      <div className="h-8 w-64 rounded-md bg-[#E6E1D6]" />
+      <div className="h-4 w-80 max-w-full rounded-md bg-[#ECE8DF]" />
       <div className="grid gap-4 pt-2 sm:grid-cols-3">
-        <div className="h-28 rounded-xl bg-white/80 border border-slate-200/80" />
-        <div className="h-28 rounded-xl bg-white/80 border border-slate-200/80" />
-        <div className="h-28 rounded-xl bg-white/80 border border-slate-200/80" />
+        <div className="h-24 rounded-lg border border-[#DFDBD0] bg-white" />
+        <div className="h-24 rounded-lg border border-[#DFDBD0] bg-white" />
+        <div className="h-24 rounded-lg border border-[#DFDBD0] bg-white" />
       </div>
-      <div className="h-64 rounded-xl bg-white/80 border border-slate-200/80" />
+      <div className="h-56 rounded-lg border border-[#DFDBD0] bg-white" />
     </div>
   );
 }
 
-type AppView = "landing" | "portal";
-
-type ProcessCategoryId =
-  | "application"
-  | "diagnosis"
-  | "matching"
-  | "pack"
-  | "programme";
-
-interface ProcessCategory {
-  id: ProcessCategoryId;
-  stepLabel: string;
-  label: string;
-  defaultScreen: NavScreenId;
-  items: { id: NavScreenId; label: string; icon: React.ElementType }[];
-}
-
-const PROCESS_CATEGORIES: ProcessCategory[] = [
-  {
-    id: "application",
-    stepLabel: "01",
-    label: "Application",
-    defaultScreen: "shg-intake",
-    items: [
-      { id: "shg-intake", label: "New SHG Intake", icon: PlusCircle },
-      { id: "finance-passport", label: "Finance Passport", icon: BookOpenCheck },
-      { id: "credit-demand", label: "Credit Demand", icon: FileSpreadsheet },
-    ],
-  },
-  {
-    id: "diagnosis",
-    stepLabel: "02",
-    label: "Diagnosis",
-    defaultScreen: "financing-blueprint",
-    items: [
-      { id: "financing-blueprint", label: "Financing Blueprint", icon: Activity },
-      { id: "livelihood-evidence", label: "Livelihood Evidence", icon: Building2 },
-    ],
-  },
-  {
-    id: "matching",
-    stepLabel: "03",
-    label: "Matching",
-    defaultScreen: "scheme-match",
-    items: [
-      { id: "scheme-match", label: "Scheme Match", icon: Compass },
-      { id: "offer-comparison", label: "Offer Comparison", icon: Scale },
-    ],
-  },
-  {
-    id: "pack",
-    stepLabel: "04",
-    label: "Application Pack",
-    defaultScreen: "application-pack",
-    items: [
-      { id: "application-pack", label: "Pack & Submission", icon: FolderCheck },
-      { id: "post-disbursement", label: "Post-Disbursement & 0% Guard", icon: ShieldCheck },
-    ],
-  },
-  {
-    id: "programme",
-    stepLabel: "05",
-    label: "Programme",
-    defaultScreen: "command-centre",
-    items: [
-      { id: "command-centre", label: "Command Centre", icon: LayoutDashboard },
-      { id: "shg-directory", label: "SHG Directory", icon: Users },
-      { id: "field-followups", label: "Field Follow-ups", icon: ClipboardCheck },
-      { id: "programme-insights", label: "Insights", icon: BarChart3 },
-      { id: "role-profit-dashboard", label: "Role & Profit Hub", icon: BadgeIndianRupee },
-    ],
-  },
-];
-
 export function App() {
+  const initialRoute = useMemo(() => parseHashRoute(), []);
   const initialStored = useMemo(() => loadCasesState(), []);
-  const [appView, setAppView] = useState<AppView>("landing");
+
+  const [appView, setAppView] = useState<AppView>(initialRoute.view);
+  const [portalRole, setPortalRole] = useState<PortalRole>(initialRoute.role);
+  const [screen, setScreen] = useState<NavScreenId>(initialRoute.screen);
   const [cases, setCases] = useState<SHGCase[]>(initialStored.cases);
   const [activeCaseId, setActiveCaseId] = useState<string>(initialStored.activeCaseId);
-  const [screen, setScreen] = useState<NavScreenId>("shg-intake");
-  const [role, setRole] = useState<UserRole>("shg-leader");
   const [language, setLanguage] = useState<AppLanguage>("en");
   const [selectedLenderId, setSelectedLenderId] = useState<string>("off-bob");
   const [globalSearch, setGlobalSearch] = useState("");
@@ -199,31 +177,36 @@ export function App() {
   const [showCaseSwitcher, setShowCaseSwitcher] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
 
+  const roleConfig = ROLE_CONFIGS[portalRole];
+  const legacyRole = roleConfig.legacyRole;
+
   useEffect(() => {
     saveCasesState(cases, activeCaseId);
   }, [cases, activeCaseId]);
 
-  const handleResetDemo = () => {
-    clearCasesStorage();
-    resetLokOSSnapshotStorage();
-    setCases(SHG_CASES_DEMO);
-    setActiveCaseId(SHG_CASES_DEMO[0].id);
-    setSelectedLenderId("off-bob");
-    setConfirmReset(false);
-    setScreen("shg-intake");
-  };
+  // Sync URL hash cleanly on state changes
+  useEffect(() => {
+    const targetHash = appView === "landing" ? "#/" : `#/${portalRole}/${screen}`;
+    if (window.location.hash !== targetHash) {
+      window.location.hash = targetHash;
+    }
+  }, [appView, portalRole, screen]);
+
+  // Support browser back / forward navigation
+  useEffect(() => {
+    const onHashChange = () => {
+      const parsed = parseHashRoute();
+      setAppView(parsed.view);
+      setPortalRole(parsed.role);
+      setScreen(parsed.screen);
+    };
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
 
   const activeCase = useMemo(
     () => cases.find((c) => c.id === activeCaseId) ?? cases[0],
     [cases, activeCaseId]
-  );
-
-  const activeCategory = useMemo(
-    () =>
-      PROCESS_CATEGORIES.find((cat) =>
-        cat.items.some((item) => item.id === screen)
-      ) ?? PROCESS_CATEGORIES[0],
-    [screen]
   );
 
   const handleUpdateCase = (updated: SHGCase) => {
@@ -233,20 +216,53 @@ export function App() {
   const handleCreateCase = (newCase: SHGCase) => {
     setCases((prev) => [newCase, ...prev]);
     setActiveCaseId(newCase.id);
-    // Start the diagnosis & matching flow immediately on their newly entered data
-    setScreen("financing-blueprint");
+    setScreen("cashflow-blueprint");
   };
 
-  const handleSelectCase = (caseId: string, navigateTo?: NavScreenId) => {
-    setActiveCaseId(caseId);
-    if (navigateTo) setScreen(navigateTo);
-    setGlobalSearch("");
+  const handleRoleSwitch = (nextRole: PortalRole) => {
+    setPortalRole(nextRole);
+    setScreen(ROLE_CONFIGS[nextRole].defaultScreen);
+    setAppView("portal");
     setShowSearch(false);
     setShowCaseSwitcher(false);
   };
 
   const handleNavigate = (target: NavScreenId) => {
+    // Map sub-screens inside Cash-flow blueprint to the unified stepper
+    if (
+      target === "credit-demand" ||
+      target === "livelihood-evidence" ||
+      target === "financing-blueprint"
+    ) {
+      setScreen("cashflow-blueprint");
+      return;
+    }
+    // Find which role owns target if jumping across
+    const ownerEntry = (Object.entries(ROLE_CONFIGS) as [PortalRole, RoleNavConfig][]).find(
+      ([, cfg]) => cfg.navItems.some((item) => item.id === target)
+    );
+    if (ownerEntry && ownerEntry[0] !== portalRole) {
+      setPortalRole(ownerEntry[0]);
+    }
     setScreen(target);
+  };
+
+  const handleSelectCase = (caseId: string, navigateTo?: NavScreenId) => {
+    setActiveCaseId(caseId);
+    if (navigateTo) handleNavigate(navigateTo);
+    setGlobalSearch("");
+    setShowSearch(false);
+    setShowCaseSwitcher(false);
+  };
+
+  const handleResetDemo = () => {
+    clearCasesStorage();
+    resetLokOSSnapshotStorage();
+    setCases(SHG_CASES_DEMO);
+    setActiveCaseId(SHG_CASES_DEMO[0].id);
+    setSelectedLenderId("off-bob");
+    setConfirmReset(false);
+    setScreen(ROLE_CONFIGS[portalRole].defaultScreen);
   };
 
   const searchMatches = useMemo(() => {
@@ -263,16 +279,33 @@ export function App() {
 
   if (appView === "landing") {
     return (
-      <Suspense fallback={<div className="min-h-screen p-8"><ScreenSkeleton /></div>}>
+      <Suspense fallback={<div className="min-h-screen bg-[#FAF8F4] p-6"><ScreenSkeleton /></div>}>
         <LandingPage
-          onEnterPortal={() => {
-            setScreen("shg-intake");
-            setAppView("portal");
-          }}
+          language={language}
+          onChangeLanguage={setLanguage}
+          onEnterPortal={(targetRole) => handleRoleSwitch(targetRole ?? "shg-sakhi")}
         />
       </Suspense>
     );
   }
+
+  // Mobile sticky bottom CTA for current screen (at most 1 primary CTA per screen)
+  const mobileAction: { label: string; onClick: () => void } | null = (() => {
+    switch (screen) {
+      case "finance-passport":
+        return { label: "Next: Cash-flow blueprint", onClick: () => handleNavigate("cashflow-blueprint") };
+      case "scheme-match":
+        return { label: "Next: Application Pack", onClick: () => handleNavigate("application-pack") };
+      case "application-pack":
+        return { label: "View 0% Subvention Guard", onClick: () => handleNavigate("post-disbursement") };
+      case "bank-queue":
+        return { label: "View Product Terms", onClick: () => handleNavigate("offer-comparison") };
+      case "command-centre":
+        return { label: "Open SHG Directory", onClick: () => handleNavigate("shg-directory") };
+      default:
+        return null;
+    }
+  })();
 
   const renderScreen = () => {
     switch (screen) {
@@ -280,35 +313,7 @@ export function App() {
         return (
           <SHGIntakeScreen
             onCreateCase={handleCreateCase}
-            onCancel={() => setScreen("finance-passport")}
-          />
-        );
-      case "role-profit-dashboard":
-        return (
-          <RoleProfitDashboardScreen
-            cases={cases}
-            role={role}
-            onChangeRole={setRole}
-            onSelectCase={handleSelectCase}
-            onNavigate={handleNavigate}
-          />
-        );
-      case "command-centre":
-        return (
-          <CommandCentreScreen
-            cases={cases}
-            activeCaseId={activeCase.id}
-            role={role}
-            onSelectCase={handleSelectCase}
-            onNavigate={handleNavigate}
-          />
-        );
-      case "shg-directory":
-        return (
-          <DirectoryScreen
-            cases={cases}
-            activeCaseId={activeCase.id}
-            onSelectCase={handleSelectCase}
+            onCancel={() => handleNavigate("finance-passport")}
           />
         );
       case "finance-passport":
@@ -316,28 +321,20 @@ export function App() {
           <FinancePassportScreen
             key={activeCase.id}
             shg={activeCase}
-            role={role}
+            role={legacyRole}
             language={language}
             onUpdateCase={handleUpdateCase}
             onNavigate={handleNavigate}
           />
         );
-      case "credit-demand":
+      case "cashflow-blueprint":
         return (
-          <CreditDemandScreen
+          <CashFlowBlueprintStepper
             key={activeCase.id}
             shg={activeCase}
-            role={role}
+            role={legacyRole}
             language={language}
             onUpdateCase={handleUpdateCase}
-            onNavigate={handleNavigate}
-          />
-        );
-      case "financing-blueprint":
-        return (
-          <FinancingBlueprintScreen
-            key={activeCase.id}
-            shg={activeCase}
             onNavigate={handleNavigate}
           />
         );
@@ -351,22 +348,12 @@ export function App() {
             onNavigate={handleNavigate}
           />
         );
-      case "offer-comparison":
-        return (
-          <OfferComparisonScreen
-            key={activeCase.id}
-            shg={activeCase}
-            selectedLenderId={selectedLenderId}
-            onSelectLender={setSelectedLenderId}
-            onNavigate={handleNavigate}
-          />
-        );
       case "application-pack":
         return (
           <ApplicationPackScreen
             key={activeCase.id}
             shg={activeCase}
-            role={role}
+            role={legacyRole}
             selectedLenderId={selectedLenderId}
             onUpdateCase={handleUpdateCase}
           />
@@ -381,12 +368,42 @@ export function App() {
             onSelectCase={handleSelectCase}
           />
         );
-      case "livelihood-evidence":
+      case "bank-queue":
         return (
-          <LivelihoodEvidenceScreen
+          <BankQueuePlaceholderScreen
+            cases={cases}
+            onSelectCase={handleSelectCase}
+            onNavigate={handleNavigate}
+          />
+        );
+      case "offer-comparison":
+        return (
+          <OfferComparisonScreen
             key={activeCase.id}
             shg={activeCase}
-            onUpdateCase={handleUpdateCase}
+            selectedLenderId={selectedLenderId}
+            onSelectLender={setSelectedLenderId}
+            onNavigate={handleNavigate}
+          />
+        );
+      case "command-centre":
+        return (
+          <CommandCentreScreen
+            cases={cases}
+            activeCaseId={activeCase.id}
+            role={legacyRole}
+            onSelectCase={handleSelectCase}
+            onNavigate={handleNavigate}
+          />
+        );
+      case "programme-insights":
+        return <ProgrammeInsightsScreen />;
+      case "shg-directory":
+        return (
+          <DirectoryScreen
+            cases={cases}
+            activeCaseId={activeCase.id}
+            onSelectCase={handleSelectCase}
           />
         );
       case "field-followups":
@@ -397,159 +414,125 @@ export function App() {
             onUpdateCase={handleUpdateCase}
           />
         );
-      case "programme-insights":
-        return <ProgrammeInsightsScreen />;
+      case "role-profit-dashboard":
+        return (
+          <RoleProfitDashboardScreen
+            cases={cases}
+            role={legacyRole}
+            onChangeRole={() => {}}
+            onSelectCase={handleSelectCase}
+            onNavigate={handleNavigate}
+          />
+        );
       default:
         return null;
     }
   };
 
   return (
-    <div className="min-h-screen ios-canvas">
-      {/* ─── Clean 5-Stage iOS Frosted Glass Navigation Bar ─── */}
-      <header className="fixed top-0 inset-x-0 z-50 border-b border-white/60 ios-glass-strong">
-        {/* Primary Row: Brand + 5 Process Stages + Controls */}
-        <div className="mx-auto flex h-14 max-w-[1400px] items-center justify-between gap-4 px-4 lg:px-6">
-          {/* Brand + Active SHG */}
-          <div className="flex items-center gap-3 shrink-0">
+    <div className="min-h-screen bg-[#FAF8F4] text-[#141A23]">
+      {/* ─── Single-Row 56px Header (strictly <=56px at 360px) ─── */}
+      <header className="sticky top-0 z-50 h-14 border-b border-[#DFDBD0] bg-white">
+        <div className="mx-auto flex h-14 max-w-[1320px] items-center justify-between gap-2 px-3 md:px-6">
+          {/* Left: Logo + 3-Role Switcher */}
+          <div className="flex items-center gap-2 min-w-0">
             <button
+              type="button"
               onClick={() => setAppView("landing")}
-              className="flex items-center gap-2.5 text-left"
+              className="flex items-center gap-2 rounded-md p-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F5E4E]"
               title="Back to Landing Page"
             >
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--sakhi-forest)]">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2.2">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                  <path d="M2 17l10 5 10-5" />
-                  <path d="M2 12l10 5 10-5" />
-                </svg>
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#0F5E4E] font-mono text-[12px] font-semibold text-white">
+                SC
               </div>
-              <span className="hidden md:inline text-[15px] font-bold tracking-tight text-[var(--sakhi-slate)]">
+              <span className="hidden lg:inline text-[14.5px] font-bold tracking-tight text-[#141A23]">
                 Sakhi CreditLink
               </span>
             </button>
 
-            <div className="hidden sm:block h-5 w-px bg-[var(--sakhi-border)]" />
+            <label htmlFor="portal-role-select" className="sr-only">
+              Select role workspace
+            </label>
+            <select
+              id="portal-role-select"
+              value={portalRole}
+              onChange={(e) => handleRoleSwitch(e.target.value as PortalRole)}
+              className="h-9 max-w-[138px] sm:max-w-none rounded-md border border-[#C9C3B4] bg-[#FAF8F4] px-2 text-[12px] sm:text-[12.5px] font-semibold text-[#141A23] focus:border-[#0F5E4E] focus:outline-none"
+            >
+              {(Object.keys(ROLE_CONFIGS) as PortalRole[]).map((rk) => (
+                <option key={rk} value={rk}>
+                  {ROLE_CONFIGS[rk].label}
+                </option>
+              ))}
+            </select>
 
-            {/* Active SHG Switcher Pill */}
-            {screen !== "shg-intake" && (
-              <button
-                onClick={() => setShowCaseSwitcher(!showCaseSwitcher)}
-                className="group hidden sm:flex items-center gap-2 rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-2.5 py-1 text-[12.5px] transition-all hover:border-[var(--sakhi-forest)]/30 hover:bg-white"
-              >
-                <span className="max-w-[150px] truncate font-semibold text-[var(--sakhi-slate)]">
-                  {activeCase.shgName}
-                </span>
-                <ChevronDown className="h-3.5 w-3.5 text-[var(--sakhi-muted)]" />
-              </button>
-            )}
+            <div className="hidden xl:block">
+              <SimulatedBadge compact />
+            </div>
           </div>
 
-          {/* Center: 5 Process Stage Categories */}
-          <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
-            {PROCESS_CATEGORIES.map((cat) => {
-              const isCurrent = activeCategory.id === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  onClick={() => handleNavigate(cat.defaultScreen)}
-                  className={cn(
-                    "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-[13px] font-medium transition-all",
-                    isCurrent
-                      ? "bg-[var(--sakhi-forest)] text-white shadow-sm"
-                      : "text-[var(--sakhi-muted)] hover:bg-[var(--sakhi-surface)] hover:text-[var(--sakhi-slate)]"
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "font-mono text-[10.5px]",
-                      isCurrent ? "text-white/75" : "text-[var(--sakhi-muted)]"
-                    )}
-                  >
-                    {cat.stepLabel}
-                  </span>
-                  <span>{cat.label}</span>
-                </button>
-              );
-            })}
-          </nav>
-
-          {/* Right: Quick Actions & Controls */}
-          <div className="flex items-center gap-2 shrink-0">
-            {screen !== "shg-intake" && (
+          {/* Right: Language EN | ગુજરાતી (always visible!), Search, Reset demo, Exit */}
+          <div className="flex items-center gap-1.5 shrink-0">
+            <div
+              className="inline-flex items-center rounded-md border border-[#C9C3B4] bg-[#FAF8F4] p-0.5 text-[11.5px]"
+              role="group"
+              aria-label="Language"
+            >
               <button
-                onClick={() => handleNavigate("shg-intake")}
-                className="hidden lg:inline-flex items-center gap-1.5 rounded-lg border border-[var(--sakhi-forest)]/25 bg-[var(--sakhi-mint)] px-3 py-1.5 text-[12px] font-semibold text-[var(--sakhi-forest)] transition-colors hover:bg-[var(--sakhi-forest)] hover:text-white"
+                type="button"
+                onClick={() => setLanguage("en")}
+                className={cn(
+                  "h-7 rounded px-2 font-semibold transition-colors duration-150",
+                  language === "en" ? "bg-[#0F5E4E] text-white" : "text-[#475467]"
+                )}
               >
-                <Sparkles className="h-3.5 w-3.5" /> New Application
+                EN
               </button>
-            )}
+              <button
+                type="button"
+                onClick={() => setLanguage("gu")}
+                className={cn(
+                  "h-7 rounded px-2 font-semibold transition-colors duration-150",
+                  language === "gu" ? "bg-[#0F5E4E] text-white" : "text-[#475467]"
+                )}
+              >
+                ગુજ
+              </button>
+            </div>
 
             <button
+              type="button"
               onClick={() => setShowSearch(!showSearch)}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--sakhi-border)] text-[var(--sakhi-muted)] transition-colors hover:bg-[var(--sakhi-surface)] hover:text-[var(--sakhi-slate)]"
-              aria-label="Search"
+              className="hidden sm:inline-flex h-9 w-9 items-center justify-center rounded-md border border-[#C9C3B4] bg-white text-[#475467] hover:bg-[#F2EFE8]"
+              aria-label="Search SHGs"
             >
               {showSearch ? <X className="h-4 w-4" /> : <Search className="h-4 w-4" />}
             </button>
 
-            <div className="hidden xl:flex items-center gap-1 rounded-lg border border-[var(--sakhi-border)] bg-white px-2 py-1 text-[12px]">
-              <Languages className="h-3.5 w-3.5 text-[var(--sakhi-forest)]" />
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value as AppLanguage)}
-                aria-label="Select language"
-                className="bg-transparent font-medium text-[var(--sakhi-slate)] focus:outline-none cursor-pointer"
-              >
-                <option value="en">EN</option>
-                <option value="en-gu">EN + ગુજરાતી</option>
-                <option value="hi">हिन्दी</option>
-              </select>
-            </div>
-
-            <div className="hidden sm:flex items-center gap-1.5 rounded-lg border border-[var(--sakhi-border)] bg-white px-2 py-1 text-[12px]">
-              <Shield className="h-3.5 w-3.5 text-[var(--sakhi-forest)]" />
-              <select
-                value={role}
-                onChange={(e) => {
-                  setRole(e.target.value as UserRole);
-                  setScreen("role-profit-dashboard");
-                }}
-                aria-label="Switch user role"
-                className="bg-transparent font-medium text-[var(--sakhi-slate)] focus:outline-none cursor-pointer"
-              >
-                {(Object.keys(ROLE_META) as UserRole[]).map((rk) => (
-                  <option key={rk} value={rk}>
-                    {ROLE_META[rk].shortLabel}
-                  </option>
-                ))}
-              </select>
-            </div>
-
             {confirmReset ? (
-              <div className="flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2 py-1 text-[11.5px]">
-                <span className="font-semibold text-red-700">Reset demo?</span>
+              <div className="flex items-center gap-1 rounded-md border border-[#FECACA] bg-[#FEF2F2] px-1.5 py-1 text-[11px]">
                 <button
                   type="button"
                   onClick={handleResetDemo}
-                  className="rounded bg-red-600 px-2 py-0.5 font-semibold text-white hover:bg-red-700"
+                  className="rounded bg-[#B91C1C] px-2 py-0.5 font-semibold text-white"
                 >
-                  Yes
+                  Reset
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmReset(false)}
-                  className="rounded px-1.5 py-0.5 font-medium text-slate-600 hover:bg-white"
+                  className="px-1 font-medium text-[#475467]"
                 >
-                  Cancel
+                  No
                 </button>
               </div>
             ) : (
               <button
                 type="button"
                 onClick={() => setConfirmReset(true)}
-                className="inline-flex h-8 items-center gap-1 rounded-lg border border-[var(--sakhi-border)] bg-white px-2.5 text-[11.5px] font-medium text-[var(--sakhi-muted)] transition-colors hover:bg-amber-50 hover:text-amber-800 hover:border-amber-200"
-                title="Reset demo data to initial seed"
+                className="inline-flex h-9 items-center gap-1 rounded-md border border-[#C9C3B4] bg-white px-2 text-[12px] font-medium text-[#475467] hover:bg-[#FFFBEB] hover:text-[#B45309]"
+                title="Reset demo"
+                aria-label="Reset demo"
               >
                 <RotateCcw className="h-3.5 w-3.5" />
                 <span className="hidden md:inline">Reset demo</span>
@@ -557,87 +540,89 @@ export function App() {
             )}
 
             <button
+              type="button"
               onClick={() => setAppView("landing")}
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--sakhi-border)] text-[var(--sakhi-muted)] transition-colors hover:bg-red-50 hover:text-red-600 hover:border-red-200"
-              aria-label="Exit portal"
+              className="hidden sm:inline-flex h-9 w-9 items-center justify-center rounded-md border border-[#C9C3B4] bg-white text-[#475467] hover:bg-[#FEF2F2] hover:text-[#B91C1C]"
+              aria-label="Exit to landing"
               title="Back to landing"
             >
               <LogOut className="h-3.5 w-3.5" />
             </button>
           </div>
         </div>
-
-        {/* Sub-navigation Row: Shows only the 1–4 tools inside the active category */}
-        <div className="border-t border-[var(--sakhi-border)] bg-[var(--sakhi-surface)]/80">
-          <div className="mx-auto flex max-w-[1400px] items-center justify-between px-4 py-1.5 lg:px-6">
-            <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
-              <span className="mr-1 text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">
-                {activeCategory.label}:
-              </span>
-              {activeCategory.items.map((item) => {
-                const Icon = item.icon;
-                const active = screen === item.id;
-                return (
-                  <button
-                    key={item.id}
-                    onClick={() => handleNavigate(item.id)}
-                    className={cn(
-                      "flex shrink-0 items-center gap-1.5 rounded-lg px-3 py-1.5 text-[12.5px] font-medium transition-all",
-                      active
-                        ? "bg-white text-[var(--sakhi-forest)] shadow-sm ring-1 ring-[var(--sakhi-border)]"
-                        : "text-[var(--sakhi-muted)] hover:text-[var(--sakhi-slate)]"
-                    )}
-                  >
-                    <Icon className="h-3.5 w-3.5" />
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {screen !== "shg-intake" && (
-              <div className="hidden md:flex items-center gap-2 text-[12px] text-[var(--sakhi-muted)]">
-                <DemoBadge compact />
-                <span>·</span>
-                <span className="font-mono">{activeCase.caseCode}</span>
-                <span>·</span>
-                <span className="font-semibold text-[var(--sakhi-forest)]">
-                  {activeCase.readinessScore}% Ready
-                </span>
-              </div>
-            )}
-          </div>
-        </div>
       </header>
 
-      {/* Search overlay */}
+      {/* ─── One-Row Role Workflow Nav + Active SHG Context ─── */}
+      <nav
+        aria-label="Role workflow navigation"
+        className="border-b border-[#DFDBD0] bg-[#F2EFE8]"
+      >
+        <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-3 px-3 py-1.5 md:px-6">
+          <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+            {roleConfig.navItems.map((item) => {
+              const active = screen === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleNavigate(item.id)}
+                  className={cn(
+                    "min-h-[38px] shrink-0 rounded-md px-3 py-1.5 text-[12.5px] font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F5E4E]",
+                    active
+                      ? "bg-[#0F5E4E] text-white"
+                      : "text-[#475467] hover:bg-white hover:text-[#141A23]"
+                  )}
+                >
+                  {language === "gu" ? item.labelGu : item.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Active SHG Switcher & Simulated Pill */}
+          <div className="hidden md:flex items-center gap-2 shrink-0">
+            <div className="xl:hidden">
+              <SimulatedBadge compact />
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowCaseSwitcher(!showCaseSwitcher)}
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-[#C9C3B4] bg-white px-2.5 text-[12px] font-semibold text-[#141A23] hover:bg-[#FAF8F4]"
+            >
+              <span className="max-w-[160px] truncate">{activeCase.shgName}</span>
+              <span className="font-mono text-[#0F5E4E]">{activeCase.readinessScore}%</span>
+              <ChevronDown className="h-3.5 w-3.5 text-[#475467]" />
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Search Popover */}
       {showSearch && (
-        <div className="fixed inset-x-0 top-[98px] z-40 border-b border-[var(--sakhi-border)] bg-white shadow-xl shadow-black/5">
-          <div className="mx-auto max-w-2xl px-4 py-4">
+        <div className="border-b border-[#DFDBD0] bg-white px-4 py-3">
+          <div className="mx-auto max-w-2xl">
             <div className="relative">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[var(--sakhi-muted)]" />
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#475467]" />
               <input
                 type="text"
                 value={globalSearch}
                 onChange={(e) => setGlobalSearch(e.target.value)}
                 placeholder="Search SHGs by name, case ID, or activity..."
                 autoFocus
-                className="h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] pl-10 pr-4 text-[14px] text-[var(--sakhi-slate)] placeholder:text-[var(--sakhi-muted)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[var(--sakhi-forest)]/10"
+                className="h-10 w-full rounded-md border border-[#C9C3B4] bg-[#FAF8F4] pl-9 pr-3 text-[13.5px] focus:border-[#0F5E4E] focus:bg-white focus:outline-none"
               />
             </div>
             {searchMatches.length > 0 && (
-              <div className="mt-3 space-y-1 rounded-xl border border-[var(--sakhi-border)] bg-white p-2">
+              <div className="mt-2 divide-y divide-[#DFDBD0] rounded-md border border-[#DFDBD0] bg-white">
                 {searchMatches.map((m) => (
                   <button
                     key={m.id}
+                    type="button"
                     onClick={() => handleSelectCase(m.id, "finance-passport")}
-                    className="flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-colors hover:bg-[var(--sakhi-surface)]"
+                    className="flex w-full items-center justify-between px-3 py-2 text-left text-[13px] hover:bg-[#FAF8F4]"
                   >
-                    <div>
-                      <div className="text-[14px] font-semibold text-[var(--sakhi-slate)]">{m.shgName}</div>
-                      <div className="text-[12px] text-[var(--sakhi-muted)]">{m.activity} · {m.block}</div>
-                    </div>
-                    <span className="font-mono text-[12px] text-[var(--sakhi-forest)]">{m.caseCode}</span>
+                    <span className="font-semibold text-[#141A23]">{m.shgName}</span>
+                    <span className="font-mono text-[12px] text-[#0F5E4E]">{m.caseCode}</span>
                   </button>
                 ))}
               </div>
@@ -646,42 +631,42 @@ export function App() {
         </div>
       )}
 
-      {/* Case switcher dropdown */}
+      {/* Case Switcher Popover (with flat modal shadow only) */}
       {showCaseSwitcher && (
         <>
           <div className="fixed inset-0 z-30" onClick={() => setShowCaseSwitcher(false)} />
-          <div className="fixed left-4 sm:left-[180px] top-[52px] z-40 w-80 rounded-xl border border-[var(--sakhi-border)] bg-white p-2 shadow-xl shadow-black/10">
-            <div className="mb-2 flex items-center justify-between px-2">
-              <span className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">
-                Active SHG Cases
+          <div className="fixed right-4 top-24 z-40 w-80 rounded-lg border border-[#C9C3B4] bg-white p-2 shadow-[0_4px_12px_rgba(20,26,35,0.08)]">
+            <div className="mb-1.5 flex items-center justify-between px-2 py-1">
+              <span className="text-[11px] font-semibold uppercase tracking-wider text-[#475467]">
+                Switch Active SHG
               </span>
               <button
+                type="button"
                 onClick={() => {
                   setShowCaseSwitcher(false);
                   handleNavigate("shg-intake");
                 }}
-                className="text-[11.5px] font-semibold text-[var(--sakhi-forest)] hover:underline"
+                className="text-[12px] font-semibold text-[#0F5E4E] hover:underline"
               >
                 + New SHG
               </button>
             </div>
-            <div className="max-h-72 overflow-y-auto space-y-1">
+            <div className="max-h-72 overflow-y-auto divide-y divide-[#F2EFE8]">
               {cases.map((c) => (
                 <button
                   key={c.id}
+                  type="button"
                   onClick={() => handleSelectCase(c.id)}
                   className={cn(
-                    "flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition-colors",
-                    c.id === activeCaseId
-                      ? "bg-[var(--sakhi-mint)] text-[var(--sakhi-forest)]"
-                      : "hover:bg-[var(--sakhi-surface)] text-[var(--sakhi-slate)]"
+                    "flex w-full items-center justify-between px-3 py-2 text-left transition-colors duration-150",
+                    c.id === activeCaseId ? "bg-[#ECFDF5] text-[#0F5E4E]" : "hover:bg-[#FAF8F4]"
                   )}
                 >
                   <div className="min-w-0 pr-2">
                     <div className="truncate text-[13px] font-semibold">{c.shgName}</div>
-                    <div className="truncate text-[11px] text-[var(--sakhi-muted)]">{c.block} · {c.activity}</div>
+                    <div className="truncate text-[11.5px] text-[#475467]">{c.block} · {c.activity}</div>
                   </div>
-                  <span className="shrink-0 text-[12px] font-semibold text-[var(--sakhi-forest)] tabular-nums">{c.readinessScore}%</span>
+                  <span className="font-mono text-[12px] font-semibold tabular-nums">{c.readinessScore}%</span>
                 </button>
               ))}
             </div>
@@ -690,13 +675,21 @@ export function App() {
       )}
 
       {/* Main Content */}
-      <main className="pt-[118px]">
-        <div className="mx-auto max-w-[1400px] px-4 py-8 lg:px-6">
-          <Suspense fallback={<ScreenSkeleton />}>
-            {renderScreen()}
-          </Suspense>
-        </div>
+      <main className={cn("mx-auto max-w-[1320px] px-4 py-6 md:px-6 md:py-8", mobileAction && "pb-24 md:pb-8")}>
+        <Suspense fallback={<ScreenSkeleton />}>
+          {renderScreen()}
+        </Suspense>
       </main>
+
+      {/* Sticky Mobile Bottom Action Bar (56px + safe-area, single primary CTA) */}
+      {mobileAction && (
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DFDBD0] bg-white px-4 py-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))] md:hidden no-print">
+          <Button variant="primary" className="w-full" onClick={mobileAction.onClick}>
+            {mobileAction.label}
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
