@@ -1,6 +1,6 @@
 import React from "react";
+import { motion } from "framer-motion";
 import {
-  ArrowRight,
   ArrowUpRight,
   CheckCircle2,
   ExternalLink,
@@ -8,6 +8,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import type { AppLanguage, PortalRole } from "@/data/sakhi-data";
+import { AnimatedMarqueeHero } from "@/components/ui/hero-3";
 import { Button } from "@/components/ui/button";
 import { Card, SimulatedBadge } from "@/components/ui/primitives";
 
@@ -16,6 +17,17 @@ interface LandingPageProps {
   onChangeLanguage: (lang: AppLanguage) => void;
   onEnterPortal: (targetRole?: PortalRole) => void;
 }
+
+const SHG_GROUP_PHOTOS = [
+  "/images/shg-hero.jpg",
+  "/images/shg-food.jpg",
+  "/images/shg-dairy.jpg",
+  "/images/shg-tailoring.jpg",
+  "/images/shg-hero.jpg",
+  "/images/shg-food.jpg",
+  "/images/shg-dairy.jpg",
+  "/images/shg-tailoring.jpg",
+];
 
 const GOVT_PORTALS = [
   {
@@ -62,6 +74,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onEnterPortal,
 }) => {
   const isGu = language === "gu";
+  const duplicatedPortals = [...GOVT_PORTALS, ...GOVT_PORTALS];
 
   return (
     <div className="min-h-screen bg-[#FAF8F4] text-[#141A23]">
@@ -119,88 +132,108 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         </div>
       </header>
 
-      {/* ─── Editorial 2-Column Hero ─── */}
-      <section className="mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-14">
-        <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
-          <div className="lg:col-span-7 space-y-5">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="rounded-md border border-[#DFDBD0] bg-[#F2EFE8] px-2.5 py-1 font-mono text-[11px] font-medium text-[#475467]">
-                SEVA First Innovation · PS000311
-              </span>
-              <SimulatedBadge />
-            </div>
-
-            <h1 className="font-serif text-[34px] md:text-[46px] font-semibold leading-[1.12] tracking-tight text-[#141A23]">
-              {isGu
-                ? "સખી મંડળોને લક્ષ્યાંકથી વાસ્તવિક બેંક ધિરાણ સુધી લઈ જતું પ્લેટફોર્મ."
-                : "Move Sakhi Mandals from credit targets to real bank access."}
-            </h1>
-
-            <p className="max-w-xl text-[15.5px] leading-relaxed text-[#475467]">
-              {isGu
-                ? "લોકOS ચકાસણી, ૬× કોર્પસ નિયમ, ૬–૧૨ મહિનાના વેચાણ આધારિત રોકડ પ્રવાહ અને ૦% વ્યાજ સબવેન્શન ટ્રેકિંગ સાથે બેંક-તૈયાર અરજી પેક."
-                : "Verify NRLM LokOS identity, size working capital vs Capex against RBI's 6× corpus norm, match Gujarat & GLPC schemes, and track bank branch SLAs."}
-            </p>
-
-            {/* Target vs Access Gap Callout */}
-            <div className="rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[11.5px] font-semibold uppercase tracking-wider text-[#B45309]">
-                  The Target-vs-Access Gap (Illustrative Baseline)
-                </span>
-                <span className="font-mono text-[11px] text-[#B45309]">Simulated pilot</span>
-              </div>
-              <p className="mt-1.5 text-[13.5px] text-[#141A23]">
-                Systems track <strong>number of SHGs linked</strong>, while real access stalls on{" "}
-                <strong>time-to-credit (34d → 18d target)</strong>, <strong>under-sized tickets</strong>, and{" "}
-                <strong>missing cashbook / buyer proof</strong>.
-              </p>
-            </div>
-
-            {/* Role Entry CTAs (1 Primary + 1 Secondary) */}
-            <div className="flex flex-wrap items-center gap-3 pt-1">
-              <Button variant="primary" size="lg" onClick={() => onEnterPortal("shg-sakhi")}>
-                {isGu ? "સખી મંડળ / બેંક સખી તરીકે દાખલ થાઓ" : "Enter as SHG / Bank Sakhi"}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-              <Button variant="secondary" size="lg" onClick={() => onEnterPortal("bank-branch")}>
-                Enter as Bank Branch
-              </Button>
-              <Button variant="tertiary" size="lg" onClick={() => onEnterPortal("district-official")}>
-                District Official View
-              </Button>
-            </div>
+      {/* ─── Animated Marquee Hero with SHG Group Photos (hero-3) ─── */}
+      <AnimatedMarqueeHero
+        tagline="SEVA First Innovation · PS000311 · Gujarat Sakhi Mandal Gateway"
+        title={
+          isGu ? (
+            <>
+              સખી મંડળોને લક્ષ્યાંકથી
+              <br />
+              <span className="text-[#0F5E4E]">વાસ્તવિક બેંક ધિરાણ સુધી</span>
+            </>
+          ) : (
+            <>
+              From Credit Targets
+              <br />
+              <span className="text-[#0F5E4E]">to Real Bank Access</span>
+            </>
+          )
+        }
+        description={
+          isGu
+            ? "લોકOS ચકાસણી, ૬× કોર્પસ નિયમ, ૬–૧૨ મહિનાના વેચાણ આધારિત રોકડ પ્રવાહ અને ૦% વ્યાજ સબવેન્શન ટ્રેકિંગ સાથે બેંક-તૈયાર અરજી પેક."
+            : "Verify NRLM LokOS identity, size Working Capital vs Capex against RBI's 6× corpus norm, match Gujarat & GLPC schemes, and track bank SLAs."
+        }
+        ctaText={isGu ? "સખી મંડળ / બેંક સખી તરીકે દાખલ થાઓ" : "Enter as SHG / Bank Sakhi"}
+        images={SHG_GROUP_PHOTOS}
+        onCtaClick={() => onEnterPortal("shg-sakhi")}
+        secondaryActions={
+          <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+            <Button variant="secondary" size="sm" onClick={() => onEnterPortal("bank-branch")}>
+              Enter as Bank Branch
+            </Button>
+            <Button variant="tertiary" size="sm" onClick={() => onEnterPortal("district-official")}>
+              District Official View
+            </Button>
           </div>
+        }
+      />
 
-          {/* Static Authentic SHG Photo */}
-          <div className="lg:col-span-5">
-            <Card className="overflow-hidden">
-              <img
-                src="/images/shg-hero.jpg"
-                alt="Sakhi Mandal women members reviewing enterprise ledger in Gujarat"
-                width={900}
-                height={640}
-                className="h-[300px] md:h-[340px] w-full object-cover"
-              />
-              <div className="border-t border-[#DFDBD0] bg-white px-4 py-3 flex items-center justify-between gap-2">
+      {/* ─── Government Websites / Official Portals (Transformed to Tilted Marquee Style) ─── */}
+      <section id="govt-portals" className="border-t border-[#DFDBD0] bg-white overflow-hidden py-14">
+        <div className="mx-auto max-w-4xl px-4 text-center md:px-6">
+          <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-[#DFDBD0] bg-[#FAF8F4] px-4 py-1 text-[12px] font-medium text-[#0F5E4E]">
+            <Globe className="h-3.5 w-3.5" aria-hidden="true" />
+            Official Gujarat &amp; Central Government Portals
+          </div>
+          <h2 className="font-serif text-3xl md:text-4xl font-semibold tracking-tight text-[#141A23]">
+            Direct Access to Government Scheme Websites
+          </h2>
+          <p className="mt-3 mx-auto max-w-2xl text-[14.5px] leading-relaxed text-[#475467]">
+            Sakhi CreditLink prepares your Sakhi Mandal&apos;s pre-application dossier and links
+            directly to official government portals for submission.
+          </p>
+        </div>
+
+        {/* Continuous Tilted Government Website Cards Marquee */}
+        <div className="relative mt-10 w-full overflow-hidden py-4 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+          <motion.div
+            className="flex gap-5 w-max px-4"
+            animate={{
+              x: ["0%", "-50%"],
+              transition: {
+                ease: "linear",
+                duration: 42,
+                repeat: Infinity,
+              },
+            }}
+            whileHover={{ transition: { duration: 140 } }}
+          >
+            {duplicatedPortals.map((portal, idx) => (
+              <motion.a
+                key={`${portal.name}-${idx}`}
+                href={portal.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.03, rotate: 0, y: -4 }}
+                style={{ rotate: `${idx % 2 === 0 ? -1.8 : 2.2}deg` }}
+                className="group flex w-72 sm:w-80 flex-shrink-0 flex-col justify-between rounded-lg border border-[#DFDBD0] bg-[#FAF8F4] p-5 transition-colors hover:border-[#0F5E4E] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F5E4E]"
+              >
                 <div>
-                  <div className="text-[13px] font-semibold text-[#141A23]">
-                    Ujjwal Sakhi Mandal · Chikhodra, Anand
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="rounded-md border border-[#A7F3D0] bg-[#ECFDF5] px-2.5 py-0.5 text-[11px] font-semibold text-[#047857]">
+                      {portal.tag}
+                    </span>
+                    <ExternalLink className="h-4 w-4 text-[#475467] group-hover:text-[#0F5E4E]" aria-hidden="true" />
                   </div>
-                  <div className="text-[12px] text-[#475467]">
-                    Papad &amp; Spice Unit · Simulated case walkthrough
-                  </div>
+                  <h3 className="mt-3 text-[16px] font-semibold text-[#141A23] group-hover:text-[#0F5E4E]">
+                    {portal.name}
+                  </h3>
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-[#475467]">{portal.desc}</p>
                 </div>
-                <span className="font-mono text-[12px] font-semibold text-[#0F5E4E]">₹2.15L</span>
-              </div>
-            </Card>
-          </div>
+                <div className="mt-4 inline-flex items-center gap-1 text-[12.5px] font-semibold text-[#0F5E4E]">
+                  Open official website <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
+                </div>
+              </motion.a>
+            ))}
+          </motion.div>
         </div>
       </section>
 
       {/* ─── Simulated Pilot Metrics Strip ─── */}
-      <section className="border-y border-[#DFDBD0] bg-white">
-        <div className="mx-auto max-w-6xl px-4 py-8 md:px-6">
+      <section className="border-t border-[#DFDBD0] bg-[#FAF8F4]">
+        <div className="mx-auto max-w-6xl px-4 py-10 md:px-6">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
             <span className="text-[12px] font-semibold uppercase tracking-wider text-[#475467]">
               Anand &amp; Kheda Illustrative Pilot Snapshot
@@ -214,92 +247,47 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               { value: "61", label: "Lender-Ready Packs (Simulated)", sub: "Verified checklist" },
               { value: "29", label: "Sanctioned Packs (Simulated)", sub: "Branch tracking" },
             ].map((stat) => (
-              <div key={stat.label} className="rounded-lg border border-[#DFDBD0] bg-[#FAF8F4] p-4">
+              <Card key={stat.label} className="p-4">
                 <div className="font-mono text-[26px] font-semibold text-[#141A23] tabular-nums">
                   {stat.value}
                 </div>
                 <div className="mt-1 text-[13px] font-semibold text-[#141A23]">{stat.label}</div>
                 <div className="mt-0.5 text-[12px] text-[#475467]">{stat.sub}</div>
-              </div>
+              </Card>
             ))}
           </div>
         </div>
       </section>
 
       {/* ─── How It Works (3 Crisp Steps) ─── */}
-      <section className="mx-auto max-w-6xl px-4 py-12 md:px-6">
-        <h2 className="font-serif text-[26px] font-semibold text-[#141A23]">
-          How Sakhi CreditLink Works in 3 Steps
-        </h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {[
-            {
-              step: "01",
-              title: "Verify LokOS & RBI 6× Corpus",
-              desc: "Pull Sakhi Mandal identity from GLPC snapshot and check RBI first-dose eligibility: max(6× corpus, ₹1.5L) with 6-month active books.",
-            },
-            {
-              step: "02",
-              title: "Build Cash-Flow Blueprint",
-              desc: "Separate Capex from Working Capital, attach 6–12 month sales ledger, and check lean-month EMI coverage.",
-            },
-            {
-              step: "03",
-              title: "Match, Submit & Guard 0%",
-              desc: "Match 9 Gujarat/GLPC schemes, send bank-ready dossier, track branch SLA timers, and protect 0% interest subvention.",
-            },
-          ].map((item) => (
-            <Card key={item.step} className="p-5">
-              <div className="font-mono text-[12px] font-semibold text-[#0F5E4E]">STEP {item.step}</div>
-              <h3 className="mt-2 text-[16px] font-semibold text-[#141A23]">{item.title}</h3>
-              <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#475467]">{item.desc}</p>
-            </Card>
-          ))}
-        </div>
-      </section>
-
-      {/* ─── Official Government Portals (Static Accessible Grid) ─── */}
-      <section id="govt-portals" className="border-t border-[#DFDBD0] bg-white">
+      <section className="border-t border-[#DFDBD0] bg-white">
         <div className="mx-auto max-w-6xl px-4 py-12 md:px-6">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div>
-              <div className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-[#0F5E4E]">
-                <Globe className="h-3.5 w-3.5" /> Official Portals Directory
-              </div>
-              <h2 className="mt-1 font-serif text-[26px] font-semibold text-[#141A23]">
-                Direct Government Scheme &amp; Registration Links
-              </h2>
-            </div>
-            <p className="max-w-md text-[13px] text-[#475467]">
-              Sakhi CreditLink prepares pre-application packs and links out to official government portals for submission.
-            </p>
-          </div>
-
-          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {GOVT_PORTALS.map((portal) => (
-              <a
-                key={portal.name}
-                href={portal.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex flex-col justify-between rounded-lg border border-[#DFDBD0] bg-[#FAF8F4] p-5 transition-colors duration-150 hover:border-[#0F5E4E] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F5E4E]"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="rounded-md border border-[#A7F3D0] bg-[#ECFDF5] px-2.5 py-0.5 text-[11px] font-semibold text-[#047857]">
-                      {portal.tag}
-                    </span>
-                    <ExternalLink className="h-4 w-4 text-[#475467] group-hover:text-[#0F5E4E]" aria-hidden="true" />
-                  </div>
-                  <h3 className="mt-3 text-[15.5px] font-semibold text-[#141A23] group-hover:text-[#0F5E4E]">
-                    {portal.name}
-                  </h3>
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-[#475467]">{portal.desc}</p>
-                </div>
-                <div className="mt-4 inline-flex items-center gap-1 text-[12.5px] font-semibold text-[#0F5E4E]">
-                  Open official portal <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
-                </div>
-              </a>
+          <h2 className="font-serif text-[26px] font-semibold text-[#141A23]">
+            How Sakhi CreditLink Works in 3 Steps
+          </h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {[
+              {
+                step: "01",
+                title: "Verify LokOS & RBI 6× Corpus",
+                desc: "Pull Sakhi Mandal identity from GLPC snapshot and check RBI first-dose eligibility: max(6× corpus, ₹1.5L) with 6-month active books.",
+              },
+              {
+                step: "02",
+                title: "Build Cash-Flow Blueprint",
+                desc: "Separate Capex from Working Capital, attach 6–12 month sales ledger, and check lean-month EMI coverage.",
+              },
+              {
+                step: "03",
+                title: "Match, Submit & Guard 0%",
+                desc: "Match 9 Gujarat/GLPC schemes, send bank-ready dossier, track branch SLA timers, and protect 0% interest subvention.",
+              },
+            ].map((item) => (
+              <Card key={item.step} className="bg-[#FAF8F4] p-5">
+                <div className="font-mono text-[12px] font-semibold text-[#0F5E4E]">STEP {item.step}</div>
+                <h3 className="mt-2 text-[16px] font-semibold text-[#141A23]">{item.title}</h3>
+                <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#475467]">{item.desc}</p>
+              </Card>
             ))}
           </div>
         </div>
