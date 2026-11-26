@@ -5,12 +5,20 @@ import {
   Building2,
   Calculator,
   CheckCircle2,
+  Database,
   Landmark,
   Shield,
   Sparkles,
   TrendingUp,
+  Upload,
   Users,
 } from "lucide-react";
+import {
+  getLokOSAdapterState,
+  importLokOSSnapshotCSV,
+  setLokOSAdapterMode,
+  type LokOSAdapterMode,
+} from "@/lib/lokos-adapter";
 import {
   ROLE_META,
   type NavScreenId,
@@ -41,6 +49,34 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
   const [loansPerBlockPerYear, setLoansPerBlockPerYear] = useState<number>(48);
   const [flatBankLspFee, setFlatBankLspFee] = useState<number>(1400);
   const [monthlyOpsCost, setMonthlyOpsCost] = useState<number>(45000);
+
+  // Phased LokOS Adapter State (Day-1 GLPC Snapshot -> Post-MoU Official LokOS API)
+  const [lokosState, setLokosState] = useState(() => getLokOSAdapterState());
+  const [syncMessage, setSyncMessage] = useState<string>("");
+
+  const handleModeChange = (mode: LokOSAdapterMode) => {
+    setLokOSAdapterMode(mode);
+    setLokosState(getLokOSAdapterState());
+  };
+
+  const handleCsvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    const added = importLokOSSnapshotCSV(text);
+    setLokosState(getLokOSAdapterState());
+    setSyncMessage(added > 0 ? `Imported ${added} SHG(s) into Day-1 Snapshot` : "No valid rows found in CSV");
+  };
+
+  const handleLoadSampleBlockCsv = () => {
+    const sample = [
+      "GJ-AND-055-SHG-3101,Nutan Mahila Masala SHG,Anand,Borsad,Bhadran,11,2020,Kavitaben Parmar",
+      "GJ-KHD-022-SHG-4088,Sabarmati Handloom SHG,Kheda,Kapadvanj,Antroli,15,2021,Bhavnaben Zala",
+    ].join("\n");
+    const added = importLokOSSnapshotCSV(sample);
+    setLokosState(getLokOSAdapterState());
+    setSyncMessage(`Synced ${added} block SHGs (GJ-AND-055-SHG-3101, GJ-KHD-022-SHG-4088)`);
+  };
 
   const portfolioStats = useMemo(() => {
     let totalProjectValue = 0;
@@ -265,6 +301,71 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
               })}
             </tbody>
           </table>
+        </div>
+      </section>
+
+      {/* Phased LokOS Integration Adapter (Problem #2 Solution) */}
+      <section className="rounded-3xl ios-glass p-6 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--sakhi-border)] pb-4">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-[var(--sakhi-mint)] px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-forest)]">
+              <Database className="h-3.5 w-3.5" /> NRLM LokOS Registry Bridge
+            </div>
+            <h2 className="mt-1.5 text-[17px] font-bold text-[var(--sakhi-slate)]">
+              Phased Sync: Day-1 GLPC Cluster Snapshot → Official LokOS API
+            </h2>
+            <p className="text-[12.5px] text-[var(--sakhi-muted)]">
+              {lokosState.count} verified NRLM SHGs active in registry · {lokosState.lastSyncTimestamp}
+            </p>
+          </div>
+
+          <div className="flex items-center rounded-xl border border-[var(--sakhi-border)] bg-white p-1 text-[12.5px]">
+            <button
+              type="button"
+              onClick={() => handleModeChange("cluster-snapshot")}
+              className={cn(
+                "rounded-lg px-3 py-1.5 font-semibold transition-all",
+                lokosState.mode === "cluster-snapshot"
+                  ? "bg-[var(--sakhi-forest)] text-white"
+                  : "text-[var(--sakhi-muted)]"
+              )}
+            >
+              Day 1: GLPC Snapshot
+            </button>
+            <button
+              type="button"
+              onClick={() => handleModeChange("official-api")}
+              className={cn(
+                "rounded-lg px-3 py-1.5 font-semibold transition-all",
+                lokosState.mode === "official-api"
+                  ? "bg-[var(--sakhi-forest)] text-white"
+                  : "text-[var(--sakhi-muted)]"
+              )}
+            >
+              Scale: Official LokOS API
+            </button>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[var(--sakhi-border)] bg-white px-4 py-2 text-[12.5px] font-semibold text-[var(--sakhi-slate)] hover:bg-[var(--sakhi-surface)]">
+              <Upload className="h-3.5 w-3.5 text-[var(--sakhi-forest)]" />
+              Import GLPC LokOS CSV
+              <input type="file" accept=".csv,.txt" onChange={handleCsvUpload} className="hidden" />
+            </label>
+            <button
+              type="button"
+              onClick={handleLoadSampleBlockCsv}
+              className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--sakhi-mint)] px-4 py-2 text-[12.5px] font-semibold text-[var(--sakhi-forest)] hover:bg-[var(--sakhi-forest)] hover:text-white transition-colors"
+            >
+              + Sync Sample Block CSV
+            </button>
+          </div>
+
+          {syncMessage && (
+            <span className="text-[12.5px] font-semibold text-emerald-700">{syncMessage}</span>
+          )}
         </div>
       </section>
 

@@ -15,6 +15,11 @@ import {
   Wand2,
 } from "lucide-react";
 import type { SHGCase } from "@/data/sakhi-data";
+import {
+  getLokOSAdapterState,
+  verifySHGByLokosId,
+  type LokOSAdapterMode,
+} from "@/lib/lokos-adapter";
 import { formatINR } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -31,68 +36,15 @@ const ACTIVITY_PRESETS = [
   { label: "Handicrafts & Retail Enterprise", value: "Artisan Handicrafts", isFood: false, defaultProduct: "Handcrafted Unit" },
 ];
 
-interface LokOSMockRecord {
-  lokosId: string;
-  shgName: string;
-  district: string;
-  block: string;
-  village: string;
-  membersCount: number;
-  formationYear: number;
-  presidentName: string;
-  panchasutraChecks: {
-    regularMeetings: boolean;
-    regularSavings: boolean;
-    internalLending: boolean;
-    timelyRepayment: boolean;
-    updatedBooks: boolean;
-  };
-}
-
-const SIMULATED_LOKOS_REGISTRY: Record<string, LokOSMockRecord> = {
-  "GJ-AND-042-SHG-1189": {
-    lokosId: "GJ-AND-042-SHG-1189",
-    shgName: "Shakti Mahila Enterprise SHG",
-    district: "Anand",
-    block: "Anand Rural",
-    village: "Karamsad",
-    membersCount: 12,
-    formationYear: 2021,
-    presidentName: "Gitaben Patel",
-    panchasutraChecks: {
-      regularMeetings: true,
-      regularSavings: true,
-      internalLending: true,
-      timelyRepayment: true,
-      updatedBooks: true,
-    },
-  },
-  "GJ-KHD-018-SHG-2045": {
-    lokosId: "GJ-KHD-018-SHG-2045",
-    shgName: "Jagruti Dairy & Agro SHG",
-    district: "Kheda",
-    block: "Nadiad",
-    village: "Uttarsanda",
-    membersCount: 14,
-    formationYear: 2020,
-    presidentName: "Meenaben Solanki",
-    panchasutraChecks: {
-      regularMeetings: true,
-      regularSavings: true,
-      internalLending: true,
-      timelyRepayment: true,
-      updatedBooks: true,
-    },
-  },
-};
-
 export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCancel }) => {
   const [step, setStep] = useState<1 | 2 | 3>(1);
 
-  // Simulated NRLM / LokOS Gate State
+  // Phased LokOS Adapter Gate (Day 1: GLPC Cluster Snapshot -> Scale: Official LokOS API)
+  const adapterState = getLokOSAdapterState();
   const [lokosInput, setLokosInput] = useState("GJ-AND-042-SHG-1189");
   const [lokosStatus, setLokosStatus] = useState<"idle" | "checking" | "verified" | "unregistered">("idle");
   const [verifiedLokosId, setVerifiedLokosId] = useState<string | null>(null);
+  const [verifiedMode, setVerifiedMode] = useState<LokOSAdapterMode>(adapterState.mode);
 
   // Step 1: SHG Identity & Governance
   const [shgName, setShgName] = useState("");
@@ -137,28 +89,28 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
   const externalNeed = Math.max(0, totalCost - Math.max(0, ownContribution));
   const panchasutraScore = Object.values(panchasutraChecks).filter(Boolean).length;
 
-  const verifyLokosRegistration = (idOverride?: string) => {
+  const verifyLokosRegistration = async (idOverride?: string) => {
     const query = (idOverride ?? lokosInput).trim().toUpperCase();
     if (!query) return;
     setLokosStatus("checking");
-    setTimeout(() => {
-      const match = SIMULATED_LOKOS_REGISTRY[query];
-      if (match) {
-        setShgName(match.shgName);
-        setDistrict(match.district);
-        setBlock(match.block);
-        setVillage(match.village);
-        setMembersCount(match.membersCount);
-        setFormationYear(match.formationYear);
-        setPresidentName(match.presidentName);
-        setPanchasutraChecks(match.panchasutraChecks);
-        setVerifiedLokosId(match.lokosId);
-        setLokosStatus("verified");
-      } else {
-        setVerifiedLokosId(null);
-        setLokosStatus("unregistered");
-      }
-    }, 450);
+    const res = await verifySHGByLokosId(query);
+    if (res.verified && res.record) {
+      const match = res.record;
+      setShgName(match.shgName);
+      setDistrict(match.district);
+      setBlock(match.block);
+      setVillage(match.village);
+      setMembersCount(match.membersCount);
+      setFormationYear(match.formationYear);
+      setPresidentName(match.presidentName);
+      setPanchasutraChecks(match.panchasutraChecks);
+      setVerifiedLokosId(match.lokosId);
+      setVerifiedMode(res.mode);
+      setLokosStatus("verified");
+    } else {
+      setVerifiedLokosId(null);
+      setLokosStatus("unregistered");
+    }
   };
 
   const fillQuickSample = () => {
@@ -441,7 +393,9 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                   </span>
                 </div>
                 <span className="rounded-full bg-white/80 px-2.5 py-0.5 text-[10.5px] font-semibold text-[var(--sakhi-forest)] border border-[var(--sakhi-forest)]/15">
-                  NRLM-Registered SHGs Only
+                  {adapterState.mode === "official-api"
+                    ? "Scale: Official LokOS API"
+                    : `Day-1: GLPC Snapshot (${adapterState.count} SHGs)`}
                 </span>
               </div>
 
@@ -502,7 +456,10 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                 <div className="flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-[12.5px] text-emerald-800">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                   <span>
-                    <strong>Verified on NRLM LokOS (Simulated):</strong> Group identity, office bearer, and Panchasutra records auto-populated below — zero duplicate entry.
+                    <strong>
+                      Verified via {verifiedMode === "official-api" ? "Official NRLM LokOS API" : "GLPC Authorised LokOS Snapshot"}:
+                    </strong>{" "}
+                    Group identity, office bearer, and Panchasutra records auto-populated below — zero duplicate entry.
                   </span>
                 </div>
               )}

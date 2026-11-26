@@ -9,6 +9,7 @@ export type NavScreenId =
   | "scheme-match"
   | "offer-comparison"
   | "application-pack"
+  | "post-disbursement"
   | "livelihood-evidence"
   | "field-followups"
   | "programme-insights";
@@ -171,8 +172,19 @@ export interface SHGCase {
 export interface SchemeMatchItem {
   id: string;
   schemeName: string;
-  instrumentType: "Bank Loan (CCL / Term)" | "Capital Subsidy (Credit-Linked)" | "SHG Seed Capital" | "Micro-Enterprise Term/WC";
-  fitStatus: "Strong Fit — Verify Conditions" | "Conditional Fit" | "Not Applicable / Excluded";
+  agency: string;
+  isGlpcCore?: boolean;
+  instrumentType:
+    | "Bank Loan (CCL / Term)"
+    | "Capital Subsidy (Credit-Linked)"
+    | "SHG Seed Capital"
+    | "Micro-Enterprise Term/WC"
+    | "State 0% Interest Loan"
+    | "Federation Corpus (CIF)"
+    | "Grant / Revolving Fund";
+  fitStatus: "Absolute Match" | "Strong Fit — Verify Conditions" | "Near Match — Conditional" | "Not Applicable / Excluded";
+  matchScore: number;
+  eligibilityChecklist: { rule: string; passed: boolean }[];
   indicativeEligibilityAmount?: string;
   whyMatched: string[];
   conditionsToVerify: string[];
@@ -922,6 +934,8 @@ export function getSchemeMatchesForCase(shg: SHGCase): SchemeMatchItem[] {
     .reduce((sum, c) => sum + c.amount, 0);
   const totalCost = capex + wc;
   const externalNeed = Math.max(0, totalCost - shg.ownContribution);
+  const isGujarat = shg.district === "Anand" || shg.district === "Kheda" || shg.district === "Vadodara" || shg.district === "Mehsana";
+  const isGroupSHG = shg.applicantType === "SHG Group Enterprise" || shg.applicantType === "Federation / FPO";
   const isFoodProcessing =
     shg.activity.toLowerCase().includes("papad") ||
     shg.activity.toLowerCase().includes("spice") ||
@@ -930,50 +944,217 @@ export function getSchemeMatchesForCase(shg: SHGCase): SchemeMatchItem[] {
     shg.activity.toLowerCase().includes("millet");
 
   const machineryItem = shg.costLines.find((c) =>
-    c.label.toLowerCase().includes("machinery") || c.label.toLowerCase().includes("oven") || c.label.toLowerCase().includes("separator")
+    c.label.toLowerCase().includes("machinery") ||
+    c.label.toLowerCase().includes("oven") ||
+    c.label.toLowerCase().includes("separator") ||
+    c.label.toLowerCase().includes("sewing") ||
+    c.label.toLowerCase().includes("beds")
   );
   const machineryAmt = machineryItem ? machineryItem.amount : Math.round(capex * 0.85);
   const illustrativePMFME = Math.round(machineryAmt * 0.35);
 
-  return [
+  const ue = shg.unitEconomics;
+  const netMarginUnit = Math.max(0, ue.sellingPricePerUnit - ue.directCostPerUnit - ue.overheadPerUnit);
+  const projectedAnnualSurplus = ue.projectedMonthlyUnits * netMarginUnit * 12;
+  const annualIncomePerMember = Math.round(projectedAnnualSurplus / Math.max(1, shg.membersCount));
+  const shgAgeYears = 2026 - shg.formationYear;
+
+  const schemes: SchemeMatchItem[] = [
     {
-      id: "sch-nrlm",
-      schemeName: "DAY-NRLM SHG Bank Linkage (CCL + Term Loan)",
+      id: "sch-glpc-nrlm",
+      schemeName: "GLPC Mission Mangalam — Sakhi Mandal Bank Linkage (0% State Subvention)",
+      agency: "GLPC · DAY-NRLM Gujarat",
+      isGlpcCore: true,
       instrumentType: "Bank Loan (CCL / Term)",
       fitStatus:
-        shg.panchasutraScore >= 4
-          ? "Strong Fit — Verify Conditions"
-          : "Conditional Fit",
-      indicativeEligibilityAmount: `Up to ₹${externalNeed.toLocaleString("en-IN")} (subject to bank appraisal & MCP)`,
+        shg.panchasutraScore >= 4 && isGroupSHG && externalNeed <= 2000000
+          ? "Absolute Match"
+          : isGroupSHG
+          ? "Near Match — Conditional"
+          : "Not Applicable / Excluded",
+      matchScore:
+        (isGroupSHG ? 40 : 0) +
+        (shg.panchasutraScore >= 4 ? 30 : 10) +
+        (isGujarat ? 15 : 0) +
+        (externalNeed <= 2000000 ? 15 : 0),
+      eligibilityChecklist: [
+        { rule: "Registered Sakhi Mandal / SHG Group", passed: isGroupSHG },
+        { rule: "Panchasutra Score ≥ 4/5", passed: shg.panchasutraScore >= 4 },
+        { rule: "Gujarat District (0% State Subvention + Stamp Waiver)", passed: isGujarat },
+        { rule: "External Credit Within ₹20L CCL/Term Norm", passed: externalNeed <= 2000000 },
+      ],
+      indicativeEligibilityAmount: `Up to ₹${externalNeed.toLocaleString("en-IN")} (0% effective interest on timely repayment; stamp duty waived up to ₹10L)`,
       whyMatched: [
-        `Active SHG formed in ${shg.formationYear} with ${shg.membersCount} members and Panchasutra score ${shg.panchasutraScore}/5.`,
-        `Supports blended structure: Term Loan component for Capex (₹${capex.toLocaleString("en-IN")}) and Cash Credit Limit (CCL) for Working Capital (₹${wc.toLocaleString("en-IN")}).`,
-        "Micro Credit Plan (MCP) and group resolution match NRLM linkage prerequisites.",
+        `Active Sakhi Mandal (${shg.membersCount} members, formed ${shg.formationYear}) with ${shg.panchasutraScore}/5 Panchasutra compliance.`,
+        `Gujarat State Interest Subvention bridges the gap over DAY-NRLM 7%/4% rates down to 0% effective interest for regular repayers.`,
+        `Supports blended Capex (₹${capex.toLocaleString("en-IN")}) + Working Capital CCL (₹${wc.toLocaleString("en-IN")}) up to ₹20L.`,
       ],
       conditionsToVerify: [
         "Confirm bank branch grading against current RBI Master Circular on DAY-NRLM.",
         "Verify whether existing SHG debt (₹" + shg.existingDebt.toLocaleString("en-IN") + ") is closed or rolled into enhanced CCL.",
-        "Interest subvention applicability depends on current state/central DAY-NRLM circular & timely repayment.",
+        "Timely monthly repayment is mandatory to retain 0% effective state interest subvention.",
       ],
       exclusions: [
-        "Not a capital grant or subsidy; full principal & applicable interest are repayable to the lending bank.",
-        "Does not replace official NRLM / LokOS bank-linkage portal reporting.",
+        "Not a capital grant; full principal is repayable to the lending bank.",
+        "Stamp duty waiver applies up to ₹10,00,000 limit per Gujarat norms.",
       ],
       requiredDocuments: [
-        "SHG Resolution & Inter-se Agreement",
+        "SHG Resolution & Inter-se Agreement (Tharav)",
         "12-month Panchasutra Register & Bank Passbook",
         "Endorsed Micro Credit Plan (MCP)",
-        "KYC of authorised office bearers",
+        "KYC of 3 authorised office bearers",
       ],
-      sourceAnchor: "RBI Master Circular — DAY-NRLM & NRLM Portal (Verify FY2026-27 window)",
-      ruleVersion: "RULE-NRLM-2026.1",
-      lastVerifiedDate: "15 Nov 2026 (Rule Stub — Verify Live Circular)",
+      sourceAnchor: "GLPC Mission Mangalam & RBI Master Circular — DAY-NRLM",
+      ruleVersion: "RULE-GLPC-NRLM-2026.2",
+      lastVerifiedDate: "15 Nov 2026",
+    },
+    {
+      id: "sch-glpc-cif",
+      schemeName: "GLPC — Community Investment Fund (CIF) via Cluster Federation",
+      agency: "GLPC · CLF / VO Channel",
+      isGlpcCore: true,
+      instrumentType: "Federation Corpus (CIF)",
+      fitStatus:
+        isGroupSHG && shg.panchasutraScore >= 4 && externalNeed <= 250000
+          ? "Strong Fit — Verify Conditions"
+          : isGroupSHG
+          ? "Near Match — Conditional"
+          : "Not Applicable / Excluded",
+      matchScore:
+        (isGroupSHG ? 35 : 0) +
+        (shg.panchasutraScore >= 4 ? 25 : 10) +
+        (externalNeed <= 250000 ? 20 : 8) +
+        (isGujarat ? 10 : 0),
+      eligibilityChecklist: [
+        { rule: "Member of GLPC Village Org / CLF", passed: isGroupSHG },
+        { rule: "Panchasutra Books & MCP Updated", passed: shg.panchasutraScore >= 4 },
+        { rule: "Ideal Ticket Size (≤ ₹2.5L Tranche)", passed: externalNeed <= 250000 },
+      ],
+      indicativeEligibilityAmount: `₹50,000 – ₹2,50,000 federation tranche (can co-fund working capital / margin share)`,
+      whyMatched: [
+        "CIF is a perpetual community corpus routed by GLPC through Cluster Level Federations (CLFs) for SHG livelihoods.",
+        "Can bridge working capital or SHG own-contribution gap faster than retail bank term loans.",
+      ],
+      conditionsToVerify: [
+        `Confirm active CIF liquidity in ${shg.cluster} (${shg.block} block).`,
+        "Verify whether the SHG has already availed a prior CIF tranche and its repayment status.",
+      ],
+      exclusions: [
+        "Repayable to the Village Organisation / CLF at federation-approved interest (typically 6–12% p.a.).",
+        "Subject to CLF executive committee prioritization.",
+      ],
+      requiredDocuments: [
+        "Endorsed Micro Credit Plan (MCP)",
+        "CLF / VO Recommendation Letter",
+        "Internal Lending Ledger",
+      ],
+      sourceAnchor: "GLPC Mission Mangalam — CIF & Federation Guidelines",
+      ruleVersion: "RULE-GLPC-CIF-2026.1",
+      lastVerifiedDate: "14 Nov 2026",
+    },
+    {
+      id: "sch-guj-mmuy",
+      schemeName: "Mukhyamantri Mahila Utkarsh Yojana (MMUY) — 0% Interest Loan",
+      agency: "Government of Gujarat (Urban & Rural)",
+      isGlpcCore: true,
+      instrumentType: "State 0% Interest Loan",
+      fitStatus:
+        isGroupSHG && shg.membersCount >= 10 && externalNeed <= 100000
+          ? "Absolute Match"
+          : isGroupSHG && shg.membersCount >= 10
+          ? "Near Match — Conditional"
+          : "Not Applicable / Excluded",
+      matchScore:
+        (isGroupSHG && shg.membersCount >= 10 ? 40 : 10) +
+        (isGujarat ? 20 : 0) +
+        (externalNeed <= 100000 ? 35 : 15),
+      eligibilityChecklist: [
+        { rule: "Women SHG / JLEG (≥ 10 Women Members)", passed: isGroupSHG && shg.membersCount >= 10 },
+        { rule: "Gujarat Resident Group", passed: isGujarat },
+        { rule: "Loan Within ₹1,00,000 Ceiling", passed: externalNeed <= 100000 },
+      ],
+      indicativeEligibilityAmount:
+        externalNeed <= 100000
+          ? `₹${externalNeed.toLocaleString("en-IN")} at 0% Interest (up to ₹1,00,000 ceiling)`
+          : `Partial cap: Up to ₹1,00,000 at 0% interest (remaining ₹${(externalNeed - 100000).toLocaleString("en-IN")} requires Bank Linkage)`,
+      whyMatched: [
+        `Group has ${shg.membersCount} women members (meets ≥ 10 member MMUY norm) in ${shg.district}, Gujarat.`,
+        "Collateral-free bank loan with 100% interest borne by the Government of Gujarat.",
+      ],
+      conditionsToVerify: [
+        "Confirm group is not simultaneously availing another state 0% interest subsidy for the same loan account.",
+        "Verify bank participation under MMUY district allocation.",
+      ],
+      exclusions: [
+        "STRICT CEILING: Maximum ₹1,00,000 per SHG/JLEG under MMUY; larger expansion needs must route to DAY-NRLM CCL.",
+      ],
+      requiredDocuments: [
+        "10-Member Group KYC & Aadhaar",
+        "MMUY Joint Liability / SHG Resolution",
+        "Bank Account Passbook",
+      ],
+      sourceAnchor: "Government of Gujarat — MMUY Guidelines",
+      ruleVersion: "RULE-GUJ-MMUY-2026.1",
+      lastVerifiedDate: "15 Nov 2026",
+    },
+    {
+      id: "sch-glpc-lakhpati",
+      schemeName: "GLPC — Lakhpati Didi Enterprise Convergence Support",
+      agency: "GLPC · MoRD Convergence",
+      isGlpcCore: true,
+      instrumentType: "Bank Loan (CCL / Term)",
+      fitStatus:
+        isGroupSHG && annualIncomePerMember >= 100000
+          ? "Absolute Match"
+          : isGroupSHG && annualIncomePerMember >= 60000
+          ? "Near Match — Conditional"
+          : "Not Applicable / Excluded",
+      matchScore:
+        (isGroupSHG ? 30 : 0) +
+        (annualIncomePerMember >= 100000 ? 40 : annualIncomePerMember >= 60000 ? 22 : 5) +
+        (shg.buyerEvidence.length > 0 ? 15 : 5) +
+        (shg.panchasutraScore >= 4 ? 10 : 0),
+      eligibilityChecklist: [
+        { rule: "Active Sakhi Mandal Member Collective", passed: isGroupSHG },
+        { rule: "Projected Net Income ≥ ₹1,00,000 / Member / Yr", passed: annualIncomePerMember >= 100000 },
+        { rule: "Verified Market / Saras Buyer Linkage", passed: shg.buyerEvidence.length > 0 },
+      ],
+      indicativeEligibilityAmount: `Projected ₹${annualIncomePerMember.toLocaleString("en-IN")}/member/yr net surplus + GLPC Saras / Packaging & Skill convergence`,
+      whyMatched: [
+        `Projected enterprise surplus generates ~₹${annualIncomePerMember.toLocaleString("en-IN")} per member annually.`,
+        "Unlocks priority GLPC Bank Sakhi handholding, Saras Mela / Garvi market access, and multi-scheme convergence.",
+      ],
+      conditionsToVerify: [
+        "Validate projected unit volume against written buyer purchase orders.",
+        "Tag individual SHG members in GLPC Lakhpati Didi MIS tracker.",
+      ],
+      exclusions: [
+        "Not a standalone cash loan—acts as a convergence wrapper combining Bank Linkage, CIF, and PMFME/skill grants.",
+      ],
+      requiredDocuments: [
+        "Unit Economics & 6–12 Month Sales Ledger",
+        "Buyer Offtake / GLPC Saras Linkage Proof",
+      ],
+      sourceAnchor: "GLPC Mission Mangalam — Lakhpati Didi Framework",
+      ruleVersion: "RULE-GLPC-LD-2026.1",
+      lastVerifiedDate: "15 Nov 2026",
     },
     {
       id: "sch-pmfme-cap",
       schemeName: "PMFME — Credit-Linked Capital Subsidy (Micro Food Processing)",
+      agency: "MoFPI · Gujarat Agro SNA",
+      isGlpcCore: false,
       instrumentType: "Capital Subsidy (Credit-Linked)",
-      fitStatus: isFoodProcessing ? "Strong Fit — Verify Conditions" : "Not Applicable / Excluded",
+      fitStatus:
+        isFoodProcessing && capex > 0
+          ? "Strong Fit — Verify Conditions"
+          : "Not Applicable / Excluded",
+      matchScore: isFoodProcessing && capex > 0 ? 88 : 10,
+      eligibilityChecklist: [
+        { rule: "Food-Processing Sector Activity", passed: isFoodProcessing },
+        { rule: "Eligible Fixed Capex (Machinery > ₹0)", passed: capex > 0 },
+        { rule: "Capex Separated from Working Capital", passed: true },
+      ],
       indicativeEligibilityAmount: isFoodProcessing
         ? `Illustrative 35% on eligible machinery (₹${machineryAmt.toLocaleString("en-IN")}) = ₹${illustrativePMFME.toLocaleString("en-IN")} (NOT guaranteed)`
         : "Excluded — non-food enterprise",
@@ -981,22 +1162,21 @@ export function getSchemeMatchesForCase(shg: SHGCase): SchemeMatchItem[] {
         ? [
             `Enterprise activity (${shg.activity}) falls under micro food-processing category.`,
             `Capex machinery line of ₹${machineryAmt.toLocaleString("en-IN")} is separated from working capital for clean eligible-cost assessment.`,
-            "Official guidance has described 35% credit-linked capital subsidy (up to ₹10 lakh ceiling) subject to active window and bank term-loan sanction.",
+            "35% credit-linked capital subsidy (up to ₹10 lakh ceiling) subject to active window and bank term-loan sanction.",
           ]
         : [
             `Activity (${shg.activity}) is outside food-processing scope under PMFME guidelines.`,
           ],
       conditionsToVerify: isFoodProcessing
         ? [
-            "Confirm current PMFME extension/application window with MoFPI portal & Gujarat State Nodal Agency.",
-            "Confirm whether SHG group entity holds valid Udyam / FSSAI registration and meets beneficiary contribution rules.",
-            "Only bank-appraised eligible fixed capital (machinery/equipment) qualifies; final eligible cost is decided by SNA & bank.",
+            "Confirm current PMFME application window with MoFPI portal & Gujarat State Nodal Agency.",
+            "Confirm SHG group holds valid Udyam & FSSAI registration.",
+            "Only bank-appraised eligible fixed capital (machinery/equipment) qualifies.",
           ]
         : ["N/A — route excluded based on sector rule."],
       exclusions: [
         "STRICT EXCLUSION: Working capital (₹" + wc.toLocaleString("en-IN") + " raw material, packaging, wages) is NOT eligible for PMFME capital subsidy.",
         "Do NOT double-finance machinery cost across multiple capital subsidies.",
-        "Subsidy is credit-linked and back-ended/adjusted per scheme norms — never upfront guaranteed cash.",
       ],
       requiredDocuments: [
         "Detailed Project Report (DPR) separating Capex & Working Capital",
@@ -1004,30 +1184,81 @@ export function getSchemeMatchesForCase(shg: SHGCase): SchemeMatchItem[] {
         "FSSAI Registration & Udyam Registration",
         "Bank Term Loan appraisal concurrence",
       ],
-      sourceAnchor: "MoFPI PMFME Official Portal (pmfme.mofpi.gov.in) & State Nodal Agency",
+      sourceAnchor: "MoFPI PMFME Official Portal (pmfme.mofpi.gov.in) & Gujarat SNA",
       ruleVersion: "RULE-PMFME-CAP-2026.1",
-      lastVerifiedDate: "12 Nov 2026 (Verify active FY2026-27 window)",
+      lastVerifiedDate: "12 Nov 2026",
+    },
+    {
+      id: "sch-guj-vby",
+      schemeName: "Shri Vajpayee Bankable Yojana (VBY) — Women Artisan & Enterprise Subsidy",
+      agency: "Commissionerate of Cottage & Rural Industries, Gujarat",
+      isGlpcCore: false,
+      instrumentType: "Capital Subsidy (Credit-Linked)",
+      fitStatus:
+        shg.applicantType === "Member Micro-Enterprise" && externalNeed <= 2500000
+          ? "Strong Fit — Verify Conditions"
+          : isGujarat && externalNeed <= 2500000
+          ? "Near Match — Conditional"
+          : "Not Applicable / Excluded",
+      matchScore:
+        (shg.applicantType === "Member Micro-Enterprise" ? 45 : 20) +
+        (isGujarat ? 25 : 0) +
+        (externalNeed <= 2500000 ? 20 : 0),
+      eligibilityChecklist: [
+        { rule: "Individual / Artisan / Proprietor Borrower", passed: shg.applicantType === "Member Micro-Enterprise" },
+        { rule: "Gujarat Industry / Service / Business Sector", passed: isGujarat },
+        { rule: "Project Cost Within ₹8L–₹25L Norm", passed: externalNeed <= 2500000 },
+      ],
+      indicativeEligibilityAmount:
+        shg.applicantType === "Member Micro-Enterprise"
+          ? `40% Rural Women Subsidy (30% Urban), capped up to ₹3,75,000`
+          : `Near Match: Requires applying as an individual SHG woman entrepreneur rather than group SHG`,
+      whyMatched: [
+        "Gujarat flagship bankable subsidy offering 40% subsidy for Rural Women (30% Urban Women) across Industry, Service, and Business sectors.",
+        "Ideal if an SHG member scales an individual tailoring, spice, or service unit.",
+      ],
+      conditionsToVerify: [
+        "Applicant age 18–65, minimum 4th pass or relevant training/experience.",
+        "Cannot combine VBY subsidy with PMFME capital subsidy for the same asset.",
+      ],
+      exclusions: [
+        "Designed for individual artisans/entrepreneurs—collective SHG groups normally route via DAY-NRLM / MMUY.",
+      ],
+      requiredDocuments: [
+        "Individual Aadhaar, Ration Card & Age Proof",
+        "Training / Experience Certificate",
+        "Project Report & Bank Consent",
+      ],
+      sourceAnchor: "Commissionerate of Cottage & Rural Industries (e-MSME / Digital Gujarat)",
+      ruleVersion: "RULE-GUJ-VBY-2026.1",
+      lastVerifiedDate: "12 Nov 2026",
     },
     {
       id: "sch-pmfme-seed",
-      schemeName: "PMFME — SHG Seed Capital Route (Separate from Capital Subsidy)",
+      schemeName: "PMFME — SHG Seed Capital Route (via GLPC / CLF)",
+      agency: "MoFPI · GLPC Federation Channel",
+      isGlpcCore: true,
       instrumentType: "SHG Seed Capital",
-      fitStatus: isFoodProcessing ? "Conditional Fit" : "Not Applicable / Excluded",
+      fitStatus: isFoodProcessing && isGroupSHG ? "Near Match — Conditional" : "Not Applicable / Excluded",
+      matchScore: isFoodProcessing && isGroupSHG ? 72 : 12,
+      eligibilityChecklist: [
+        { rule: "Food-Processing SHG Members", passed: isFoodProcessing },
+        { rule: "Routed via GLPC / CLF Channel", passed: isGroupSHG },
+      ],
       indicativeEligibilityAmount: isFoodProcessing
-        ? "Member-level working capital / small tool support via CLF/federation channel (subject to prescribed guidelines)"
+        ? "Up to ₹40,000 per eligible SHG member for working capital / small tools via CLF"
         : "Excluded — non-food SHG",
       whyMatched: isFoodProcessing
         ? [
-            "Potentially relevant if individual SHG members already engaged in food processing seek working-capital seed support through prescribed SRLM/CLF channels.",
+            "Relevant if individual SHG members already engaged in food processing seek working-capital seed support through prescribed GLPC/CLF channels.",
           ]
         : ["Activity is outside food-processing sector."],
       conditionsToVerify: [
-        "Verify whether members have already availed PMFME seed capital earlier (one-time per eligible member norms).",
+        "Verify whether members have already availed PMFME seed capital earlier (one-time per eligible member).",
         "Confirm active GLPC/CLF channel allocation in " + shg.district + " district.",
       ],
       exclusions: [
-        "Distinct from enterprise credit-linked capital subsidy — cannot be merged or claimed for the same cost item.",
-        "Routed via prescribed federation/SRLM channel, not direct retail bank loan.",
+        "Distinct from enterprise credit-linked capital subsidy — cannot be claimed for the same cost item.",
       ],
       requiredDocuments: [
         "SHG member list with existing food-processing activity proof",
@@ -1035,39 +1266,87 @@ export function getSchemeMatchesForCase(shg: SHGCase): SchemeMatchItem[] {
       ],
       sourceAnchor: "PMFME SHG Seed Capital Guidelines & GLPC Circulars",
       ruleVersion: "RULE-PMFME-SEED-2026.1",
-      lastVerifiedDate: "12 Nov 2026 (Verify CLF allocation)",
+      lastVerifiedDate: "12 Nov 2026",
+    },
+    {
+      id: "sch-glpc-rf",
+      schemeName: "GLPC — Revolving Fund (RF) Early-Stage Corpus Grant",
+      agency: "GLPC · DAY-NRLM Gujarat",
+      isGlpcCore: true,
+      instrumentType: "Grant / Revolving Fund",
+      fitStatus:
+        isGroupSHG && shgAgeYears <= 2 && shg.corpusBalance < 50000
+          ? "Strong Fit — Verify Conditions"
+          : isGroupSHG
+          ? "Near Match — Conditional"
+          : "Not Applicable / Excluded",
+      matchScore:
+        (isGroupSHG ? 25 : 0) +
+        (shgAgeYears <= 2 ? 25 : 5) +
+        (shg.corpusBalance < 50000 ? 20 : 5),
+      eligibilityChecklist: [
+        { rule: "Sakhi Mandal Group", passed: isGroupSHG },
+        { rule: "Early-Stage Group (≤ 2 Years) / Low Corpus", passed: shgAgeYears <= 2 || shg.corpusBalance < 50000 },
+        { rule: "Panchasutra Practised ≥ 3 Months", passed: shg.panchasutraScore >= 3 },
+      ],
+      indicativeEligibilityAmount: "₹10,000 – ₹15,000 one-time grant (likely already availed by mature SHGs)",
+      whyMatched: [
+        "Foundational GLPC grant to strengthen internal lending corpus before bank credit linkage.",
+      ],
+      conditionsToVerify: [
+        `Group formed in ${shg.formationYear} (${shgAgeYears} yrs old, corpus ₹${shg.corpusBalance.toLocaleString("en-IN")}) — verify if RF was already disbursed.`,
+      ],
+      exclusions: [
+        "One-time grant only; cannot fund ₹1L+ machinery expansion.",
+      ],
+      requiredDocuments: [
+        "3–6 Month Panchasutra Register",
+        "SHG Bank Account Verification",
+      ],
+      sourceAnchor: "GLPC Mission Mangalam — Revolving Fund Norms",
+      ruleVersion: "RULE-GLPC-RF-2026.1",
+      lastVerifiedDate: "12 Nov 2026",
     },
     {
       id: "sch-mudra",
       schemeName: "PM MUDRA Yojana (Shishu / Kishore / Tarun)",
+      agency: "DFS · Government of India",
+      isGlpcCore: false,
       instrumentType: "Micro-Enterprise Term/WC",
       fitStatus:
         shg.applicantType === "Member Micro-Enterprise"
-          ? "Strong Fit — Verify Conditions"
+          ? "Absolute Match"
           : "Not Applicable / Excluded",
+      matchScore: shg.applicantType === "Member Micro-Enterprise" ? 90 : 15,
+      eligibilityChecklist: [
+        { rule: "Individual / Proprietor Micro-Enterprise", passed: shg.applicantType === "Member Micro-Enterprise" },
+        { rule: "Non-Farm Income-Generating Activity", passed: true },
+      ],
       indicativeEligibilityAmount:
         shg.applicantType === "Member Micro-Enterprise"
-          ? "Up to ₹50,000 (Shishu) or ₹5,00,000 (Kishore) per eligible individual/proprietor"
+          ? "Up to ₹50,000 (Shishu) or ₹5,00,000 (Kishore) per eligible individual"
           : "Excluded at Group SHG level — requires individual/legal micro-enterprise borrower",
       whyMatched:
         shg.applicantType === "Member Micro-Enterprise"
           ? ["Selected applicant type is Member Micro-Enterprise (individual/proprietor borrower)."]
           : [
-              `Current applicant is "${shg.applicantType}". MUDRA targets eligible non-corporate, non-farm micro-enterprise borrowers rather than collective SHG group linkage.`,
+              `Current applicant is "${shg.applicantType}". MUDRA targets individual micro-enterprise borrowers rather than collective SHG group linkage.`,
             ],
       conditionsToVerify: [
-        "If an individual SHG member applies independently, check personal credit bureau history & lender MUDRA policy.",
+        "Check personal credit bureau history & lender MUDRA policy if applying individually.",
       ],
       exclusions: [
-        "Do NOT assume an SHG group automatically qualifies as a single MUDRA borrower.",
-        "Do not duplicate the same project cost across DAY-NRLM group loan and individual MUDRA loan.",
+        "Do NOT assume an SHG group qualifies as a single MUDRA borrower.",
+        "Do not duplicate project cost across DAY-NRLM group loan and individual MUDRA loan.",
       ],
-      requiredDocuments: ["Individual KYC", "Udyam / Business registration", "Enterprise cash-flow estimate"],
+      requiredDocuments: ["Individual KYC", "Udyam Registration", "Cash-flow estimate"],
       sourceAnchor: "Department of Financial Services — PMMY Guidelines",
       ruleVersion: "RULE-PMMY-2026.1",
-      lastVerifiedDate: "10 Nov 2026 (Verify lender policy)",
+      lastVerifiedDate: "10 Nov 2026",
     },
   ];
+
+  return schemes.sort((a, b) => b.matchScore - a.matchScore);
 }
 
 export function getDemoOffersForCase(shg: SHGCase): DemoLenderOffer[] {

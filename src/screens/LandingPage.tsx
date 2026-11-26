@@ -1,10 +1,9 @@
 import React from "react";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   ArrowUpRight,
   BarChart3,
-  CheckCircle2,
-  ChevronRight,
   ExternalLink,
   FileCheck2,
   Fingerprint,
@@ -13,13 +12,24 @@ import {
   Shield,
   Sparkles,
   Target,
-  Users,
   Zap,
 } from "lucide-react";
+import { AnimatedMarqueeHero } from "@/components/ui/hero-3";
 
 interface LandingPageProps {
   onEnterPortal: () => void;
 }
+
+const SHG_MARQUEE_IMAGES = [
+  "/images/shg-hero.jpg",
+  "/images/shg-food.jpg",
+  "/images/shg-dairy.jpg",
+  "/images/shg-tailoring.jpg",
+  "/images/shg-hero.jpg",
+  "/images/shg-food.jpg",
+  "/images/shg-dairy.jpg",
+  "/images/shg-tailoring.jpg",
+];
 
 const GOVT_PORTALS = [
   {
@@ -27,36 +37,42 @@ const GOVT_PORTALS = [
     tag: "SHG Bank Linkage",
     desc: "Official National Rural Livelihoods Mission portal for SHG CCL, interest subvention, and LokOS guidelines.",
     url: "https://aajeevika.gov.in/",
+    accent: "from-emerald-600 to-teal-700",
   },
   {
     name: "PMFME Portal (MoFPI)",
     tag: "35% Capital Subsidy",
     desc: "Micro Food Processing Enterprises scheme portal for machinery & fixed-capital subsidy applications.",
     url: "https://pmfme.mofpi.gov.in/",
+    accent: "from-amber-600 to-orange-700",
   },
   {
-    name: "JanSamarth National Portal",
+    name: "JanSamarth Portal",
     tag: "Credit-Linked Schemes",
     desc: "Unified Government of India portal to check eligibility and apply across 12+ credit-linked schemes.",
     url: "https://www.jansamarth.in/",
+    accent: "from-sky-600 to-blue-700",
   },
   {
     name: "PM MUDRA Yojana",
     tag: "Micro-Enterprise Loans",
     desc: "Official PMMY guidelines for Shishu, Kishore, and Tarun non-farm micro-enterprise credit.",
     url: "https://www.mudra.org.in/",
+    accent: "from-teal-700 to-emerald-800",
   },
   {
-    name: "Udyam Registration (MSME)",
-    tag: "Enterprise Identity",
+    name: "Udyam Registration",
+    tag: "MSME Identity",
     desc: "Zero-cost Government of India MSME registration required by banks and PMFME subsidy workflows.",
     url: "https://udyamregistration.gov.in/",
+    accent: "from-indigo-600 to-slate-800",
   },
   {
-    name: "GLPC — Mission Mangalam",
+    name: "GLPC Mission Mangalam",
     tag: "Gujarat State Nodal",
     desc: "Gujarat Livelihood Promotion Company portal for district cluster federations and Bank Sakhi support.",
     url: "https://glpc.gujarat.gov.in/",
+    accent: "from-[#0D4F3C] to-[#148060]",
   },
 ];
 
@@ -82,6 +98,8 @@ const LIVELIHOOD_CARDS = [
 ];
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPortal }) => {
+  const duplicatedPortals = [...GOVT_PORTALS, ...GOVT_PORTALS];
+
   return (
     <div className="min-h-screen ios-canvas">
       {/* ─── iOS Frosted Glass Navigation ─── */}
@@ -106,9 +124,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPortal }) => {
           </div>
 
           <div className="hidden md:flex items-center gap-7 text-[13.5px] font-medium text-[var(--sakhi-muted)]">
-            <a href="#features" className="hover:text-[var(--sakhi-slate)] transition-colors">Capabilities</a>
-            <a href="#livelihoods" className="hover:text-[var(--sakhi-slate)] transition-colors">SHG Enterprises</a>
             <a href="#govt-portals" className="hover:text-[var(--sakhi-slate)] transition-colors">Govt Portals</a>
+            <a href="#livelihoods" className="hover:text-[var(--sakhi-slate)] transition-colors">SHG Enterprises</a>
+            <a href="#features" className="hover:text-[var(--sakhi-slate)] transition-colors">Capabilities</a>
             <a href="#how-it-works" className="hover:text-[var(--sakhi-slate)] transition-colors">How It Works</a>
           </div>
 
@@ -122,116 +140,109 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPortal }) => {
         </div>
       </nav>
 
-      {/* ─── Hero Section ─── */}
-      <section className="relative overflow-hidden pt-24">
-        <div className="absolute inset-0 gradient-mesh pointer-events-none" />
+      {/* ─── Animated Marquee Hero (hero-3 style) ─── */}
+      <div className="pt-14 gradient-mesh">
+        <AnimatedMarqueeHero
+          tagline="SFIC 2026 · PS000311 · Gujarat SHG Credit Gateway"
+          title={
+            <>
+              From Group Savings{" "}
+              <span className="text-[var(--sakhi-forest)]">to Enterprise Credit</span>
+              <span className="text-[var(--sakhi-gold)]">.</span>
+            </>
+          }
+          description="Verify your NRLM LokOS registration, run a 6–12 month sales-backed financial diagnosis, match 9 Gujarat & GLPC schemes, and export a bank-ready dossier in minutes."
+          ctaText="Start Credit Application →"
+          images={SHG_MARQUEE_IMAGES}
+          onCtaClick={onEnterPortal}
+        />
+      </div>
 
-        <div className="relative mx-auto max-w-7xl px-6 pb-20 pt-14 md:pt-20">
-          <div className="grid gap-12 lg:grid-cols-12 lg:gap-12 items-center">
-            <div className="lg:col-span-6 max-w-2xl">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full ios-pill px-4 py-2 animate-fade-in-up">
-                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse-dot" />
-                <span className="text-[12.5px] font-medium text-[var(--sakhi-slate)]">
-                  SFIC 2026 · PS000311 · Gujarat SHG Credit Gateway
-                </span>
+      {/* ─── iOS Glass Stat Strip ─── */}
+      <section className="mx-auto max-w-7xl px-6 py-10">
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {[
+            { value: "148", label: "SHGs Assessed", sub: "Anand & Kheda Pilot" },
+            { value: "₹3.62 Cr", label: "Pipeline Demand", sub: "Pre-application verified" },
+            { value: "84%", label: "Avg Readiness", sub: "Panchasutra + Unit Economics" },
+            { value: "61", label: "Bank-Ready Packs", sub: "First-time complete" },
+          ].map((stat, i) => (
+            <div key={i} className="rounded-2xl ios-glass px-5 py-6 text-center">
+              <div className="font-display text-[32px] text-[var(--sakhi-slate)] animate-count" style={{ animationDelay: `${i * 120}ms` }}>
+                {stat.value}
               </div>
-
-              <h1 className="font-display text-[46px] leading-[1.08] tracking-tight text-[var(--sakhi-slate)] md:text-[58px] animate-fade-in-up animation-delay-100">
-                From group savings{" "}
-                <span className="text-[var(--sakhi-forest)]">to enterprise credit</span>
-                <span className="text-[var(--sakhi-gold)]">.</span>
-              </h1>
-
-              <p className="mt-6 text-[17.5px] leading-relaxed text-[var(--sakhi-muted)] animate-fade-in-up animation-delay-200">
-                Enter your SHG&apos;s enterprise needs in 3 guided steps. Sakhi CreditLink diagnoses
-                cash-flow viability, matches eligible schemes like DAY-NRLM &amp; PMFME, and
-                assembles a bank-ready application dossier.
-              </p>
-
-              <div className="mt-9 flex flex-wrap gap-4 animate-fade-in-up animation-delay-300">
-                <button
-                  onClick={onEnterPortal}
-                  className="group flex items-center gap-2.5 rounded-2xl bg-[var(--sakhi-forest)] px-7 py-4 text-[15.5px] font-semibold text-white shadow-xl shadow-[var(--sakhi-forest)]/25 transition-all hover:bg-[var(--sakhi-forest-deep)] hover:shadow-2xl hover:-translate-y-0.5"
-                >
-                  <Sparkles className="h-5 w-5" />
-                  Start Credit Application
-                  <ChevronRight className="h-5 w-5 transition-transform group-hover:translate-x-0.5" />
-                </button>
-                <a
-                  href="#govt-portals"
-                  className="flex items-center gap-2 rounded-2xl ios-glass px-7 py-4 text-[15.5px] font-semibold text-[var(--sakhi-slate)] transition-all hover:-translate-y-0.5"
-                >
-                  Official Scheme Portals
-                </a>
-              </div>
+              <div className="mt-1 text-[13.5px] font-semibold text-[var(--sakhi-slate)]">{stat.label}</div>
+              <div className="mt-0.5 text-[12px] text-[var(--sakhi-muted)]">{stat.sub}</div>
             </div>
+          ))}
+        </div>
+      </section>
 
-            {/* Hero Photo + iOS Glass Overlay Cards */}
-            <div className="relative lg:col-span-6 animate-fade-in-up animation-delay-400">
-              <div className="relative mx-auto max-w-xl">
-                <div className="overflow-hidden rounded-[28px] border border-white/80 shadow-2xl shadow-slate-900/10">
-                  <img
-                    src="/images/shg-hero.jpg"
-                    alt="Women Self-Help Group members reviewing enterprise credit plans"
-                    className="h-[380px] w-full object-cover md:h-[430px]"
-                  />
-                </div>
-
-                {/* Top-left iOS Glass Pill */}
-                <div className="absolute -left-3 top-6 rounded-2xl ios-glass-strong p-4 animate-scale-in md:-left-6">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--sakhi-mint)]">
-                      <Users className="h-5 w-5 text-[var(--sakhi-forest)]" />
-                    </div>
-                    <div>
-                      <div className="text-[20px] font-bold text-[var(--sakhi-slate)] tabular-nums">148 SHGs</div>
-                      <div className="text-[11.5px] text-[var(--sakhi-muted)]">Verified credit pipeline</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bottom-right iOS Glass Card */}
-                <div className="absolute -bottom-5 right-3 left-3 sm:left-auto sm:w-80 rounded-2xl ios-glass-strong p-4 animate-scale-in md:-right-5">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[12px] font-semibold text-[var(--sakhi-forest)]">Digital Diagnosis Ready</span>
-                    <span className="rounded-full bg-emerald-100 px-2.5 py-0.5 text-[11px] font-bold text-emerald-700">84% Score</span>
-                  </div>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200/70">
-                    <div className="h-full w-[84%] rounded-full bg-gradient-to-r from-[var(--sakhi-forest)] to-[var(--sakhi-emerald)]" />
-                  </div>
-                  <div className="mt-2.5 flex items-center gap-2 text-[12px] text-[var(--sakhi-muted)]">
-                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600" />
-                    <span>Capex &amp; Working Capital separated cleanly</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* ─── Official Government Scheme Portals (Animated Tilted Marquee Style) ─── */}
+      <section id="govt-portals" className="relative overflow-hidden py-20">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <div className="mb-4 inline-flex items-center gap-2 rounded-full ios-pill px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-widest text-[var(--sakhi-forest)]">
+            <Globe className="h-3.5 w-3.5" />
+            Direct Official Portals
           </div>
+          <h2 className="font-display text-4xl md:text-5xl tracking-tight text-[var(--sakhi-slate)]">
+            Connected to Government Credit Portals
+          </h2>
+          <p className="mt-4 mx-auto max-w-2xl text-[15.5px] text-[var(--sakhi-muted)] leading-relaxed">
+            Sakhi CreditLink prepares your group&apos;s verified dossier and connects you directly to
+            official Central &amp; Gujarat Government portals for final submission.
+          </p>
         </div>
 
-        {/* iOS Glass Stat Strip */}
-        <div className="mx-auto max-w-7xl px-6 pb-8">
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            {[
-              { value: "148", label: "SHGs Assessed", sub: "Anand & Kheda Pilot" },
-              { value: "₹3.62 Cr", label: "Pipeline Demand", sub: "Pre-application verified" },
-              { value: "84%", label: "Avg Readiness", sub: "Panchasutra + Unit Economics" },
-              { value: "61", label: "Bank-Ready Packs", sub: "First-time complete" },
-            ].map((stat, i) => (
-              <div key={i} className="rounded-2xl ios-glass px-5 py-6 text-center">
-                <div className="font-display text-[32px] text-[var(--sakhi-slate)] animate-count" style={{ animationDelay: `${i * 120}ms` }}>
-                  {stat.value}
+        {/* Animated Tilted Portal Card Marquee (hovering pauses/lifts any card to click) */}
+        <div className="relative mt-12 w-full overflow-hidden py-6 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
+          <motion.div
+            className="flex gap-5 w-max px-4"
+            animate={{
+              x: ["0%", "-50%"],
+              transition: {
+                ease: "linear",
+                duration: 38,
+                repeat: Infinity,
+              },
+            }}
+            whileHover={{ transition: { duration: 120 } }}
+          >
+            {duplicatedPortals.map((portal, idx) => (
+              <motion.a
+                key={`${portal.name}-${idx}`}
+                href={portal.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                whileHover={{ scale: 1.04, rotate: 0, y: -6 }}
+                style={{ rotate: `${idx % 2 === 0 ? -1.8 : 2.2}deg` }}
+                className="group flex w-72 sm:w-80 flex-shrink-0 flex-col justify-between rounded-3xl ios-glass-strong p-6 transition-shadow hover:shadow-2xl"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className={`rounded-full bg-gradient-to-r ${portal.accent} px-3 py-1 text-[11px] font-semibold text-white shadow-sm`}>
+                      {portal.tag}
+                    </span>
+                    <ExternalLink className="h-4 w-4 text-[var(--sakhi-muted)] group-hover:text-[var(--sakhi-forest)]" />
+                  </div>
+                  <h3 className="mt-4 text-[18px] font-bold text-[var(--sakhi-slate)] group-hover:text-[var(--sakhi-forest)]">
+                    {portal.name}
+                  </h3>
+                  <p className="mt-2 text-[13.5px] leading-relaxed text-[var(--sakhi-muted)]">
+                    {portal.desc}
+                  </p>
                 </div>
-                <div className="mt-1 text-[13.5px] font-semibold text-[var(--sakhi-slate)]">{stat.label}</div>
-                <div className="mt-0.5 text-[12px] text-[var(--sakhi-muted)]">{stat.sub}</div>
-              </div>
+                <div className="mt-5 inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-[var(--sakhi-forest)]">
+                  Visit Official Portal <ArrowUpRight className="h-3.5 w-3.5" />
+                </div>
+              </motion.a>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ─── SHG Livelihood Photos Showcase ─── */}
-      <section id="livelihoods" className="py-20">
+      <section id="livelihoods" className="py-16">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
             <div>
@@ -277,7 +288,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPortal }) => {
       </section>
 
       {/* ─── Features Section ─── */}
-      <section id="features" className="py-20">
+      <section id="features" className="py-16">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mx-auto max-w-2xl text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full ios-pill px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">
@@ -294,19 +305,19 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPortal }) => {
               {
                 icon: Fingerprint,
                 title: "Demand Diagnosis",
-                desc: "Structured intake separating Capex from Working Capital with Panchasutra validation and unit-economics DSCR.",
+                desc: "Structured intake separating Capex from Working Capital with 6–12 month sales-backed EMI & DSCR.",
                 color: "bg-[var(--sakhi-forest)]",
               },
               {
                 icon: Target,
-                title: "Transparent Scheme Matching",
-                desc: "Deterministic matching across DAY-NRLM, PMFME, and MUDRA with explicit exclusions and zero paid ranking.",
+                title: "9-Scheme Gujarat Engine",
+                desc: "Deterministic matching across GLPC 0% Subvention, MMUY, CIF, VBY, PMFME & MUDRA with Apply + Bank Picker.",
                 color: "bg-[var(--sakhi-gold)]",
               },
               {
                 icon: FileCheck2,
-                title: "Bank-Ready Appraisal Pack",
-                desc: "One-click printable & JSON dossier with buyer evidence, purpose-specific consent, and document checklists.",
+                title: "Verified Appraisal Pack",
+                desc: "Geo-tagged field proof, 3-bearer Quorum OTP, API Setu checks, and one-click printable PDF & JSON dossiers.",
                 color: "bg-[var(--sakhi-emerald)]",
               },
             ].map((feat, i) => (
@@ -314,7 +325,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPortal }) => {
                 key={i}
                 className="rounded-3xl ios-glass p-8 transition-all hover:-translate-y-1 hover:shadow-xl"
               >
-                <div className={`mb-5 flex h-13 w-13 h-12 w-12 items-center justify-center rounded-2xl ${feat.color} shadow-lg`}>
+                <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl ${feat.color} shadow-lg`}>
                   <feat.icon className="h-6 w-6 text-white" />
                 </div>
                 <h3 className="text-[19px] font-bold text-[var(--sakhi-slate)]">{feat.title}</h3>
@@ -325,57 +336,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPortal }) => {
         </div>
       </section>
 
-      {/* ─── Official Government Scheme Portals (Direct Access) ─── */}
-      <section id="govt-portals" className="py-20">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full ios-pill px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-widest text-[var(--sakhi-forest)]">
-              <Globe className="h-3.5 w-3.5" />
-              Direct Official Portals
-            </div>
-            <h2 className="font-display text-[38px] text-[var(--sakhi-slate)]">
-              Government Scheme &amp; Registration Links
-            </h2>
-            <p className="mt-3 text-[15px] text-[var(--sakhi-muted)]">
-              Sakhi CreditLink prepares your group&apos;s dossier and connects directly to official
-              Central &amp; Gujarat Government portals for final submission.
-            </p>
-          </div>
-
-          <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {GOVT_PORTALS.map((portal) => (
-              <a
-                key={portal.name}
-                href={portal.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex flex-col justify-between rounded-2xl ios-glass p-6 transition-all hover:-translate-y-1 hover:shadow-xl"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="rounded-full bg-[var(--sakhi-mint)] px-3 py-1 text-[11px] font-semibold text-[var(--sakhi-forest)]">
-                      {portal.tag}
-                    </span>
-                    <ExternalLink className="h-4 w-4 text-[var(--sakhi-muted)] transition-colors group-hover:text-[var(--sakhi-forest)]" />
-                  </div>
-                  <h3 className="mt-4 text-[17px] font-bold text-[var(--sakhi-slate)] group-hover:text-[var(--sakhi-forest)]">
-                    {portal.name}
-                  </h3>
-                  <p className="mt-2 text-[13.5px] leading-relaxed text-[var(--sakhi-muted)]">
-                    {portal.desc}
-                  </p>
-                </div>
-                <div className="mt-5 inline-flex items-center gap-1 text-[12.5px] font-semibold text-[var(--sakhi-forest)]">
-                  Open official website <ArrowUpRight className="h-3.5 w-3.5" />
-                </div>
-              </a>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* ─── How It Works ─── */}
-      <section id="how-it-works" className="py-20">
+      <section id="how-it-works" className="py-16">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mx-auto max-w-2xl text-center">
             <div className="mb-4 inline-flex items-center gap-2 rounded-full ios-pill px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">
@@ -389,9 +351,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPortal }) => {
 
           <div className="mt-12 grid gap-5 md:grid-cols-4">
             {[
-              { step: "01", title: "Enter SHG Details", desc: "Capture group profile, Panchasutra status, and Capex/WC split.", icon: Sparkles },
-              { step: "02", title: "Digital Diagnosis", desc: "Instant 3-scenario cash-flow, EMI, and DSCR viability check.", icon: Shield },
-              { step: "03", title: "Match & Compare", desc: "Check DAY-NRLM / PMFME fit and compare lender terms fairly.", icon: BarChart3 },
+              { step: "01", title: "Verify LokOS ID", desc: "Auto-populate SHG identity & Panchasutra from GLPC snapshot.", icon: Sparkles },
+              { step: "02", title: "Sales-Backed EMI", desc: "Enter 6–12 month sales to compute natural EMI & lean-month DSCR.", icon: Shield },
+              { step: "03", title: "Match & Choose Bank", desc: "Apply under Absolute Match Gujarat/GLPC schemes & pick a bank.", icon: BarChart3 },
               { step: "04", title: "Export Bank Pack", desc: "Print or download the verified dossier for branch appraisal.", icon: FileCheck2 },
             ].map((s) => (
               <div key={s.step} className="rounded-2xl ios-glass p-6">

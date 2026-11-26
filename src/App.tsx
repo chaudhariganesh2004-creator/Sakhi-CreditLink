@@ -17,6 +17,7 @@ import {
   Scale,
   Search,
   Shield,
+  ShieldCheck,
   Sparkles,
   Users,
   X,
@@ -39,6 +40,7 @@ import { FinancingBlueprintScreen } from "@/screens/FinancingBlueprintScreen";
 import { SchemeMatchScreen } from "@/screens/SchemeMatchScreen";
 import { OfferComparisonScreen } from "@/screens/OfferComparisonScreen";
 import { ApplicationPackScreen } from "@/screens/ApplicationPackScreen";
+import { PostDisbursementGuardScreen } from "@/screens/PostDisbursementGuardScreen";
 import { LivelihoodEvidenceScreen } from "@/screens/LivelihoodEvidenceScreen";
 import { FieldFollowupsScreen } from "@/screens/FieldFollowupsScreen";
 import { ProgrammeInsightsScreen } from "@/screens/ProgrammeInsightsScreen";
@@ -101,6 +103,7 @@ const PROCESS_CATEGORIES: ProcessCategory[] = [
     defaultScreen: "application-pack",
     items: [
       { id: "application-pack", label: "Pack & Submission", icon: FolderCheck },
+      { id: "post-disbursement", label: "Post-Disbursement & 0% Guard", icon: ShieldCheck },
     ],
   },
   {
@@ -251,7 +254,14 @@ export function App() {
           <FinancingBlueprintScreen shg={activeCase} onNavigate={handleNavigate} />
         );
       case "scheme-match":
-        return <SchemeMatchScreen shg={activeCase} onNavigate={handleNavigate} />;
+        return (
+          <SchemeMatchScreen
+            shg={activeCase}
+            selectedLenderId={selectedLenderId}
+            onSelectLender={setSelectedLenderId}
+            onNavigate={handleNavigate}
+          />
+        );
       case "offer-comparison":
         return (
           <OfferComparisonScreen
@@ -268,6 +278,15 @@ export function App() {
             role={role}
             selectedLenderId={selectedLenderId}
             onUpdateCase={handleUpdateCase}
+          />
+        );
+      case "post-disbursement":
+        return (
+          <PostDisbursementGuardScreen
+            shg={activeCase}
+            cases={cases}
+            onUpdateCase={handleUpdateCase}
+            onSelectCase={handleSelectCase}
           />
         );
       case "livelihood-evidence":

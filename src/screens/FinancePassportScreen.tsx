@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import {
+  Camera,
   CheckCircle2,
   ChevronDown,
   ChevronRight,
   FileCheck2,
+  KeyRound,
   Lock,
+  MapPin,
   ShieldCheck,
+  Sparkles,
   User,
   XCircle,
 } from "lucide-react";
@@ -33,12 +37,79 @@ interface Props {
 export const FinancePassportScreen: React.FC<Props> = ({
   shg,
   language,
+  onUpdateCase,
   onNavigate,
 }) => {
-  const [expandedSection, setExpandedSection] = useState<string | null>("identity");
+  const [expandedSection, setExpandedSection] = useState<string | null>("field-proof");
+  const [geoPhotoCaptured, setGeoPhotoCaptured] = useState<string | null>(null);
+  const [quorumOtpVerified, setQuorumOtpVerified] = useState<boolean>(false);
+  const [apiSetuVerified, setApiSetuVerified] = useState<boolean>(false);
+
   const showGu = language === "en-gu";
   const totalCost = shg.costLines.reduce((s, c) => s + c.amount, 0);
   const externalNeed = totalCost - shg.ownContribution;
+
+  const handleCaptureGeoProof = (fileName?: string) => {
+    const stamp = `22.5645° N, 72.9289° E · ${shg.village}, ${shg.district} (${fileName || "Workshop_GeoPhoto.jpg"})`;
+    setGeoPhotoCaptured(stamp);
+    onUpdateCase({
+      ...shg,
+      readinessScore: Math.min(98, shg.readinessScore + 4),
+      timeline: [
+        {
+          id: `geo-${Date.now()}`,
+          stage: "Geo-Tagged Field Proof",
+          actor: `${shg.bankSakhiName} (Bank Sakhi)`,
+          timestamp: "Just now",
+          note: `Captured geo-tagged workshop/machinery proof at ${stamp}.`,
+        },
+        ...shg.timeline,
+      ],
+    });
+  };
+
+  const handleVerifyQuorumOtp = () => {
+    setQuorumOtpVerified(true);
+    onUpdateCase({
+      ...shg,
+      readinessScore: Math.min(98, shg.readinessScore + 6),
+      costLines: shg.costLines.map((c) =>
+        c.provenance === "Self-declared" ? { ...c, provenance: "Field-verified" } : c
+      ),
+      officeBearers: shg.officeBearers.map((ob) => ({ ...ob, verified: true })),
+      timeline: [
+        {
+          id: `otp-${Date.now()}`,
+          stage: "3-Office-Bearer Quorum OTP",
+          actor: shg.officeBearers.map((o) => o.name).join(", "),
+          timestamp: "Just now",
+          note: "Upgraded self-declared cost lines to Field-verified via 3-bearer OTP quorum.",
+        },
+        ...shg.timeline,
+      ],
+    });
+  };
+
+  const handleVerifyApiSetu = () => {
+    setApiSetuVerified(true);
+    onUpdateCase({
+      ...shg,
+      readinessScore: Math.min(99, shg.readinessScore + 5),
+      documents: shg.documents.map((d) =>
+        d.status !== "Verified" ? { ...d, status: "Verified", provenance: "Document-supported", updatedAt: "Verified via API Setu / OCR" } : d
+      ),
+      timeline: [
+        {
+          id: `api-${Date.now()}`,
+          stage: "API Setu & Passbook OCR",
+          actor: "Sakhi Verification Adapter",
+          timestamp: "Just now",
+          note: "Verified Udyam/FSSAI & 12-month passbook regularity; locked Document-supported badges.",
+        },
+        ...shg.timeline,
+      ],
+    });
+  };
 
   const toggle = (section: string) => setExpandedSection(expandedSection === section ? null : section);
 
@@ -49,6 +120,110 @@ export const FinancePassportScreen: React.FC<Props> = ({
   }, {} as Record<string, typeof shg.documents>);
 
   const sections = [
+    {
+      id: "field-proof",
+      title: "Field Proof, Quorum OTP & API Setu Verification",
+      icon: Sparkles,
+      content: (
+        <div className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2">
+            {/* Day 1: Geo-Proof + Quorum OTP */}
+            <div className="rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] font-bold uppercase tracking-wider text-[var(--sakhi-forest)]">
+                  Day 1 · Bank Sakhi Field Proof
+                </span>
+                <span className="rounded-full bg-white px-2.5 py-0.5 text-[11px] font-semibold text-[var(--sakhi-slate)] border border-[var(--sakhi-border)]">
+                  Offline-Ready
+                </span>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-[var(--sakhi-border)] bg-white px-3.5 py-2 text-[12.5px] font-semibold text-[var(--sakhi-slate)] hover:bg-[var(--sakhi-mint)]/40">
+                  <Camera className="h-3.5 w-3.5 text-[var(--sakhi-forest)]" />
+                  Upload Geo Photo
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => handleCaptureGeoProof(e.target.files?.[0]?.name)}
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => handleCaptureGeoProof()}
+                  className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--sakhi-forest)] px-3.5 py-2 text-[12.5px] font-semibold text-white hover:bg-[var(--sakhi-forest-deep)]"
+                >
+                  <MapPin className="h-3.5 w-3.5" /> Capture Geo-Tag
+                </button>
+              </div>
+
+              {geoPhotoCaptured && (
+                <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-[12px] text-emerald-800">
+                  <CheckCircle2 className="mr-1 inline h-3.5 w-3.5 text-emerald-600" />
+                  {geoPhotoCaptured}
+                </div>
+              )}
+
+              <div className="border-t border-[var(--sakhi-border)] pt-3 flex items-center justify-between gap-2">
+                <div className="text-[12.5px]">
+                  <div className="font-semibold text-[var(--sakhi-slate)]">3-Office-Bearer Quorum OTP</div>
+                  <div className="text-[11.5px] text-[var(--sakhi-muted)]">Upgrades Self-declared → Field-verified</div>
+                </div>
+                <button
+                  type="button"
+                  disabled={quorumOtpVerified}
+                  onClick={handleVerifyQuorumOtp}
+                  className={cn(
+                    "inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-[12px] font-semibold",
+                    quorumOtpVerified
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "bg-[var(--sakhi-forest)] text-white hover:bg-[var(--sakhi-forest-deep)]"
+                  )}
+                >
+                  <KeyRound className="h-3.5 w-3.5" />
+                  {quorumOtpVerified ? "Quorum Verified" : "Verify 3-Bearer OTP"}
+                </button>
+              </div>
+            </div>
+
+            {/* Scale: API Setu & Passbook OCR */}
+            <div className="rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[12px] font-bold uppercase tracking-wider text-sky-800">
+                  Scale · API Setu &amp; Passbook OCR
+                </span>
+                <span className="rounded-full bg-sky-50 px-2.5 py-0.5 text-[11px] font-semibold text-sky-700 border border-sky-200">
+                  Udyam · FSSAI · OCR
+                </span>
+              </div>
+
+              <p className="text-[12.5px] leading-relaxed text-[var(--sakhi-muted)]">
+                Automatically checks Udyam, FSSAI FoSCoS, and 12-month passbook regularity to lock{" "}
+                <strong>Document-supported</strong> provenance badges in the Application Pack.
+              </p>
+
+              <button
+                type="button"
+                disabled={apiSetuVerified}
+                onClick={handleVerifyApiSetu}
+                className={cn(
+                  "inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-[12.5px] font-semibold transition-all",
+                  apiSetuVerified
+                    ? "border border-emerald-200 bg-emerald-50 text-emerald-800"
+                    : "bg-slate-900 text-white hover:bg-slate-800"
+                )}
+              >
+                <ShieldCheck className="h-4 w-4" />
+                {apiSetuVerified
+                  ? "Udyam / FSSAI & Passbook Verified (Document-Supported)"
+                  : "Run API Setu & Passbook OCR Check"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ),
+    },
     {
       id: "identity",
       title: "SHG Identity & Governance",
