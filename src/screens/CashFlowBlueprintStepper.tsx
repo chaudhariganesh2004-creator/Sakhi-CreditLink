@@ -32,12 +32,20 @@ export const CashFlowBlueprintStepper: React.FC<CashFlowBlueprintStepperProps> =
 }) => {
   const [subStep, setSubStep] = useState<1 | 2 | 3>(initialSubStep);
 
+  const isBankView = role === "bank-officer";
+
+  const stepItems = STEPS.map((step) =>
+    step.id === 1 && !isBankView
+      ? { ...step, hint: "Assets to buy vs money for running the work" }
+      : step
+  );
+
   return (
     <div className="space-y-6">
       {/* Unified Stepper Bar */}
       <nav aria-label="Cash-flow blueprint steps" className="rounded-lg border border-[#DFDBD0] bg-white p-2">
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-          {STEPS.map((step) => {
+          {stepItems.map((step) => {
             const active = subStep === step.id;
             const done = subStep > step.id;
             return (
@@ -81,7 +89,7 @@ export const CashFlowBlueprintStepper: React.FC<CashFlowBlueprintStepperProps> =
         <LivelihoodEvidenceScreen shg={shg} onUpdateCase={onUpdateCase} />
       )}
       {subStep === 3 && (
-        <FinancingBlueprintScreen shg={shg} onNavigate={onNavigate} />
+        <FinancingBlueprintScreen shg={shg} role={role} onNavigate={onNavigate} />
       )}
 
       {/* Stepper Footer Navigation */}

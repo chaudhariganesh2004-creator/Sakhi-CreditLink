@@ -18,6 +18,7 @@ interface Props {
 
 export const CreditDemandScreen: React.FC<Props> = ({
   shg,
+  role,
   language,
   onUpdateCase,
   onNavigate,
@@ -25,6 +26,11 @@ export const CreditDemandScreen: React.FC<Props> = ({
   onStepNext,
 }) => {
   const showGu = language === "gu";
+  const isBankView = role === "bank-officer";
+  const capexLabel = isBankView ? "Capex" : "Assets to buy";
+  const wcLabel = isBankView ? "Working Capital" : "Money for running the work";
+  const capexTableTitle = isBankView ? "Capital Expenditure (Capex)" : "Assets to buy (Machines & Tools)";
+  const wcTableTitle = isBankView ? "Working Capital" : "Money for running the work (Raw Material & Stock)";
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState<number>(0);
@@ -149,8 +155,8 @@ export const CreditDemandScreen: React.FC<Props> = ({
                       aria-label="Edit category"
                       className="min-h-[40px] rounded-md border border-[#C9C3B4] bg-white px-2.5 text-[13px]"
                     >
-                      <option value="Capex">Capex</option>
-                      <option value="Working Capital">Working Capital</option>
+                      <option value="Capex">{capexLabel}</option>
+                      <option value="Working Capital">{wcLabel}</option>
                     </select>
                     <input
                       type="number"
@@ -229,11 +235,11 @@ export const CreditDemandScreen: React.FC<Props> = ({
       {/* Summary strip */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="p-4">
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#475467]">Capex</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#475467]">{capexLabel}</div>
           <div className="mt-1.5 font-mono text-[22px] font-semibold text-[#141A23] tabular-nums">{formatINR(capexTotal)}</div>
         </Card>
         <Card className="p-4">
-          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#475467]">Working Capital</div>
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-[#475467]">{wcLabel}</div>
           <div className="mt-1.5 font-mono text-[22px] font-semibold text-[#141A23] tabular-nums">{formatINR(wcTotal)}</div>
         </Card>
         <Card className="p-4">
@@ -257,13 +263,17 @@ export const CreditDemandScreen: React.FC<Props> = ({
       </div>
 
       <GovernanceNotice
-        title="Capex / Working Capital Separation"
-        body="Capital subsidies apply only to eligible fixed capital (machinery/equipment). Working capital items are strictly separated and routed to Cash Credit / Working Capital limits."
+        title={isBankView ? "Capex / Working Capital Separation" : `${capexLabel} vs ${wcLabel}`}
+        body={
+          isBankView
+            ? "Capital subsidies apply only to eligible fixed capital (machinery/equipment). Working capital items are strictly separated and routed to Cash Credit / Working Capital limits."
+            : "Machines and long-term tools are grouped separately from raw materials and day-to-day running costs so bank subsidies and credit limits match cleanly."
+        }
         tone="caution"
       />
 
-      {renderTable(capex, "Capital Expenditure (Capex)")}
-      {renderTable(wc, "Working Capital")}
+      {renderTable(capex, capexTableTitle)}
+      {renderTable(wc, wcTableTitle)}
 
       {/* Add Cost Item Form */}
       <Card className="p-5">
@@ -286,8 +296,8 @@ export const CreditDemandScreen: React.FC<Props> = ({
               onChange={(e) => setNewCategory(e.target.value as "Capex" | "Working Capital")}
               className="min-h-[44px] md:min-h-[38px] w-full rounded-md border border-[#C9C3B4] bg-white px-3 text-[13.5px]"
             >
-              <option value="Capex">Capex</option>
-              <option value="Working Capital">Working Capital</option>
+              <option value="Capex">{capexLabel}</option>
+              <option value="Working Capital">{wcLabel}</option>
             </select>
           </Field>
           <Field htmlFor="new-cost-amt" label="Amount (₹)" className="sm:col-span-2">
@@ -340,22 +350,22 @@ export const CreditDemandScreen: React.FC<Props> = ({
             <div
               className="bg-[#0F5E4E]"
               style={{ width: `${(capexTotal / totalCost) * 100}%` }}
-              title={`Capex: ${formatINR(capexTotal)}`}
+              title={`${capexLabel}: ${formatINR(capexTotal)}`}
             />
             <div
               className="bg-[#B45309]"
               style={{ width: `${(wcTotal / totalCost) * 100}%` }}
-              title={`Working Capital: ${formatINR(wcTotal)}`}
+              title={`${wcLabel}: ${formatINR(wcTotal)}`}
             />
           </div>
           <div className="mt-2.5 flex flex-wrap items-center gap-6 text-[13px]">
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-sm bg-[#0F5E4E]" />
-              <span className="text-[#475467]">Capex ({Math.round((capexTotal / totalCost) * 100)}%)</span>
+              <span className="text-[#475467]">{capexLabel} ({Math.round((capexTotal / totalCost) * 100)}%)</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-sm bg-[#B45309]" />
-              <span className="text-[#475467]">Working Capital ({Math.round((wcTotal / totalCost) * 100)}%)</span>
+              <span className="text-[#475467]">{wcLabel} ({Math.round((wcTotal / totalCost) * 100)}%)</span>
             </div>
           </div>
         </Card>

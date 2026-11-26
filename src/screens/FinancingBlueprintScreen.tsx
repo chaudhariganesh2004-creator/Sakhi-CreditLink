@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from "react";
 import { CalendarRange, ChevronRight, FileSpreadsheet, TrendingUp, Upload } from "lucide-react";
-import type { NavScreenId, SHGCase } from "@/data/sakhi-data";
+import type { NavScreenId, SHGCase, UserRole } from "@/data/sakhi-data";
 import { SectionHeader, GovernanceNotice } from "@/components/shared/ui-primitives";
 import { cn, formatINR } from "@/lib/utils";
 
 interface Props {
   shg: SHGCase;
+  role?: UserRole;
   onNavigate: (s: NavScreenId) => void;
 }
 
@@ -17,7 +18,8 @@ interface MonthlySaleRow {
 const MONTHS_12 = ["Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov"];
 const SEASONAL_WEIGHTS = [1.05, 1.0, 0.95, 1.15, 1.1, 0.9, 0.72, 0.68, 0.85, 1.25, 1.3, 1.05];
 
-export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) => {
+export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, role, onNavigate }) => {
+  const isBankView = role === "bank-officer";
   const [scenario, setScenario] = useState<"base" | "optimistic" | "conservative">("base");
   const [historyWindow, setHistoryWindow] = useState<6 | 12>(12);
   const [annualRatePct, setAnnualRatePct] = useState<number>(10.2);
@@ -314,7 +316,9 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
           "rounded-lg border p-5",
           dscr >= 1.5 ? "border-emerald-200 bg-emerald-50" : dscr >= 1.2 ? "border-amber-200 bg-amber-50" : "border-red-200 bg-red-50"
         )}>
-          <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">Post-Loan / Hist. DSCR</div>
+          <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">
+            {isBankView ? "Post-Loan / Hist. DSCR" : "Can the group repay comfortably?"}
+          </div>
           <div className={cn(
             "mt-2 text-[24px] font-bold tabular-nums",
             dscr >= 1.5 ? "text-emerald-700" : dscr >= 1.2 ? "text-amber-700" : "text-red-700"
@@ -364,7 +368,7 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
             </div>
             <div className="border-t border-[var(--sakhi-border)] pt-3 text-[13px]">
               <div className="flex justify-between"><span className="text-[var(--sakhi-muted)]">{historyWindow}-Month Avg:</span> <span className="font-medium">{historicalStats.avgUnits} {ue.unitLabel}/mo</span></div>
-              <div className="flex justify-between mt-1"><span className="text-[var(--sakhi-muted)]">Post-Capex Target:</span> <span className="font-bold text-[var(--sakhi-forest)]">{projectedUnits} {ue.unitLabel}/mo</span></div>
+              <div className="flex justify-between mt-1"><span className="text-[var(--sakhi-muted)]">{isBankView ? "Post-Capex Target:" : "Target After Buying Assets:"}</span> <span className="font-bold text-[var(--sakhi-forest)]">{projectedUnits} {ue.unitLabel}/mo</span></div>
             </div>
           </div>
         </div>
@@ -372,7 +376,11 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
 
       <GovernanceNotice
         title="Illustrative Projections"
-        body="EMI and DSCR figures are calculated from the entered 6–12 month sales ledger using a standard reducing-balance formula. Final sanction terms and repayment schedules are determined solely by the lending bank."
+        body={
+          isBankView
+            ? "EMI and DSCR figures are calculated from the entered 6–12 month sales ledger using a standard reducing-balance formula. Final sanction terms and repayment schedules are determined solely by the lending bank."
+            : "Monthly instalment (EMI) and repayment comfort figures are calculated from the entered 6–12 month sales ledger using a standard reducing-balance formula. Final sanction terms and repayment schedules are determined solely by the lending bank."
+        }
         tone="caution"
       />
     </div>
