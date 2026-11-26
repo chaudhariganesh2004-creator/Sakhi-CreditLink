@@ -4,14 +4,16 @@ import { AlertTriangle, CheckCircle2, Clock, FileCheck2, Info, ShieldCheck } fro
 import type { FunnelStage, ProvenanceLevel } from "@/data/sakhi-data";
 
 export function DemoBadge({ compact = false }: { compact?: boolean }) {
-  if (compact) return null; // Hide in compact mode for cleaner UI
   return (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-1 text-[11px] font-medium text-amber-700"
-      title="Illustrative demo data — not live bank or NRLM data"
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 font-medium text-amber-800",
+        compact ? "px-2 py-0.5 text-[10px]" : "px-2.5 py-0.5 text-[11px]"
+      )}
+      title="Simulated pilot data — not live bank or NRLM data"
     >
-      <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-      Prototype
+      <span className="h-1.5 w-1.5 rounded-full bg-amber-600" />
+      {compact ? "Simulated" : "Simulated data"}
     </span>
   );
 }

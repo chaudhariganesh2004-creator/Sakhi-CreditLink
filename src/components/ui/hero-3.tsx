@@ -153,6 +153,8 @@ export const AnimatedMarqueeHero: React.FC<AnimatedMarqueeHeroProps> = ({
               <img
                 src={src}
                 alt={`SHG enterprise showcase ${index + 1}`}
+                width={360}
+                height={480}
                 className="w-full h-full object-cover rounded-2xl shadow-lg border border-white/70"
               />
             </div>

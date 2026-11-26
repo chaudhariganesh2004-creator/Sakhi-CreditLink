@@ -37,6 +37,7 @@ import {
   saveCasesState,
 } from "@/lib/storage";
 import { resetLokOSSnapshotStorage } from "@/lib/lokos-adapter";
+import { DemoBadge } from "@/components/shared/ui-primitives";
 import { cn } from "@/lib/utils";
 
 const LandingPage = lazy(() =>
@@ -596,6 +597,8 @@ export function App() {
 
             {screen !== "shg-intake" && (
               <div className="hidden md:flex items-center gap-2 text-[12px] text-[var(--sakhi-muted)]">
+                <DemoBadge compact />
+                <span>·</span>
                 <span className="font-mono">{activeCase.caseCode}</span>
                 <span>·</span>
                 <span className="font-semibold text-[var(--sakhi-forest)]">

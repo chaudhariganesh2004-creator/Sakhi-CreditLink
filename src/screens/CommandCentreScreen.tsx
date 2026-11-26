@@ -8,6 +8,7 @@ import {
   type UserRole,
 } from "@/data/sakhi-data";
 import {
+  DemoBadge,
   SectionHeader,
   StageChip,
 } from "@/components/shared/ui-primitives";
@@ -63,7 +64,9 @@ export const CommandCentreScreen: React.FC<CommandCentreProps> = ({
         title="Command Centre"
         subtitle="Pre-application demand, readiness, and conversion pipeline."
         rightSlot={
-          <div className="flex items-center rounded-xl border border-[var(--sakhi-border)] bg-white p-1 text-[13px]">
+          <div className="flex items-center gap-2.5">
+            <DemoBadge />
+            <div className="flex items-center rounded-xl border border-[var(--sakhi-border)] bg-white p-1 text-[13px]">
             {(["All", "Anand", "Kheda"] as const).map((dist) => (
               <button
                 key={dist}
@@ -78,6 +81,7 @@ export const CommandCentreScreen: React.FC<CommandCentreProps> = ({
                 {dist === "All" ? "All Districts" : dist}
               </button>
             ))}
+          </div>
           </div>
         }
       />
@@ -120,18 +124,18 @@ export const CommandCentreScreen: React.FC<CommandCentreProps> = ({
         {[
           {
             icon: Users,
-            label: "Validated Demand",
+            label: "Validated Demand (Simulated)",
             value: "148",
             unit: "SHGs",
-            detail: "₹3.62 Cr indicative need",
+            detail: "₹3.62 Cr illustrative need",
             accent: false,
           },
           {
             icon: TrendingUp,
-            label: "Lender-Ready Packs",
+            label: "Lender-Ready Packs (Simulated)",
             value: "61",
             unit: "packs",
-            detail: "78.7% first-time complete",
+            detail: "78.7% illustrative complete",
             accent: false,
           },
           {

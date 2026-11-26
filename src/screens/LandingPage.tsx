@@ -15,6 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import { AnimatedMarqueeHero } from "@/components/ui/hero-3";
+import { DemoBadge } from "@/components/shared/ui-primitives";
 
 interface LandingPageProps {
   onEnterPortal: () => void;
@@ -160,12 +161,18 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPortal }) => {
 
       {/* ─── iOS Glass Stat Strip ─── */}
       <section className="mx-auto max-w-7xl px-6 py-10">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-[12px] font-medium text-[var(--sakhi-muted)]">
+            Pilot Baseline Overview (Anand &amp; Kheda)
+          </span>
+          <DemoBadge />
+        </div>
         <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
           {[
-            { value: "148", label: "SHGs Assessed", sub: "Anand & Kheda Pilot" },
-            { value: "₹3.62 Cr", label: "Pipeline Demand", sub: "Pre-application verified" },
-            { value: "84%", label: "Avg Readiness", sub: "Panchasutra + Unit Economics" },
-            { value: "61", label: "Bank-Ready Packs", sub: "First-time complete" },
+            { value: "148", label: "SHGs Assessed (Illustrative)", sub: "Anand & Kheda Pilot" },
+            { value: "₹3.62 Cr", label: "Pipeline Demand (Illustrative)", sub: "Pre-application verified" },
+            { value: "84%", label: "Avg Readiness (Illustrative)", sub: "Panchasutra + Unit Economics" },
+            { value: "61", label: "Bank-Ready Packs (Illustrative)", sub: "First-time complete" },
           ].map((stat, i) => (
             <div key={i} className="rounded-2xl ios-glass px-5 py-6 text-center">
               <div className="font-display text-[32px] text-[var(--sakhi-slate)] animate-count" style={{ animationDelay: `${i * 120}ms` }}>
@@ -271,6 +278,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPortal }) => {
                   <img
                     src={item.image}
                     alt={item.title}
+                    width={800}
+                    height={533}
+                    loading="lazy"
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute top-3 left-3 rounded-full ios-glass-strong px-3 py-1 text-[11px] font-semibold text-[var(--sakhi-forest)]">
@@ -397,19 +407,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPortal }) => {
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { val: "5", label: "Pilot Blocks", sub: "Anand & Kheda" },
-                  { val: "14+", label: "Bank Sakhis", sub: "Cluster facilitators" },
-                  { val: "29", label: "Sanctioned", sub: "Verified packs" },
-                  { val: "₹78L", label: "Disbursed", sub: "SHG enterprises" },
-                ].map((m, i) => (
-                  <div key={i} className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-5">
-                    <div className="font-display text-[30px] text-white">{m.val}</div>
-                    <div className="mt-1 text-[13.5px] font-semibold text-white/90">{m.label}</div>
-                    <div className="text-[12px] text-white/55">{m.sub}</div>
-                  </div>
-                ))}
+              <div className="space-y-3">
+                <div className="flex items-center justify-end">
+                  <DemoBadge />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  {[
+                    { val: "5", label: "Pilot Blocks (Simulated)", sub: "Anand & Kheda" },
+                    { val: "14+", label: "Bank Sakhis (Simulated)", sub: "Cluster facilitators" },
+                    { val: "29", label: "Sanctioned (Simulated)", sub: "Verified packs" },
+                    { val: "₹78L", label: "Disbursed (Simulated)", sub: "SHG enterprises" },
+                  ].map((m, i) => (
+                    <div key={i} className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-5">
+                      <div className="font-display text-[30px] text-white">{m.val}</div>
+                      <div className="mt-1 text-[13.5px] font-semibold text-white/90">{m.label}</div>
+                      <div className="text-[12px] text-white/55">{m.sub}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
