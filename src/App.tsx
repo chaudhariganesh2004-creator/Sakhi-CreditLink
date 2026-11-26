@@ -28,6 +28,9 @@ import { cn } from "@/lib/utils";
 const LandingPage = lazy(() =>
   import("@/screens/LandingPage").then((m) => ({ default: m.LandingPage }))
 );
+const ReadinessHubScreen = lazy(() =>
+  import("@/screens/ReadinessHubScreen").then((m) => ({ default: m.ReadinessHubScreen }))
+);
 const SHGIntakeScreen = lazy(() =>
   import("@/screens/SHGIntakeScreen").then((m) => ({ default: m.SHGIntakeScreen }))
 );
@@ -91,8 +94,9 @@ const ROLE_CONFIGS: Record<PortalRole, RoleNavConfig> = {
   "shg-sakhi": {
     label: "SHG / Bank Sakhi",
     legacyRole: "bank-sakhi",
-    defaultScreen: "shg-intake",
+    defaultScreen: "readiness-hub",
     navItems: [
+      { id: "readiness-hub", label: "Readiness Hub", labelGu: "તૈયારી હબ" },
       { id: "shg-intake", label: "Intake", labelGu: "અરજી દાખલ" },
       { id: "finance-passport", label: "Finance Passport", labelGu: "ફાઇનાન્સ પાસપોર્ટ" },
       { id: "cashflow-blueprint", label: "Cash-flow blueprint", labelGu: "રોકડ પ્રવાહ" },
@@ -126,11 +130,11 @@ const ROLE_CONFIGS: Record<PortalRole, RoleNavConfig> = {
 
 function parseHashRoute(): { view: AppView; role: PortalRole; screen: NavScreenId } {
   if (typeof window === "undefined") {
-    return { view: "landing", role: "shg-sakhi", screen: "shg-intake" };
+    return { view: "landing", role: "shg-sakhi", screen: "readiness-hub" };
   }
   const raw = window.location.hash.replace(/^#\/?/, "").trim();
   if (!raw) {
-    return { view: "landing", role: "shg-sakhi", screen: "shg-intake" };
+    return { view: "landing", role: "shg-sakhi", screen: "readiness-hub" };
   }
   const [rolePart, screenPart] = raw.split("/");
   if (rolePart && rolePart in ROLE_CONFIGS) {
@@ -143,7 +147,7 @@ function parseHashRoute(): { view: AppView; role: PortalRole; screen: NavScreenI
       screen: allowed ? (screenPart as NavScreenId) : cfg.defaultScreen,
     };
   }
-  return { view: "landing", role: "shg-sakhi", screen: "shg-intake" };
+  return { view: "landing", role: "shg-sakhi", screen: "readiness-hub" };
 }
 
 function ScreenSkeleton() {
@@ -292,6 +296,8 @@ export function App() {
   // Mobile sticky bottom CTA for current screen (at most 1 primary CTA per screen)
   const mobileAction: { label: string; onClick: () => void } | null = (() => {
     switch (screen) {
+      case "readiness-hub":
+        return { label: "Open Cash-flow blueprint", onClick: () => handleNavigate("cashflow-blueprint") };
       case "finance-passport":
         return { label: "Next: Cash-flow blueprint", onClick: () => handleNavigate("cashflow-blueprint") };
       case "scheme-match":
@@ -309,11 +315,21 @@ export function App() {
 
   const renderScreen = () => {
     switch (screen) {
+      case "readiness-hub":
+        return (
+          <ReadinessHubScreen
+            key={activeCase.id}
+            shg={activeCase}
+            language={language}
+            onUpdateCase={handleUpdateCase}
+            onNavigate={handleNavigate}
+          />
+        );
       case "shg-intake":
         return (
           <SHGIntakeScreen
             onCreateCase={handleCreateCase}
-            onCancel={() => handleNavigate("finance-passport")}
+            onCancel={() => handleNavigate("readiness-hub")}
           />
         );
       case "finance-passport":
