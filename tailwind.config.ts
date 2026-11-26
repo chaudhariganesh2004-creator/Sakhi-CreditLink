@@ -8,8 +8,9 @@ const config: Config = {
       fontFamily: {
         sans: [
           "Inter",
-          "Noto Sans Gujarati",
-          "ui-sans-serif",
+          '"Noto Sans Gujarati"',
+          '"Nirmala UI"',
+          '"Shruti"',
           "system-ui",
           "sans-serif",
         ],
