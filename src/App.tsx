@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import {
   Activity,
   BadgeIndianRupee,
@@ -37,22 +37,78 @@ import {
   saveCasesState,
 } from "@/lib/storage";
 import { resetLokOSSnapshotStorage } from "@/lib/lokos-adapter";
-import { SHGIntakeScreen } from "@/screens/SHGIntakeScreen";
-import { RoleProfitDashboardScreen } from "@/screens/RoleProfitDashboardScreen";
-import { CommandCentreScreen } from "@/screens/CommandCentreScreen";
-import { DirectoryScreen } from "@/screens/DirectoryScreen";
-import { FinancePassportScreen } from "@/screens/FinancePassportScreen";
-import { CreditDemandScreen } from "@/screens/CreditDemandScreen";
-import { FinancingBlueprintScreen } from "@/screens/FinancingBlueprintScreen";
-import { SchemeMatchScreen } from "@/screens/SchemeMatchScreen";
-import { OfferComparisonScreen } from "@/screens/OfferComparisonScreen";
-import { ApplicationPackScreen } from "@/screens/ApplicationPackScreen";
-import { PostDisbursementGuardScreen } from "@/screens/PostDisbursementGuardScreen";
-import { LivelihoodEvidenceScreen } from "@/screens/LivelihoodEvidenceScreen";
-import { FieldFollowupsScreen } from "@/screens/FieldFollowupsScreen";
-import { ProgrammeInsightsScreen } from "@/screens/ProgrammeInsightsScreen";
-import { LandingPage } from "@/screens/LandingPage";
 import { cn } from "@/lib/utils";
+
+const LandingPage = lazy(() =>
+  import("@/screens/LandingPage").then((m) => ({ default: m.LandingPage }))
+);
+const SHGIntakeScreen = lazy(() =>
+  import("@/screens/SHGIntakeScreen").then((m) => ({ default: m.SHGIntakeScreen }))
+);
+const RoleProfitDashboardScreen = lazy(() =>
+  import("@/screens/RoleProfitDashboardScreen").then((m) => ({
+    default: m.RoleProfitDashboardScreen,
+  }))
+);
+const CommandCentreScreen = lazy(() =>
+  import("@/screens/CommandCentreScreen").then((m) => ({ default: m.CommandCentreScreen }))
+);
+const DirectoryScreen = lazy(() =>
+  import("@/screens/DirectoryScreen").then((m) => ({ default: m.DirectoryScreen }))
+);
+const FinancePassportScreen = lazy(() =>
+  import("@/screens/FinancePassportScreen").then((m) => ({ default: m.FinancePassportScreen }))
+);
+const CreditDemandScreen = lazy(() =>
+  import("@/screens/CreditDemandScreen").then((m) => ({ default: m.CreditDemandScreen }))
+);
+const FinancingBlueprintScreen = lazy(() =>
+  import("@/screens/FinancingBlueprintScreen").then((m) => ({
+    default: m.FinancingBlueprintScreen,
+  }))
+);
+const SchemeMatchScreen = lazy(() =>
+  import("@/screens/SchemeMatchScreen").then((m) => ({ default: m.SchemeMatchScreen }))
+);
+const OfferComparisonScreen = lazy(() =>
+  import("@/screens/OfferComparisonScreen").then((m) => ({ default: m.OfferComparisonScreen }))
+);
+const ApplicationPackScreen = lazy(() =>
+  import("@/screens/ApplicationPackScreen").then((m) => ({ default: m.ApplicationPackScreen }))
+);
+const PostDisbursementGuardScreen = lazy(() =>
+  import("@/screens/PostDisbursementGuardScreen").then((m) => ({
+    default: m.PostDisbursementGuardScreen,
+  }))
+);
+const LivelihoodEvidenceScreen = lazy(() =>
+  import("@/screens/LivelihoodEvidenceScreen").then((m) => ({
+    default: m.LivelihoodEvidenceScreen,
+  }))
+);
+const FieldFollowupsScreen = lazy(() =>
+  import("@/screens/FieldFollowupsScreen").then((m) => ({ default: m.FieldFollowupsScreen }))
+);
+const ProgrammeInsightsScreen = lazy(() =>
+  import("@/screens/ProgrammeInsightsScreen").then((m) => ({
+    default: m.ProgrammeInsightsScreen,
+  }))
+);
+
+function ScreenSkeleton() {
+  return (
+    <div className="space-y-4 py-4 animate-pulse" aria-busy="true" aria-label="Loading view">
+      <div className="h-8 w-64 rounded-lg bg-slate-200/80" />
+      <div className="h-4 w-96 max-w-full rounded bg-slate-200/60" />
+      <div className="grid gap-4 pt-2 sm:grid-cols-3">
+        <div className="h-28 rounded-xl bg-white/80 border border-slate-200/80" />
+        <div className="h-28 rounded-xl bg-white/80 border border-slate-200/80" />
+        <div className="h-28 rounded-xl bg-white/80 border border-slate-200/80" />
+      </div>
+      <div className="h-64 rounded-xl bg-white/80 border border-slate-200/80" />
+    </div>
+  );
+}
 
 type AppView = "landing" | "portal";
 
@@ -206,12 +262,14 @@ export function App() {
 
   if (appView === "landing") {
     return (
-      <LandingPage
-        onEnterPortal={() => {
-          setScreen("shg-intake");
-          setAppView("portal");
-        }}
-      />
+      <Suspense fallback={<div className="min-h-screen p-8"><ScreenSkeleton /></div>}>
+        <LandingPage
+          onEnterPortal={() => {
+            setScreen("shg-intake");
+            setAppView("portal");
+          }}
+        />
+      </Suspense>
     );
   }
 
@@ -255,6 +313,7 @@ export function App() {
       case "finance-passport":
         return (
           <FinancePassportScreen
+            key={activeCase.id}
             shg={activeCase}
             role={role}
             language={language}
@@ -265,6 +324,7 @@ export function App() {
       case "credit-demand":
         return (
           <CreditDemandScreen
+            key={activeCase.id}
             shg={activeCase}
             role={role}
             language={language}
@@ -274,11 +334,16 @@ export function App() {
         );
       case "financing-blueprint":
         return (
-          <FinancingBlueprintScreen shg={activeCase} onNavigate={handleNavigate} />
+          <FinancingBlueprintScreen
+            key={activeCase.id}
+            shg={activeCase}
+            onNavigate={handleNavigate}
+          />
         );
       case "scheme-match":
         return (
           <SchemeMatchScreen
+            key={activeCase.id}
             shg={activeCase}
             selectedLenderId={selectedLenderId}
             onSelectLender={setSelectedLenderId}
@@ -288,6 +353,7 @@ export function App() {
       case "offer-comparison":
         return (
           <OfferComparisonScreen
+            key={activeCase.id}
             shg={activeCase}
             selectedLenderId={selectedLenderId}
             onSelectLender={setSelectedLenderId}
@@ -297,6 +363,7 @@ export function App() {
       case "application-pack":
         return (
           <ApplicationPackScreen
+            key={activeCase.id}
             shg={activeCase}
             role={role}
             selectedLenderId={selectedLenderId}
@@ -306,6 +373,7 @@ export function App() {
       case "post-disbursement":
         return (
           <PostDisbursementGuardScreen
+            key={activeCase.id}
             shg={activeCase}
             cases={cases}
             onUpdateCase={handleUpdateCase}
@@ -315,6 +383,7 @@ export function App() {
       case "livelihood-evidence":
         return (
           <LivelihoodEvidenceScreen
+            key={activeCase.id}
             shg={activeCase}
             onUpdateCase={handleUpdateCase}
           />
@@ -620,7 +689,9 @@ export function App() {
       {/* Main Content */}
       <main className="pt-[118px]">
         <div className="mx-auto max-w-[1400px] px-4 py-8 lg:px-6">
-          {renderScreen()}
+          <Suspense fallback={<ScreenSkeleton />}>
+            {renderScreen()}
+          </Suspense>
         </div>
       </main>
     </div>
