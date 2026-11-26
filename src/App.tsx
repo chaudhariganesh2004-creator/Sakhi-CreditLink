@@ -53,9 +53,9 @@ const PostDisbursementGuardScreen = lazy(() =>
     default: m.PostDisbursementGuardScreen,
   }))
 );
-const BankQueuePlaceholderScreen = lazy(() =>
-  import("@/screens/BankQueuePlaceholderScreen").then((m) => ({
-    default: m.BankQueuePlaceholderScreen,
+const BankBranchQueueScreen = lazy(() =>
+  import("@/screens/BankBranchQueueScreen").then((m) => ({
+    default: m.BankBranchQueueScreen,
   }))
 );
 const OfferComparisonScreen = lazy(() =>
@@ -111,6 +111,7 @@ const ROLE_CONFIGS: Record<PortalRole, RoleNavConfig> = {
     defaultScreen: "bank-queue",
     navItems: [
       { id: "bank-queue", label: "Queue", labelGu: "બેંક કતાર" },
+      { id: "application-pack", label: "Application Pack", labelGu: "અરજી પેક" },
       { id: "offer-comparison", label: "Offer Comparison", labelGu: "બેંક શરતો" },
     ],
   },
@@ -386,9 +387,12 @@ export function App() {
         );
       case "bank-queue":
         return (
-          <BankQueuePlaceholderScreen
+          <BankBranchQueueScreen
             cases={cases}
+            activeCaseId={activeCase.id}
+            language={language}
             onSelectCase={handleSelectCase}
+            onUpdateCase={handleUpdateCase}
             onNavigate={handleNavigate}
           />
         );
@@ -409,11 +413,12 @@ export function App() {
             activeCaseId={activeCase.id}
             role={legacyRole}
             onSelectCase={handleSelectCase}
+            onUpdateCase={handleUpdateCase}
             onNavigate={handleNavigate}
           />
         );
       case "programme-insights":
-        return <ProgrammeInsightsScreen />;
+        return <ProgrammeInsightsScreen cases={cases} />;
       case "shg-directory":
         return (
           <DirectoryScreen

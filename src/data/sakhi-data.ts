@@ -102,9 +102,18 @@ export interface CaseQuery {
   id: string;
   raisedBy: string;
   raisedOn: string;
+  reasonCode?: string;
   question: string;
   response?: string;
   status: "Open" | "Resolved";
+}
+
+export interface BranchDecisionRecord {
+  status: "Pending" | "Approved" | "Query Raised" | "Rejected";
+  reasonCode?: string;
+  note?: string;
+  decidedAt: string;
+  sanctionedAmountINR?: number;
 }
 
 export interface StatusEvent {
@@ -171,6 +180,8 @@ export interface SHGCase {
   queries: CaseQuery[];
   timeline: StatusEvent[];
   bottleneckReason?: string;
+  branchDecision?: BranchDecisionRecord;
+  ldmEscalated?: boolean;
   activeBookMonths?: number;
   currentDose?: 1 | 2 | 3;
   isPrimaryDemo?: boolean;
@@ -613,6 +624,7 @@ export const SHG_CASES_DEMO: SHGCase[] = [
         id: "qry-2",
         raisedBy: "DMMU Pre-Pack Reviewer",
         raisedOn: "25 Nov 2026",
+        reasonCode: "BUYER-PROOF",
         question: "Attach buyer PO for Anand Consumer Co-op to move buyer evidence from self-declared to document-supported.",
         status: "Open",
       },
@@ -727,7 +739,16 @@ export const SHG_CASES_DEMO: SHGCase[] = [
     tasks: [
       { id: "nt1", title: "Follow up on SBI branch field inspection visit date", owner: "Ritaben Solanki", ownerRole: "bank-sakhi", dueDate: "24 Nov 2026", status: "Overdue", priority: "High" },
     ],
-    queries: [],
+    queries: [
+      {
+        id: "nq-1",
+        raisedBy: "SBI — Petlad Agri Branch",
+        raisedOn: "20 Nov 2026",
+        reasonCode: "INSPECTION-DELAY",
+        question: "Field inspection visit awaited by branch officer before final limit sanction.",
+        status: "Open",
+      },
+    ],
     timeline: [
       { id: "nev1", stage: "Submitted", actor: "Ritaben Solanki (Assisted Handoff)", timestamp: "14 Nov 2026 · 14:00", note: "Physical + PDF pack handed over at SBI Petlad branch; awaiting appraisal visit." },
     ],
@@ -797,7 +818,16 @@ export const SHG_CASES_DEMO: SHGCase[] = [
     tasks: [
       { id: "st1", title: "Update Panchasutra cashbook entries for Sep–Nov", owner: "Kajalben Chauhan", ownerRole: "bank-sakhi", dueDate: "22 Nov 2026", status: "Overdue", priority: "High" },
     ],
-    queries: [],
+    queries: [
+      {
+        id: "sq-1",
+        raisedBy: "Bank of Baroda — Bhadran",
+        raisedOn: "19 Nov 2026",
+        reasonCode: "MCP-MISMATCH",
+        question: "Cashbook and Micro Credit Plan (MCP) working capital figures need reconciliation.",
+        status: "Open",
+      },
+    ],
     timeline: [
       { id: "sev1", stage: "Need validated", actor: "Kajalben Chauhan", timestamp: "12 Nov 2026 · 12:15", note: "Stalled: cashbook reconciliation pending." },
     ],
@@ -864,6 +894,12 @@ export const SHG_CASES_DEMO: SHGCase[] = [
     },
     tasks: [],
     queries: [],
+    branchDecision: {
+      status: "Approved",
+      note: "Sanctioned for rotary convection oven & millet flour mill after inspection.",
+      decidedAt: "21 Nov 2026",
+      sanctionedAmountINR: 270000,
+    },
     timeline: [],
   },
   {
@@ -926,7 +962,16 @@ export const SHG_CASES_DEMO: SHGCase[] = [
       leanMonths: "Apr–May",
     },
     tasks: [],
-    queries: [],
+    queries: [
+      {
+        id: "aq-1",
+        raisedBy: "Bank of Baroda — Kapadvanj",
+        raisedOn: "21 Nov 2026",
+        reasonCode: "BUYER-PROOF",
+        question: "Submit block FPO buyer offtake letter to validate vermicompost demand.",
+        status: "Open",
+      },
+    ],
     timeline: [],
     bottleneckReason: "Awaiting block FPO buyer letter for cash-flow validation",
   },
