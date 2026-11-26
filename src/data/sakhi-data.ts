@@ -1,5 +1,7 @@
 export type NavScreenId =
   | "shg-intake"
+  | "cashflow-blueprint"
+  | "bank-queue"
   | "role-profit-dashboard"
   | "command-centre"
   | "shg-directory"
@@ -14,6 +16,8 @@ export type NavScreenId =
   | "field-followups"
   | "programme-insights";
 
+export type PortalRole = "shg-sakhi" | "bank-branch" | "district-official";
+
 export type UserRole =
   | "bank-sakhi"
   | "glpc-officer"
@@ -21,7 +25,7 @@ export type UserRole =
   | "bank-officer"
   | "admin";
 
-export type AppLanguage = "en" | "en-gu" | "hi";
+export type AppLanguage = "en" | "gu";
 
 export type ProvenanceLevel =
   | "Self-declared"

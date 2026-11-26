@@ -39,7 +39,7 @@ export const DirectoryScreen: React.FC<DirectoryProps> = ({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search by name, block, activity..."
-              className="h-10 w-full rounded-xl border border-[var(--sakhi-border)] bg-white pl-10 pr-4 text-[14px] text-[var(--sakhi-slate)] placeholder:text-[var(--sakhi-muted)] focus:border-[var(--sakhi-forest)] focus:outline-none focus:ring-2 focus:ring-[var(--sakhi-forest)]/10"
+              className="h-10 w-full rounded-lg border border-[var(--sakhi-border)] bg-white pl-10 pr-4 text-[14px] text-[var(--sakhi-slate)] placeholder:text-[var(--sakhi-muted)] focus:border-[var(--sakhi-forest)] focus:outline-none focus:ring-2 focus:ring-[var(--sakhi-forest)]/10"
             />
           </div>
         }
@@ -55,7 +55,7 @@ export const DirectoryScreen: React.FC<DirectoryProps> = ({
               key={c.id}
               onClick={() => onSelectCase(c.id, "finance-passport")}
               className={cn(
-                "group relative rounded-2xl border p-5 text-left transition-all hover:shadow-lg hover:shadow-black/5 hover:-translate-y-0.5",
+                "group relative rounded-lg border p-5 text-left transition-all hover: hover:shadow-black/5 ",
                 isActive
                   ? "border-[var(--sakhi-forest)]/30 bg-[var(--sakhi-mint)]/50 ring-1 ring-[var(--sakhi-forest)]/10"
                   : "border-[var(--sakhi-border)] bg-white"
@@ -81,7 +81,7 @@ export const DirectoryScreen: React.FC<DirectoryProps> = ({
 
               <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-[var(--sakhi-surface)]">
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-[var(--sakhi-forest)] to-[var(--sakhi-emerald)]"
+                  className="h-full rounded-full bg-[#0F5E4E]"
                   style={{ width: `${c.readinessScore}%` }}
                 />
               </div>

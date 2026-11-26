@@ -45,7 +45,7 @@ export const FinancePassportScreen: React.FC<Props> = ({
   const [quorumOtpVerified, setQuorumOtpVerified] = useState<boolean>(false);
   const [apiSetuVerified, setApiSetuVerified] = useState<boolean>(false);
 
-  const showGu = language === "en-gu";
+  const showGu = language === "gu";
   const totalCost = shg.costLines.reduce((s, c) => s + c.amount, 0);
   const externalNeed = totalCost - shg.ownContribution;
 
@@ -128,7 +128,7 @@ export const FinancePassportScreen: React.FC<Props> = ({
         <div className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             {/* Day 1: Geo-Proof + Quorum OTP */}
-            <div className="rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 space-y-3">
+            <div className="rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-[12px] font-bold uppercase tracking-wider text-[var(--sakhi-forest)]">
                   Day 1 · Bank Sakhi Field Proof
@@ -139,7 +139,7 @@ export const FinancePassportScreen: React.FC<Props> = ({
               </div>
 
               <div className="flex flex-wrap gap-2">
-                <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-[var(--sakhi-border)] bg-white px-3.5 py-2 text-[12.5px] font-semibold text-[var(--sakhi-slate)] hover:bg-[var(--sakhi-mint)]/40">
+                <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-[var(--sakhi-border)] bg-white px-3.5 py-2 text-[12.5px] font-semibold text-[var(--sakhi-slate)] hover:bg-[var(--sakhi-mint)]/40">
                   <Camera className="h-3.5 w-3.5 text-[var(--sakhi-forest)]" />
                   Upload Geo Photo
                   <input
@@ -152,7 +152,7 @@ export const FinancePassportScreen: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={() => handleCaptureGeoProof()}
-                  className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--sakhi-forest)] px-3.5 py-2 text-[12.5px] font-semibold text-white hover:bg-[var(--sakhi-forest-deep)]"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--sakhi-forest)] px-3.5 py-2 text-[12.5px] font-semibold text-white hover:bg-[var(--sakhi-forest-deep)]"
                 >
                   <MapPin className="h-3.5 w-3.5" /> Capture Geo-Tag
                 </button>
@@ -175,7 +175,7 @@ export const FinancePassportScreen: React.FC<Props> = ({
                   disabled={quorumOtpVerified}
                   onClick={handleVerifyQuorumOtp}
                   className={cn(
-                    "inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-[12px] font-semibold",
+                    "inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-[12px] font-semibold",
                     quorumOtpVerified
                       ? "bg-emerald-100 text-emerald-800"
                       : "bg-[var(--sakhi-forest)] text-white hover:bg-[var(--sakhi-forest-deep)]"
@@ -188,7 +188,7 @@ export const FinancePassportScreen: React.FC<Props> = ({
             </div>
 
             {/* Scale: API Setu & Passbook OCR */}
-            <div className="rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 space-y-3">
+            <div className="rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-[12px] font-bold uppercase tracking-wider text-sky-800">
                   Scale · API Setu &amp; Passbook OCR
@@ -208,7 +208,7 @@ export const FinancePassportScreen: React.FC<Props> = ({
                 disabled={apiSetuVerified}
                 onClick={handleVerifyApiSetu}
                 className={cn(
-                  "inline-flex w-full items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-[12.5px] font-semibold transition-all",
+                  "inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-[12.5px] font-semibold transition-all",
                   apiSetuVerified
                     ? "border border-emerald-200 bg-emerald-50 text-emerald-800"
                     : "bg-slate-900 text-white hover:bg-slate-800"
@@ -231,7 +231,7 @@ export const FinancePassportScreen: React.FC<Props> = ({
       content: (
         <div className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-xl bg-[var(--sakhi-surface)] p-4 space-y-3">
+            <div className="rounded-lg bg-[var(--sakhi-surface)] p-4 space-y-3">
               <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">Group Details</div>
               {[
                 ["Name", showGu ? `${shg.shgName} (${shg.shgNameGu})` : shg.shgName],
@@ -248,7 +248,7 @@ export const FinancePassportScreen: React.FC<Props> = ({
               ))}
             </div>
             <div className="space-y-4">
-              <div className="rounded-xl bg-[var(--sakhi-surface)] p-4">
+              <div className="rounded-lg bg-[var(--sakhi-surface)] p-4">
                 <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">Office Bearers</div>
                 <div className="mt-3 space-y-2.5">
                   {shg.officeBearers.map((ob) => (
@@ -266,7 +266,7 @@ export const FinancePassportScreen: React.FC<Props> = ({
                   ))}
                 </div>
               </div>
-              <div className="rounded-xl bg-[var(--sakhi-surface)] p-4">
+              <div className="rounded-lg bg-[var(--sakhi-surface)] p-4">
                 <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">Bank Sakhi</div>
                 <div className="mt-2 text-[14px] font-semibold text-[var(--sakhi-slate)]">{shg.bankSakhiName}</div>
                 <div className="text-[13px] text-[var(--sakhi-muted)]">{shg.linkedBranch}</div>
@@ -283,8 +283,8 @@ export const FinancePassportScreen: React.FC<Props> = ({
       content: (
         <div className="space-y-5">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[var(--sakhi-forest)]">
-              <span className="font-display text-[28px] text-white">{shg.panchasutraScore}/5</span>
+            <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-[var(--sakhi-forest)]">
+              <span className="font-serif font-semibold text-[28px] text-white">{shg.panchasutraScore}/5</span>
             </div>
             <div>
               <div className="text-[16px] font-bold text-[var(--sakhi-slate)]">
@@ -306,7 +306,7 @@ export const FinancePassportScreen: React.FC<Props> = ({
                 <div
                   key={p.key}
                   className={cn(
-                    "rounded-xl border p-4 text-center",
+                    "rounded-lg border p-4 text-center",
                     met ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50"
                   )}
                 >
@@ -323,15 +323,15 @@ export const FinancePassportScreen: React.FC<Props> = ({
             })}
           </div>
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-xl bg-[var(--sakhi-surface)] p-4">
+            <div className="rounded-lg bg-[var(--sakhi-surface)] p-4">
               <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">Existing Debt</div>
               <div className="mt-1 text-[20px] font-bold text-[var(--sakhi-slate)] tabular-nums">{formatINR(shg.existingDebt)}</div>
             </div>
-            <div className="rounded-xl bg-[var(--sakhi-surface)] p-4">
+            <div className="rounded-lg bg-[var(--sakhi-surface)] p-4">
               <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">Savings / Member</div>
               <div className="mt-1 text-[20px] font-bold text-[var(--sakhi-slate)] tabular-nums">{formatINR(shg.monthlySavingsPerMember)}/mo</div>
             </div>
-            <div className="rounded-xl bg-[var(--sakhi-surface)] p-4">
+            <div className="rounded-lg bg-[var(--sakhi-surface)] p-4">
               <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">Corpus Balance</div>
               <div className="mt-1 text-[20px] font-bold text-[var(--sakhi-forest)] tabular-nums">{formatINR(shg.corpusBalance)}</div>
             </div>
@@ -357,7 +357,7 @@ export const FinancePassportScreen: React.FC<Props> = ({
                     Expired: "text-slate-500 bg-slate-50 border-slate-200",
                   };
                   return (
-                    <div key={doc.id} className="flex items-center justify-between rounded-xl border border-[var(--sakhi-border)] bg-white p-3.5">
+                    <div key={doc.id} className="flex items-center justify-between rounded-lg border border-[var(--sakhi-border)] bg-white p-3.5">
                       <div className="flex items-center gap-3">
                         {doc.status === "Verified" ? (
                           <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-500" />
@@ -400,12 +400,12 @@ export const FinancePassportScreen: React.FC<Props> = ({
             tone="neutral"
           />
           {shg.consents.length === 0 ? (
-            <div className="rounded-xl border border-dashed border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-8 text-center text-[14px] text-[var(--sakhi-muted)]">
+            <div className="rounded-lg border border-dashed border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-8 text-center text-[14px] text-[var(--sakhi-muted)]">
               No consent records yet. Consent will be captured during the finance planning stage.
             </div>
           ) : (
             shg.consents.map((con) => (
-              <div key={con.id} className="rounded-xl border border-[var(--sakhi-border)] bg-white p-5 space-y-3">
+              <div key={con.id} className="rounded-lg border border-[var(--sakhi-border)] bg-white p-5 space-y-3">
                 <div className="flex items-start justify-between">
                   <div className="text-[15px] font-semibold text-[var(--sakhi-slate)]">{con.purpose}</div>
                   <span className={cn(
@@ -440,13 +440,13 @@ export const FinancePassportScreen: React.FC<Props> = ({
         subtitle={`${shg.shgName} · ${shg.activity} · ${shg.block}, ${shg.district}`}
         rightSlot={
           <div className="flex items-center gap-3">
-            <div className="rounded-xl bg-[var(--sakhi-forest)] px-4 py-2 text-center">
+            <div className="rounded-lg bg-[var(--sakhi-forest)] px-4 py-2 text-center">
               <div className="text-[24px] font-bold text-white tabular-nums">{shg.readinessScore}%</div>
               <div className="text-[11px] font-medium text-white/70">Ready</div>
             </div>
             <button
               onClick={() => onNavigate("credit-demand")}
-              className="group flex items-center gap-1.5 rounded-xl bg-[var(--sakhi-forest)] px-4 py-2.5 text-[13px] font-semibold text-white transition-all hover:bg-[var(--sakhi-forest-deep)]"
+              className="group flex items-center gap-1.5 rounded-lg bg-[var(--sakhi-forest)] px-4 py-2.5 text-[13px] font-semibold text-white transition-all hover:bg-[var(--sakhi-forest-deep)]"
             >
               Credit Demand <ChevronRight className="h-4 w-4" />
             </button>
@@ -456,19 +456,19 @@ export const FinancePassportScreen: React.FC<Props> = ({
 
       {/* Quick overview */}
       <div className="grid gap-4 sm:grid-cols-4">
-        <div className="rounded-2xl border border-[var(--sakhi-border)] bg-white p-5">
+        <div className="rounded-lg border border-[var(--sakhi-border)] bg-white p-5">
           <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">Total Cost</div>
           <div className="mt-2 text-[24px] font-bold text-[var(--sakhi-slate)] tabular-nums">{formatINR(totalCost)}</div>
         </div>
-        <div className="rounded-2xl border border-[var(--sakhi-border)] bg-white p-5">
+        <div className="rounded-lg border border-[var(--sakhi-border)] bg-white p-5">
           <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">Own Contribution</div>
           <div className="mt-2 text-[24px] font-bold text-[var(--sakhi-slate)] tabular-nums">{formatINR(shg.ownContribution)}</div>
         </div>
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-5">
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-5">
           <div className="text-[11px] font-semibold uppercase tracking-widest text-emerald-600">External Need</div>
           <div className="mt-2 text-[24px] font-bold text-emerald-700 tabular-nums">{formatINR(externalNeed)}</div>
         </div>
-        <div className="rounded-2xl border border-[var(--sakhi-border)] bg-white p-5">
+        <div className="rounded-lg border border-[var(--sakhi-border)] bg-white p-5">
           <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">Timeline</div>
           <div className="mt-2 text-[24px] font-bold text-[var(--sakhi-slate)] tabular-nums">{shg.timelineMonths} mo</div>
         </div>
@@ -480,13 +480,13 @@ export const FinancePassportScreen: React.FC<Props> = ({
           const Icon = section.icon;
           const isOpen = expandedSection === section.id;
           return (
-            <div key={section.id} className="rounded-2xl border border-[var(--sakhi-border)] bg-white overflow-hidden">
+            <div key={section.id} className="rounded-lg border border-[var(--sakhi-border)] bg-white overflow-hidden">
               <button
                 onClick={() => toggle(section.id)}
                 className="flex w-full items-center justify-between p-5 text-left transition-colors hover:bg-[var(--sakhi-surface)]"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--sakhi-surface)]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--sakhi-surface)]">
                     <Icon className="h-5 w-5 text-[var(--sakhi-forest)]" />
                   </div>
                   <span className="text-[16px] font-bold text-[var(--sakhi-slate)]">{section.title}</span>
@@ -494,7 +494,7 @@ export const FinancePassportScreen: React.FC<Props> = ({
                 <ChevronDown className={cn("h-5 w-5 text-[var(--sakhi-muted)] transition-transform", isOpen && "rotate-180")} />
               </button>
               {isOpen && (
-                <div className="border-t border-[var(--sakhi-border)] p-5 animate-fade-in-up" style={{animationDuration: '0.3s'}}>
+                <div className="border-t border-[var(--sakhi-border)] p-5 " >
                   {section.content}
                 </div>
               )}

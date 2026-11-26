@@ -59,7 +59,7 @@ export const FieldFollowupsScreen: React.FC<FieldFollowupsProps> = ({
   };
 
   return (
-    <div className="space-y-6 animate-fade-in-up" style={{ animationDuration: "0.35s" }}>
+    <div className="space-y-6 " >
       <SectionHeader
         eyebrow="Field Workspace · Bank Sakhi Queue"
         title="Field Follow-ups & Document Capture"
@@ -68,7 +68,7 @@ export const FieldFollowupsScreen: React.FC<FieldFollowupsProps> = ({
           <button
             onClick={() => setOfflineSyncQueued(!offlineSyncQueued)}
             className={cn(
-              "inline-flex items-center gap-2 rounded-xl border px-3.5 py-2 text-[12.5px] font-medium transition-colors",
+              "inline-flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[12.5px] font-medium transition-colors",
               offlineSyncQueued
                 ? "border-amber-200 bg-amber-50 text-amber-800"
                 : "border-[var(--sakhi-border)] bg-white text-[var(--sakhi-slate)] hover:bg-[var(--sakhi-surface)]"
@@ -81,7 +81,7 @@ export const FieldFollowupsScreen: React.FC<FieldFollowupsProps> = ({
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        <section className="lg:col-span-7 rounded-2xl border border-[var(--sakhi-border)] bg-white p-6 space-y-4">
+        <section className="lg:col-span-7 rounded-lg border border-[var(--sakhi-border)] bg-white p-6 space-y-4">
           <div className="flex items-center justify-between border-b border-[var(--sakhi-border)] pb-3.5">
             <h2 className="flex items-center gap-2 text-[16px] font-bold text-[var(--sakhi-slate)]">
               <ClipboardList className="h-4 w-4 text-[var(--sakhi-forest)]" />
@@ -96,7 +96,7 @@ export const FieldFollowupsScreen: React.FC<FieldFollowupsProps> = ({
             {allTasks.map((t) => (
               <div
                 key={t.id}
-                className="flex flex-col gap-3 rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-3 rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="space-y-1">
                   <div className="flex flex-wrap items-center gap-2">
@@ -112,7 +112,7 @@ export const FieldFollowupsScreen: React.FC<FieldFollowupsProps> = ({
                 <div className="flex shrink-0 items-center gap-2.5">
                   <button
                     onClick={() => toggleTaskComplete(t.shg, t.id)}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--sakhi-border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--sakhi-slate)] transition-colors hover:bg-[var(--sakhi-mint)]"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--sakhi-border)] bg-white px-3 py-1.5 text-[12px] font-semibold text-[var(--sakhi-slate)] transition-colors hover:bg-[var(--sakhi-mint)]"
                   >
                     <CheckCircle2 className="h-3.5 w-3.5 text-[var(--sakhi-forest)]" />
                     {t.status === "Completed" ? "Reopen" : "Complete"}
@@ -130,7 +130,7 @@ export const FieldFollowupsScreen: React.FC<FieldFollowupsProps> = ({
         </section>
 
         {/* Visit Note & Assisted Evidence */}
-        <section className="lg:col-span-5 rounded-2xl border border-[var(--sakhi-border)] bg-white p-6 space-y-5">
+        <section className="lg:col-span-5 rounded-lg border border-[var(--sakhi-border)] bg-white p-6 space-y-5">
           <h2 className="border-b border-[var(--sakhi-border)] pb-3.5 text-[16px] font-bold text-[var(--sakhi-slate)]">
             Log Field Visit Note
           </h2>
@@ -142,7 +142,7 @@ export const FieldFollowupsScreen: React.FC<FieldFollowupsProps> = ({
               <select
                 value={selectedCaseForNote}
                 onChange={(e) => setSelectedCaseForNote(e.target.value)}
-                className="mt-1.5 h-10 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3 text-[13px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
+                className="mt-1.5 h-10 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3 text-[13px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
               >
                 {cases.map((c) => (
                   <option key={c.id} value={c.id}>
@@ -160,7 +160,7 @@ export const FieldFollowupsScreen: React.FC<FieldFollowupsProps> = ({
                 value={visitNote}
                 onChange={(e) => setVisitNote(e.target.value)}
                 placeholder="e.g., Collected signed Anand Consumer Co-op purchase letter during Chikhodra cluster visit."
-                className="mt-1.5 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-3 text-[13px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
+                className="mt-1.5 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-3 text-[13px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
               />
             </div>
             <div className="flex items-center justify-between gap-2 pt-1">
@@ -169,7 +169,7 @@ export const FieldFollowupsScreen: React.FC<FieldFollowupsProps> = ({
               </span>
               <button
                 type="submit"
-                className="rounded-xl bg-[var(--sakhi-forest)] px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-[var(--sakhi-forest-deep)]"
+                className="rounded-lg bg-[var(--sakhi-forest)] px-5 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-[var(--sakhi-forest-deep)]"
               >
                 Save Visit Note
               </button>
@@ -183,7 +183,7 @@ export const FieldFollowupsScreen: React.FC<FieldFollowupsProps> = ({
             {cases.slice(0, 3).map((c) => (
               <div
                 key={c.id}
-                className="flex items-center justify-between rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 py-2.5 text-[13px]"
+                className="flex items-center justify-between rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 py-2.5 text-[13px]"
               >
                 <span className="font-medium text-[var(--sakhi-slate)]">{c.shgName}</span>
                 <StageChip stage={c.stage} />

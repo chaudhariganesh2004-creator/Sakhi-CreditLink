@@ -306,14 +306,14 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
   };
 
   return (
-    <div className="mx-auto max-w-3xl space-y-6 animate-fade-in-up" style={{ animationDuration: "0.35s" }}>
+    <div className="mx-auto max-w-3xl space-y-6 " >
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <div className="inline-flex items-center gap-2 rounded-full bg-[var(--sakhi-mint)] px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-forest)]">
             <Sparkles className="h-3.5 w-3.5" /> Live Credit Assessment
           </div>
-          <h1 className="mt-2 font-display text-[32px] leading-tight text-[var(--sakhi-slate)]">
+          <h1 className="mt-2 font-serif font-semibold text-[32px] leading-tight text-[var(--sakhi-slate)]">
             Start SHG Credit Application
           </h1>
           <p className="mt-1 text-[14px] text-[var(--sakhi-muted)]">
@@ -324,7 +324,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
         <button
           type="button"
           onClick={fillQuickSample}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-xl border border-[var(--sakhi-border)] bg-white px-3.5 py-2 text-[12.5px] font-semibold text-[var(--sakhi-forest)] shadow-sm transition-all hover:bg-[var(--sakhi-mint)]/40"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-[var(--sakhi-border)] bg-white px-3.5 py-2 text-[12.5px] font-semibold text-[var(--sakhi-forest)]  transition-all hover:bg-[var(--sakhi-mint)]/40"
         >
           <Wand2 className="h-3.5 w-3.5" /> Quick Fill Sample
         </button>
@@ -346,9 +346,9 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
               type="button"
               onClick={() => setStep(item.num as 1 | 2 | 3)}
               className={cn(
-                "flex items-center gap-3 rounded-2xl border p-3.5 text-left transition-all",
+                "flex items-center gap-3 rounded-lg border p-3.5 text-left transition-all",
                 active
-                  ? "border-[var(--sakhi-forest)] bg-white shadow-sm ring-1 ring-[var(--sakhi-forest)]/15"
+                  ? "border-[var(--sakhi-forest)] bg-white  ring-1 ring-[var(--sakhi-forest)]/15"
                   : done
                   ? "border-emerald-200 bg-emerald-50/60"
                   : "border-[var(--sakhi-border)] bg-white/60 text-[var(--sakhi-muted)]"
@@ -356,7 +356,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
             >
               <div
                 className={cn(
-                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-[13px] font-bold",
+                  "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[13px] font-bold",
                   active
                     ? "bg-[var(--sakhi-forest)] text-white"
                     : done
@@ -380,11 +380,11 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
       </div>
 
       {/* Form Card */}
-      <form onSubmit={handleSubmit} className="rounded-2xl border border-[var(--sakhi-border)] bg-white p-6 md:p-8 shadow-sm space-y-6">
+      <form onSubmit={handleSubmit} className="rounded-lg border border-[var(--sakhi-border)] bg-white p-6 md:p-8  space-y-6">
         {step === 1 && (
           <div className="space-y-5">
             {/* Simulated NRLM / LokOS Verification Gate */}
-            <div className="rounded-2xl border border-[var(--sakhi-forest)]/20 bg-[var(--sakhi-mint)]/45 p-4 md:p-5 space-y-3">
+            <div className="rounded-lg border border-[var(--sakhi-forest)]/20 bg-[var(--sakhi-mint)]/45 p-4 md:p-5 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <Database className="h-4 w-4 text-[var(--sakhi-forest)]" />
@@ -408,13 +408,13 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                     if (lokosStatus !== "idle") setLokosStatus("idle");
                   }}
                   placeholder="Enter NRLM LokOS SHG ID (e.g. GJ-AND-042-SHG-1189)"
-                  className="h-10 flex-1 rounded-xl border border-[var(--sakhi-border)] bg-white px-3.5 font-mono text-[13px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:outline-none"
+                  className="h-10 flex-1 rounded-lg border border-[var(--sakhi-border)] bg-white px-3.5 font-mono text-[13px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => verifyLokosRegistration()}
                   disabled={lokosStatus === "checking"}
-                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl bg-[var(--sakhi-forest)] px-4 text-[12.5px] font-semibold text-white hover:bg-[var(--sakhi-forest-deep)] disabled:opacity-60"
+                  className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg bg-[var(--sakhi-forest)] px-4 text-[12.5px] font-semibold text-white hover:bg-[var(--sakhi-forest-deep)] disabled:opacity-60"
                 >
                   {lokosStatus === "checking" ? (
                     <>
@@ -453,7 +453,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
               </div>
 
               {lokosStatus === "verified" && (
-                <div className="flex items-start gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-[12.5px] text-emerald-800">
+                <div className="flex items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2.5 text-[12.5px] text-emerald-800">
                   <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
                   <span>
                     <strong>
@@ -465,7 +465,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
               )}
 
               {lokosStatus === "unregistered" && (
-                <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 px-3.5 py-2.5 text-[12.5px] text-red-800">
+                <div className="flex items-start gap-2 rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-[12.5px] text-red-800">
                   <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
                   <span>
                     <strong>Access Restricted:</strong> This ID is not found in the NRLM / LokOS registry. Only NRLM-registered SHGs can proceed. Please register via your GLPC Cluster /{" "}
@@ -478,7 +478,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
             </div>
 
             {lokosStatus !== "verified" ? (
-              <div className="flex items-center gap-3 rounded-xl border border-dashed border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-5 text-[13px] text-[var(--sakhi-muted)]">
+              <div className="flex items-center gap-3 rounded-lg border border-dashed border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-5 text-[13px] text-[var(--sakhi-muted)]">
                 <Lock className="h-5 w-5 shrink-0 text-[var(--sakhi-forest)]" />
                 <span>
                   Verify an NRLM / LokOS SHG ID above (or click <strong>Quick Fill Sample</strong>) to unlock and auto-fill the SHG profile.
@@ -497,7 +497,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                   value={shgName}
                   onChange={(e) => setShgName(e.target.value)}
                   placeholder="e.g., Shakti Mahila Enterprise SHG"
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
                 />
               </div>
 
@@ -506,7 +506,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                 <select
                   value={district}
                   onChange={(e) => setDistrict(e.target.value)}
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
                 >
                   <option value="Anand">Anand</option>
                   <option value="Kheda">Kheda</option>
@@ -522,7 +522,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                   value={block}
                   onChange={(e) => setBlock(e.target.value)}
                   placeholder="e.g., Anand Rural"
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
                 />
               </div>
 
@@ -533,7 +533,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                   value={village}
                   onChange={(e) => setVillage(e.target.value)}
                   placeholder="e.g., Chikhodra"
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
                 />
               </div>
 
@@ -544,7 +544,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                   value={presidentName}
                   onChange={(e) => setPresidentName(e.target.value)}
                   placeholder="e.g., Hansaben Parmar"
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
                 />
               </div>
 
@@ -553,7 +553,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                 <select
                   value={applicantType}
                   onChange={(e) => setApplicantType(e.target.value as SHGCase["applicantType"])}
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
                 >
                   <option value="SHG Group Enterprise">SHG Group Enterprise</option>
                   <option value="Member Micro-Enterprise">Member Micro-Enterprise</option>
@@ -570,7 +570,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                     max={30}
                     value={membersCount}
                     onChange={(e) => setMembersCount(Number(e.target.value) || 10)}
-                    className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3 font-mono text-[14px]"
+                    className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3 font-mono text-[14px]"
                   />
                 </div>
                 <div>
@@ -581,14 +581,14 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                     max={2026}
                     value={formationYear}
                     onChange={(e) => setFormationYear(Number(e.target.value) || 2022)}
-                    className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3 font-mono text-[14px]"
+                    className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3 font-mono text-[14px]"
                   />
                 </div>
               </div>
             </div>
 
             {/* Panchasutra quick checks */}
-            <div className="rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4">
+            <div className="rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[12.5px] font-bold text-[var(--sakhi-slate)]">Panchasutra Readiness ({panchasutraScore}/5)</span>
                 <span className="text-[11.5px] text-[var(--sakhi-muted)]">Check active habits</span>
@@ -634,7 +634,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                     const preset = ACTIVITY_PRESETS.find((p) => p.value === val);
                     if (preset) setPrimaryProduct(preset.defaultProduct);
                   }}
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
                 >
                   {ACTIVITY_PRESETS.map((p) => (
                     <option key={p.value} value={p.value}>{p.label}</option>
@@ -649,11 +649,11 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                   value={purposeSummary}
                   onChange={(e) => setPurposeSummary(e.target.value)}
                   placeholder="e.g., Machinery purchase & 60-day raw material stock for expansion"
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[14px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
                 />
               </div>
 
-              <div className="rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 space-y-3">
+              <div className="rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 space-y-3">
                 <div className="text-[12px] font-bold uppercase tracking-wider text-[var(--sakhi-forest)]">Capital Expenditure (Capex)</div>
                 <input
                   type="text"
@@ -672,7 +672,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                 />
               </div>
 
-              <div className="rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 space-y-3">
+              <div className="rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 space-y-3">
                 <div className="text-[12px] font-bold uppercase tracking-wider text-amber-700">Working Capital</div>
                 <input
                   type="text"
@@ -699,7 +699,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                   step={5000}
                   value={ownContribution}
                   onChange={(e) => setOwnContribution(Number(e.target.value) || 0)}
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 font-mono text-[14px]"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 font-mono text-[14px]"
                 />
               </div>
 
@@ -708,7 +708,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                 <select
                   value={timelineMonths}
                   onChange={(e) => setTimelineMonths(Number(e.target.value))}
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3 font-mono text-[14px]"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3 font-mono text-[14px]"
                 >
                   <option value={24}>24 months (2 years)</option>
                   <option value={36}>36 months (3 years)</option>
@@ -719,14 +719,14 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
             </div>
 
             {/* Live Need Calculation Banner */}
-            <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-4">
               <div>
                 <div className="text-[11px] font-semibold uppercase tracking-widest text-emerald-700">Calculated External Credit Need</div>
                 <div className="text-[12.5px] text-[var(--sakhi-muted)]">
                   Total Project {formatINR(totalCost)} − Own Share {formatINR(ownContribution)}
                 </div>
               </div>
-              <div className="font-display text-[28px] text-[var(--sakhi-forest)] tabular-nums">
+              <div className="font-serif font-semibold text-[28px] text-[var(--sakhi-forest)] tabular-nums">
                 {formatINR(externalNeed)}
               </div>
             </div>
@@ -742,7 +742,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                   type="text"
                   value={primaryProduct}
                   onChange={(e) => setPrimaryProduct(e.target.value)}
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[14px]"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[14px]"
                 />
               </div>
 
@@ -753,7 +753,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                   min={1}
                   value={sellingPricePerUnit}
                   onChange={(e) => setSellingPricePerUnit(Number(e.target.value) || 0)}
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 font-mono text-[14px]"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 font-mono text-[14px]"
                 />
               </div>
 
@@ -764,7 +764,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                   min={0}
                   value={directCostPerUnit}
                   onChange={(e) => setDirectCostPerUnit(Number(e.target.value) || 0)}
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 font-mono text-[14px]"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 font-mono text-[14px]"
                 />
               </div>
 
@@ -775,7 +775,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                   min={0}
                   value={currentMonthlyUnits}
                   onChange={(e) => setCurrentMonthlyUnits(Number(e.target.value) || 0)}
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 font-mono text-[14px]"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 font-mono text-[14px]"
                 />
               </div>
 
@@ -786,7 +786,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                   min={1}
                   value={projectedMonthlyUnits}
                   onChange={(e) => setProjectedMonthlyUnits(Number(e.target.value) || 0)}
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 font-mono text-[14px]"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 font-mono text-[14px]"
                 />
               </div>
 
@@ -797,7 +797,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                   value={buyerName}
                   onChange={(e) => setBuyerName(e.target.value)}
                   placeholder="e.g., Local Retail Co-op / GLPC Saras"
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[14px]"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[14px]"
                 />
               </div>
 
@@ -808,7 +808,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
                   min={0}
                   value={buyerMonthlyValue}
                   onChange={(e) => setBuyerMonthlyValue(Number(e.target.value) || 0)}
-                  className="mt-1.5 h-11 w-full rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 font-mono text-[14px]"
+                  className="mt-1.5 h-11 w-full rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 font-mono text-[14px]"
                 />
               </div>
             </div>
@@ -822,7 +822,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
               <button
                 type="button"
                 onClick={() => setStep((s) => (s - 1) as 1 | 2 | 3)}
-                className="inline-flex items-center gap-1.5 rounded-xl border border-[var(--sakhi-border)] bg-white px-4 py-2.5 text-[13px] font-semibold text-[var(--sakhi-slate)] hover:bg-[var(--sakhi-surface)]"
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--sakhi-border)] bg-white px-4 py-2.5 text-[13px] font-semibold text-[var(--sakhi-slate)] hover:bg-[var(--sakhi-surface)]"
               >
                 <ArrowLeft className="h-4 w-4" /> Back
               </button>
@@ -830,7 +830,7 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
               <button
                 type="button"
                 onClick={onCancel}
-                className="rounded-xl px-4 py-2.5 text-[13px] font-medium text-[var(--sakhi-muted)] hover:text-[var(--sakhi-slate)]"
+                className="rounded-lg px-4 py-2.5 text-[13px] font-medium text-[var(--sakhi-muted)] hover:text-[var(--sakhi-slate)]"
               >
                 Cancel
               </button>
@@ -842,14 +842,14 @@ export const SHGIntakeScreen: React.FC<SHGIntakeProps> = ({ onCreateCase, onCanc
               type="button"
               disabled={step === 1 && lokosStatus !== "verified"}
               onClick={() => setStep((s) => (s + 1) as 1 | 2 | 3)}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--sakhi-forest)] px-6 py-2.5 text-[13.5px] font-semibold text-white shadow-sm hover:bg-[var(--sakhi-forest-deep)] disabled:opacity-45 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--sakhi-forest)] px-6 py-2.5 text-[13.5px] font-semibold text-white  hover:bg-[var(--sakhi-forest-deep)] disabled:opacity-45 disabled:cursor-not-allowed"
             >
               Continue <ArrowRight className="h-4 w-4" />
             </button>
           ) : (
             <button
               type="submit"
-              className="inline-flex items-center gap-2 rounded-xl bg-[var(--sakhi-forest)] px-6 py-3 text-[14px] font-semibold text-white shadow-md shadow-[var(--sakhi-forest)]/20 hover:bg-[var(--sakhi-forest-deep)]"
+              className="inline-flex items-center gap-2 rounded-lg bg-[var(--sakhi-forest)] px-6 py-3 text-[14px] font-semibold text-white shadow-md shadow-[var(--sakhi-forest)]/20 hover:bg-[var(--sakhi-forest-deep)]"
             >
               <Sparkles className="h-4 w-4" /> Run Digital Diagnosis &amp; Match
             </button>

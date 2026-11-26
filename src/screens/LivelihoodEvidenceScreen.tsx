@@ -48,7 +48,7 @@ export const LivelihoodEvidenceScreen: React.FC<LivelihoodEvidenceProps> = ({
   };
 
   return (
-    <div className="space-y-6 animate-fade-in-up" style={{ animationDuration: "0.35s" }}>
+    <div className="space-y-6 " >
       <SectionHeader
         eyebrow={`Market & Livelihood · ${shg.caseCode}`}
         title="Livelihood Evidence & Capacity"
@@ -57,7 +57,7 @@ export const LivelihoodEvidenceScreen: React.FC<LivelihoodEvidenceProps> = ({
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         {/* Unit Economics Breakdown */}
-        <section className="lg:col-span-6 rounded-2xl border border-[var(--sakhi-border)] bg-white p-6 space-y-4">
+        <section className="lg:col-span-6 rounded-lg border border-[var(--sakhi-border)] bg-white p-6 space-y-4">
           <div className="border-b border-[var(--sakhi-border)] pb-3.5">
             <h2 className="flex items-center gap-2 text-[16px] font-bold text-[var(--sakhi-slate)]">
               <PackageCheck className="h-4 w-4 text-[var(--sakhi-forest)]" />
@@ -96,7 +96,7 @@ export const LivelihoodEvidenceScreen: React.FC<LivelihoodEvidenceProps> = ({
         </section>
 
         {/* Capacity & Seasonality */}
-        <section className="lg:col-span-6 rounded-2xl border border-[var(--sakhi-border)] bg-white p-6 space-y-5">
+        <section className="lg:col-span-6 rounded-lg border border-[var(--sakhi-border)] bg-white p-6 space-y-5">
           <div className="border-b border-[var(--sakhi-border)] pb-3.5">
             <h2 className="text-[16px] font-bold text-[var(--sakhi-slate)]">
               Production Capacity &amp; Seasonality
@@ -114,7 +114,7 @@ export const LivelihoodEvidenceScreen: React.FC<LivelihoodEvidenceProps> = ({
             </div>
             <div className="h-3 w-full overflow-hidden rounded-full bg-[var(--sakhi-surface)]">
               <div
-                className="h-full rounded-full bg-gradient-to-r from-[var(--sakhi-forest)] to-[var(--sakhi-emerald)] transition-all duration-700"
+                className="h-full rounded-full bg-[#0F5E4E] transition-all duration-700"
                 style={{ width: `${capacityPct}%` }}
               />
             </div>
@@ -124,13 +124,13 @@ export const LivelihoodEvidenceScreen: React.FC<LivelihoodEvidenceProps> = ({
           </div>
 
           <div className="grid grid-cols-1 gap-3 pt-1 sm:grid-cols-2">
-            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+            <div className="rounded-lg border border-emerald-200 bg-emerald-50 p-4">
               <div className="text-[11px] font-semibold uppercase tracking-widest text-emerald-700">
                 Peak Demand Window
               </div>
               <div className="mt-1 text-[13.5px] font-semibold text-[var(--sakhi-slate)]">{ue.peakMonths}</div>
             </div>
-            <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
               <div className="text-[11px] font-semibold uppercase tracking-widest text-amber-700">
                 Lean / Moisture Risk
               </div>
@@ -141,7 +141,7 @@ export const LivelihoodEvidenceScreen: React.FC<LivelihoodEvidenceProps> = ({
       </div>
 
       {/* Buyer Offtake Evidence Ledger */}
-      <section className="overflow-hidden rounded-2xl border border-[var(--sakhi-border)] bg-white">
+      <section className="overflow-hidden rounded-lg border border-[var(--sakhi-border)] bg-white">
         <div className="border-b border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-6 py-4">
           <h2 className="text-[16px] font-bold text-[var(--sakhi-slate)]">
             Verified Buyer &amp; Channel Offtake Evidence
@@ -194,18 +194,18 @@ export const LivelihoodEvidenceScreen: React.FC<LivelihoodEvidenceProps> = ({
             value={buyerName}
             onChange={(e) => setBuyerName(e.target.value)}
             placeholder="Log additional buyer PO or GLPC Saras demand channel..."
-            className="h-10 flex-1 rounded-xl border border-[var(--sakhi-border)] bg-white px-3.5 text-[13px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:outline-none"
+            className="h-10 flex-1 rounded-lg border border-[var(--sakhi-border)] bg-white px-3.5 text-[13px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:outline-none"
           />
           <input
             type="number"
             value={monthlyVal}
             onChange={(e) => setMonthlyVal(e.target.value)}
             placeholder="Monthly ₹ value"
-            className="h-10 w-44 rounded-xl border border-[var(--sakhi-border)] bg-white px-3.5 font-mono text-[13px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:outline-none"
+            className="h-10 w-44 rounded-lg border border-[var(--sakhi-border)] bg-white px-3.5 font-mono text-[13px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:outline-none"
           />
           <button
             type="submit"
-            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl bg-[var(--sakhi-forest)] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[var(--sakhi-forest-deep)]"
+            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-lg bg-[var(--sakhi-forest)] px-5 text-[13px] font-semibold text-white transition-colors hover:bg-[var(--sakhi-forest-deep)]"
           >
             <Plus className="h-4 w-4" /> Attach Evidence
           </button>

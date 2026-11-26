@@ -1,457 +1,323 @@
 import React from "react";
-import { motion } from "framer-motion";
 import {
   ArrowRight,
   ArrowUpRight,
-  BarChart3,
+  CheckCircle2,
   ExternalLink,
-  FileCheck2,
-  Fingerprint,
   Globe,
-  MapPin,
-  Shield,
-  Sparkles,
-  Target,
-  Zap,
+  ShieldCheck,
 } from "lucide-react";
-import { AnimatedMarqueeHero } from "@/components/ui/hero-3";
-import { DemoBadge } from "@/components/shared/ui-primitives";
+import type { AppLanguage, PortalRole } from "@/data/sakhi-data";
+import { Button } from "@/components/ui/button";
+import { Card, SimulatedBadge } from "@/components/ui/primitives";
 
 interface LandingPageProps {
-  onEnterPortal: () => void;
+  language: AppLanguage;
+  onChangeLanguage: (lang: AppLanguage) => void;
+  onEnterPortal: (targetRole?: PortalRole) => void;
 }
-
-const SHG_MARQUEE_IMAGES = [
-  "/images/shg-hero.jpg",
-  "/images/shg-food.jpg",
-  "/images/shg-dairy.jpg",
-  "/images/shg-tailoring.jpg",
-  "/images/shg-hero.jpg",
-  "/images/shg-food.jpg",
-  "/images/shg-dairy.jpg",
-  "/images/shg-tailoring.jpg",
-];
 
 const GOVT_PORTALS = [
   {
     name: "DAY-NRLM / Aajeevika",
     tag: "SHG Bank Linkage",
-    desc: "Official National Rural Livelihoods Mission portal for SHG CCL, interest subvention, and LokOS guidelines.",
+    desc: "National Rural Livelihoods Mission portal for Sakhi Mandal CCL, interest subvention, and LokOS norms.",
     url: "https://aajeevika.gov.in/",
-    accent: "from-emerald-600 to-teal-700",
   },
   {
     name: "PMFME Portal (MoFPI)",
     tag: "35% Capital Subsidy",
-    desc: "Micro Food Processing Enterprises scheme portal for machinery & fixed-capital subsidy applications.",
+    desc: "Micro Food Processing Enterprises portal for machinery and fixed-capital subsidy applications.",
     url: "https://pmfme.mofpi.gov.in/",
-    accent: "from-amber-600 to-orange-700",
   },
   {
     name: "JanSamarth Portal",
     tag: "Credit-Linked Schemes",
-    desc: "Unified Government of India portal to check eligibility and apply across 12+ credit-linked schemes.",
+    desc: "Unified Government of India portal to check eligibility across credit-linked schemes.",
     url: "https://www.jansamarth.in/",
-    accent: "from-sky-600 to-blue-700",
   },
   {
     name: "PM MUDRA Yojana",
     tag: "Micro-Enterprise Loans",
-    desc: "Official PMMY guidelines for Shishu, Kishore, and Tarun non-farm micro-enterprise credit.",
+    desc: "Official PMMY guidelines for Shishu, Kishore, and Tarun non-farm micro-enterprise loans.",
     url: "https://www.mudra.org.in/",
-    accent: "from-teal-700 to-emerald-800",
   },
   {
     name: "Udyam Registration",
     tag: "MSME Identity",
-    desc: "Zero-cost Government of India MSME registration required by banks and PMFME subsidy workflows.",
+    desc: "Zero-cost Government of India MSME registration required by banks and PMFME workflows.",
     url: "https://udyamregistration.gov.in/",
-    accent: "from-indigo-600 to-slate-800",
   },
   {
     name: "GLPC Mission Mangalam",
     tag: "Gujarat State Nodal",
-    desc: "Gujarat Livelihood Promotion Company portal for district cluster federations and Bank Sakhi support.",
+    desc: "Gujarat Livelihood Promotion Company portal for district cluster federations and Bank Sakhis.",
     url: "https://glpc.gujarat.gov.in/",
-    accent: "from-[#0D4F3C] to-[#148060]",
   },
 ];
 
-const LIVELIHOOD_CARDS = [
-  {
-    title: "Food Processing & Spices",
-    scheme: "DAY-NRLM + PMFME Capex",
-    image: "/images/shg-food.jpg",
-    desc: "Papad rolling, spice pulverizers, millet bakeries, and FSSAI-compliant packaging units.",
-  },
-  {
-    title: "Dairy & Value-Added Ghee",
-    scheme: "SHG Term + CCL",
-    image: "/images/shg-dairy.jpg",
-    desc: "Milk cream separators, cultured A2 ghee kettles, and cooperative supply linkage.",
-  },
-  {
-    title: "Garments & Tailoring Units",
-    scheme: "DAY-NRLM / MUDRA",
-    image: "/images/shg-tailoring.jpg",
-    desc: "Motorized lockstitch clusters, school uniforms, and institutional bulk orders.",
-  },
-];
-
-export const LandingPage: React.FC<LandingPageProps> = ({ onEnterPortal }) => {
-  const duplicatedPortals = [...GOVT_PORTALS, ...GOVT_PORTALS];
+export const LandingPage: React.FC<LandingPageProps> = ({
+  language,
+  onChangeLanguage,
+  onEnterPortal,
+}) => {
+  const isGu = language === "gu";
 
   return (
-    <div className="min-h-screen ios-canvas">
-      {/* ─── iOS Frosted Glass Navigation ─── */}
-      <nav className="fixed top-3 inset-x-4 z-50 mx-auto max-w-7xl rounded-2xl ios-glass-strong">
-        <div className="flex h-16 items-center justify-between px-5 md:px-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--sakhi-forest)] shadow-md shadow-[var(--sakhi-forest)]/25">
-              <svg viewBox="0 0 24 24" className="h-5 w-5 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                <path d="M2 17l10 5 10-5" />
-                <path d="M2 12l10 5 10-5" />
-              </svg>
+    <div className="min-h-screen bg-[#FAF8F4] text-[#141A23]">
+      {/* ─── Clean Single-Row Institutional Header ─── */}
+      <header className="sticky top-0 z-40 border-b border-[#DFDBD0] bg-white">
+        <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 md:px-6">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#0F5E4E] text-white font-mono text-[12px] font-semibold">
+              SC
             </div>
-            <div>
-              <span className="text-[17px] font-bold tracking-tight text-[var(--sakhi-slate)]">
+            <div className="truncate">
+              <span className="text-[15px] font-bold tracking-tight text-[#141A23]">
                 Sakhi CreditLink
               </span>
-              <span className="ml-2 hidden sm:inline-block rounded-full bg-[var(--sakhi-mint)] px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-[var(--sakhi-forest)]">
-                Gujarat Pilot
+              <span className="ml-2 hidden sm:inline font-mono text-[11px] text-[#475467]">
+                Gujarat · PS000311
               </span>
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-7 text-[13.5px] font-medium text-[var(--sakhi-muted)]">
-            <a href="#govt-portals" className="hover:text-[var(--sakhi-slate)] transition-colors">Govt Portals</a>
-            <a href="#livelihoods" className="hover:text-[var(--sakhi-slate)] transition-colors">SHG Enterprises</a>
-            <a href="#features" className="hover:text-[var(--sakhi-slate)] transition-colors">Capabilities</a>
-            <a href="#how-it-works" className="hover:text-[var(--sakhi-slate)] transition-colors">How It Works</a>
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="hidden sm:block">
+              <SimulatedBadge compact />
+            </div>
+
+            <div
+              className="inline-flex rounded-md border border-[#C9C3B4] bg-[#FAF8F4] p-0.5 text-[12px]"
+              role="group"
+              aria-label="Language selector"
+            >
+              <button
+                type="button"
+                onClick={() => onChangeLanguage("en")}
+                className={`min-h-[32px] rounded px-2.5 font-medium transition-colors duration-150 ${
+                  language === "en" ? "bg-[#0F5E4E] text-white" : "text-[#475467] hover:text-[#141A23]"
+                }`}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => onChangeLanguage("gu")}
+                className={`min-h-[32px] rounded px-2.5 font-medium transition-colors duration-150 ${
+                  language === "gu" ? "bg-[#0F5E4E] text-white" : "text-[#475467] hover:text-[#141A23]"
+                }`}
+              >
+                ગુજરાતી
+              </button>
+            </div>
+
+            <Button variant="primary" size="sm" onClick={() => onEnterPortal("shg-sakhi")}>
+              {isGu ? "પોર્ટલ ખોલો" : "Open Live Demo"}
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* ─── Editorial 2-Column Hero ─── */}
+      <section className="mx-auto max-w-6xl px-4 py-10 md:px-6 md:py-14">
+        <div className="grid gap-10 lg:grid-cols-12 lg:items-center">
+          <div className="lg:col-span-7 space-y-5">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-md border border-[#DFDBD0] bg-[#F2EFE8] px-2.5 py-1 font-mono text-[11px] font-medium text-[#475467]">
+                SEVA First Innovation · PS000311
+              </span>
+              <SimulatedBadge />
+            </div>
+
+            <h1 className="font-serif text-[34px] md:text-[46px] font-semibold leading-[1.12] tracking-tight text-[#141A23]">
+              {isGu
+                ? "સખી મંડળોને લક્ષ્યાંકથી વાસ્તવિક બેંક ધિરાણ સુધી લઈ જતું પ્લેટફોર્મ."
+                : "Move Sakhi Mandals from credit targets to real bank access."}
+            </h1>
+
+            <p className="max-w-xl text-[15.5px] leading-relaxed text-[#475467]">
+              {isGu
+                ? "લોકOS ચકાસણી, ૬× કોર્પસ નિયમ, ૬–૧૨ મહિનાના વેચાણ આધારિત રોકડ પ્રવાહ અને ૦% વ્યાજ સબવેન્શન ટ્રેકિંગ સાથે બેંક-તૈયાર અરજી પેક."
+                : "Verify NRLM LokOS identity, size working capital vs Capex against RBI's 6× corpus norm, match Gujarat & GLPC schemes, and track bank branch SLAs."}
+            </p>
+
+            {/* Target vs Access Gap Callout */}
+            <div className="rounded-lg border border-[#FDE68A] bg-[#FFFBEB] p-4">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[11.5px] font-semibold uppercase tracking-wider text-[#B45309]">
+                  The Target-vs-Access Gap (Illustrative Baseline)
+                </span>
+                <span className="font-mono text-[11px] text-[#B45309]">Simulated pilot</span>
+              </div>
+              <p className="mt-1.5 text-[13.5px] text-[#141A23]">
+                Systems track <strong>number of SHGs linked</strong>, while real access stalls on{" "}
+                <strong>time-to-credit (34d → 18d target)</strong>, <strong>under-sized tickets</strong>, and{" "}
+                <strong>missing cashbook / buyer proof</strong>.
+              </p>
+            </div>
+
+            {/* Role Entry CTAs (1 Primary + 1 Secondary) */}
+            <div className="flex flex-wrap items-center gap-3 pt-1">
+              <Button variant="primary" size="lg" onClick={() => onEnterPortal("shg-sakhi")}>
+                {isGu ? "સખી મંડળ / બેંક સખી તરીકે દાખલ થાઓ" : "Enter as SHG / Bank Sakhi"}
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+              <Button variant="secondary" size="lg" onClick={() => onEnterPortal("bank-branch")}>
+                Enter as Bank Branch
+              </Button>
+              <Button variant="tertiary" size="lg" onClick={() => onEnterPortal("district-official")}>
+                District Official View
+              </Button>
+            </div>
           </div>
 
-          <button
-            onClick={onEnterPortal}
-            className="group flex items-center gap-2 rounded-xl bg-[var(--sakhi-forest)] px-5 py-2.5 text-[13.5px] font-semibold text-white shadow-lg shadow-[var(--sakhi-forest)]/25 transition-all hover:bg-[var(--sakhi-forest-deep)] hover:-translate-y-0.5"
-          >
-            Enter Portal
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </button>
-        </div>
-      </nav>
-
-      {/* ─── Animated Marquee Hero (hero-3 style) ─── */}
-      <div className="pt-14 gradient-mesh">
-        <AnimatedMarqueeHero
-          tagline="SFIC 2026 · PS000311 · Gujarat SHG Credit Gateway"
-          title={
-            <>
-              From Group Savings{" "}
-              <span className="text-[var(--sakhi-forest)]">to Enterprise Credit</span>
-              <span className="text-[var(--sakhi-gold)]">.</span>
-            </>
-          }
-          description="Verify your NRLM LokOS registration, run a 6–12 month sales-backed financial diagnosis, match 9 Gujarat & GLPC schemes, and export a bank-ready dossier in minutes."
-          ctaText="Start Credit Application →"
-          images={SHG_MARQUEE_IMAGES}
-          onCtaClick={onEnterPortal}
-        />
-      </div>
-
-      {/* ─── iOS Glass Stat Strip ─── */}
-      <section className="mx-auto max-w-7xl px-6 py-10">
-        <div className="mb-3 flex items-center justify-between">
-          <span className="text-[12px] font-medium text-[var(--sakhi-muted)]">
-            Pilot Baseline Overview (Anand &amp; Kheda)
-          </span>
-          <DemoBadge />
-        </div>
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {[
-            { value: "148", label: "SHGs Assessed (Illustrative)", sub: "Anand & Kheda Pilot" },
-            { value: "₹3.62 Cr", label: "Pipeline Demand (Illustrative)", sub: "Pre-application verified" },
-            { value: "84%", label: "Avg Readiness (Illustrative)", sub: "Panchasutra + Unit Economics" },
-            { value: "61", label: "Bank-Ready Packs (Illustrative)", sub: "First-time complete" },
-          ].map((stat, i) => (
-            <div key={i} className="rounded-2xl ios-glass px-5 py-6 text-center">
-              <div className="font-display text-[32px] text-[var(--sakhi-slate)] animate-count" style={{ animationDelay: `${i * 120}ms` }}>
-                {stat.value}
+          {/* Static Authentic SHG Photo */}
+          <div className="lg:col-span-5">
+            <Card className="overflow-hidden">
+              <img
+                src="/images/shg-hero.jpg"
+                alt="Sakhi Mandal women members reviewing enterprise ledger in Gujarat"
+                width={900}
+                height={640}
+                className="h-[300px] md:h-[340px] w-full object-cover"
+              />
+              <div className="border-t border-[#DFDBD0] bg-white px-4 py-3 flex items-center justify-between gap-2">
+                <div>
+                  <div className="text-[13px] font-semibold text-[#141A23]">
+                    Ujjwal Sakhi Mandal · Chikhodra, Anand
+                  </div>
+                  <div className="text-[12px] text-[#475467]">
+                    Papad &amp; Spice Unit · Simulated case walkthrough
+                  </div>
+                </div>
+                <span className="font-mono text-[12px] font-semibold text-[#0F5E4E]">₹2.15L</span>
               </div>
-              <div className="mt-1 text-[13.5px] font-semibold text-[var(--sakhi-slate)]">{stat.label}</div>
-              <div className="mt-0.5 text-[12px] text-[var(--sakhi-muted)]">{stat.sub}</div>
-            </div>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Simulated Pilot Metrics Strip ─── */}
+      <section className="border-y border-[#DFDBD0] bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-8 md:px-6">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <span className="text-[12px] font-semibold uppercase tracking-wider text-[#475467]">
+              Anand &amp; Kheda Illustrative Pilot Snapshot
+            </span>
+            <SimulatedBadge />
+          </div>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            {[
+              { value: "148", label: "SHGs Identified (Simulated)", sub: "Anand & Kheda blocks" },
+              { value: "₹3.62 Cr", label: "Indicative Demand (Simulated)", sub: "Capex + WC separated" },
+              { value: "61", label: "Lender-Ready Packs (Simulated)", sub: "Verified checklist" },
+              { value: "29", label: "Sanctioned Packs (Simulated)", sub: "Branch tracking" },
+            ].map((stat) => (
+              <div key={stat.label} className="rounded-lg border border-[#DFDBD0] bg-[#FAF8F4] p-4">
+                <div className="font-mono text-[26px] font-semibold text-[#141A23] tabular-nums">
+                  {stat.value}
+                </div>
+                <div className="mt-1 text-[13px] font-semibold text-[#141A23]">{stat.label}</div>
+                <div className="mt-0.5 text-[12px] text-[#475467]">{stat.sub}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── How It Works (3 Crisp Steps) ─── */}
+      <section className="mx-auto max-w-6xl px-4 py-12 md:px-6">
+        <h2 className="font-serif text-[26px] font-semibold text-[#141A23]">
+          How Sakhi CreditLink Works in 3 Steps
+        </h2>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {[
+            {
+              step: "01",
+              title: "Verify LokOS & RBI 6× Corpus",
+              desc: "Pull Sakhi Mandal identity from GLPC snapshot and check RBI first-dose eligibility: max(6× corpus, ₹1.5L) with 6-month active books.",
+            },
+            {
+              step: "02",
+              title: "Build Cash-Flow Blueprint",
+              desc: "Separate Capex from Working Capital, attach 6–12 month sales ledger, and check lean-month EMI coverage.",
+            },
+            {
+              step: "03",
+              title: "Match, Submit & Guard 0%",
+              desc: "Match 9 Gujarat/GLPC schemes, send bank-ready dossier, track branch SLA timers, and protect 0% interest subvention.",
+            },
+          ].map((item) => (
+            <Card key={item.step} className="p-5">
+              <div className="font-mono text-[12px] font-semibold text-[#0F5E4E]">STEP {item.step}</div>
+              <h3 className="mt-2 text-[16px] font-semibold text-[#141A23]">{item.title}</h3>
+              <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#475467]">{item.desc}</p>
+            </Card>
           ))}
         </div>
       </section>
 
-      {/* ─── Official Government Scheme Portals (Animated Tilted Marquee Style) ─── */}
-      <section id="govt-portals" className="relative overflow-hidden py-20">
-        <div className="mx-auto max-w-4xl px-6 text-center">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full ios-pill px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-widest text-[var(--sakhi-forest)]">
-            <Globe className="h-3.5 w-3.5" />
-            Direct Official Portals
+      {/* ─── Official Government Portals (Static Accessible Grid) ─── */}
+      <section id="govt-portals" className="border-t border-[#DFDBD0] bg-white">
+        <div className="mx-auto max-w-6xl px-4 py-12 md:px-6">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <div className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-[#0F5E4E]">
+                <Globe className="h-3.5 w-3.5" /> Official Portals Directory
+              </div>
+              <h2 className="mt-1 font-serif text-[26px] font-semibold text-[#141A23]">
+                Direct Government Scheme &amp; Registration Links
+              </h2>
+            </div>
+            <p className="max-w-md text-[13px] text-[#475467]">
+              Sakhi CreditLink prepares pre-application packs and links out to official government portals for submission.
+            </p>
           </div>
-          <h2 className="font-display text-4xl md:text-5xl tracking-tight text-[var(--sakhi-slate)]">
-            Connected to Government Credit Portals
-          </h2>
-          <p className="mt-4 mx-auto max-w-2xl text-[15.5px] text-[var(--sakhi-muted)] leading-relaxed">
-            Sakhi CreditLink prepares your group&apos;s verified dossier and connects you directly to
-            official Central &amp; Gujarat Government portals for final submission.
-          </p>
-        </div>
 
-        {/* Animated Tilted Portal Card Marquee (hovering pauses/lifts any card to click) */}
-        <div className="relative mt-12 w-full overflow-hidden py-6 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-          <motion.div
-            className="flex gap-5 w-max px-4"
-            animate={{
-              x: ["0%", "-50%"],
-              transition: {
-                ease: "linear",
-                duration: 38,
-                repeat: Infinity,
-              },
-            }}
-            whileHover={{ transition: { duration: 120 } }}
-          >
-            {duplicatedPortals.map((portal, idx) => (
-              <motion.a
-                key={`${portal.name}-${idx}`}
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {GOVT_PORTALS.map((portal) => (
+              <a
+                key={portal.name}
                 href={portal.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                whileHover={{ scale: 1.04, rotate: 0, y: -6 }}
-                style={{ rotate: `${idx % 2 === 0 ? -1.8 : 2.2}deg` }}
-                className="group flex w-72 sm:w-80 flex-shrink-0 flex-col justify-between rounded-3xl ios-glass-strong p-6 transition-shadow hover:shadow-2xl"
+                className="group flex flex-col justify-between rounded-lg border border-[#DFDBD0] bg-[#FAF8F4] p-5 transition-colors duration-150 hover:border-[#0F5E4E] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F5E4E]"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <span className={`rounded-full bg-gradient-to-r ${portal.accent} px-3 py-1 text-[11px] font-semibold text-white shadow-sm`}>
+                    <span className="rounded-md border border-[#A7F3D0] bg-[#ECFDF5] px-2.5 py-0.5 text-[11px] font-semibold text-[#047857]">
                       {portal.tag}
                     </span>
-                    <ExternalLink className="h-4 w-4 text-[var(--sakhi-muted)] group-hover:text-[var(--sakhi-forest)]" />
+                    <ExternalLink className="h-4 w-4 text-[#475467] group-hover:text-[#0F5E4E]" aria-hidden="true" />
                   </div>
-                  <h3 className="mt-4 text-[18px] font-bold text-[var(--sakhi-slate)] group-hover:text-[var(--sakhi-forest)]">
+                  <h3 className="mt-3 text-[15.5px] font-semibold text-[#141A23] group-hover:text-[#0F5E4E]">
                     {portal.name}
                   </h3>
-                  <p className="mt-2 text-[13.5px] leading-relaxed text-[var(--sakhi-muted)]">
-                    {portal.desc}
-                  </p>
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-[#475467]">{portal.desc}</p>
                 </div>
-                <div className="mt-5 inline-flex items-center gap-1.5 text-[12.5px] font-semibold text-[var(--sakhi-forest)]">
-                  Visit Official Portal <ArrowUpRight className="h-3.5 w-3.5" />
+                <div className="mt-4 inline-flex items-center gap-1 text-[12.5px] font-semibold text-[#0F5E4E]">
+                  Open official portal <ArrowUpRight className="h-3.5 w-3.5" aria-hidden="true" />
                 </div>
-              </motion.a>
-            ))}
-          </motion.div>
-        </div>
-      </section>
-
-      {/* ─── SHG Livelihood Photos Showcase ─── */}
-      <section id="livelihoods" className="py-16">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
-            <div>
-              <div className="mb-3 inline-flex items-center gap-2 rounded-full ios-pill px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-widest text-[var(--sakhi-forest)]">
-                Rural Women Collectives
-              </div>
-              <h2 className="font-display text-[38px] text-[var(--sakhi-slate)]">
-                Built for real SHG enterprises
-              </h2>
-            </div>
-            <button
-              onClick={onEnterPortal}
-              className="inline-flex items-center gap-1.5 text-[14px] font-semibold text-[var(--sakhi-forest)] hover:underline"
-            >
-              Assess your enterprise <ArrowRight className="h-4 w-4" />
-            </button>
-          </div>
-
-          <div className="mt-10 grid gap-6 md:grid-cols-3">
-            {LIVELIHOOD_CARDS.map((item) => (
-              <div
-                key={item.title}
-                className="group overflow-hidden rounded-3xl ios-glass transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl"
-              >
-                <div className="relative h-56 overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    width={800}
-                    height={533}
-                    loading="lazy"
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute top-3 left-3 rounded-full ios-glass-strong px-3 py-1 text-[11px] font-semibold text-[var(--sakhi-forest)]">
-                    {item.scheme}
-                  </div>
-                </div>
-                <div className="p-6">
-                  <h3 className="text-[18px] font-bold text-[var(--sakhi-slate)]">{item.title}</h3>
-                  <p className="mt-2 text-[14px] leading-relaxed text-[var(--sakhi-muted)]">{item.desc}</p>
-                </div>
-              </div>
+              </a>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ─── Features Section ─── */}
-      <section id="features" className="py-16">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full ios-pill px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">
-              <Zap className="h-3.5 w-3.5 text-[var(--sakhi-forest)]" />
-              Core Capabilities
-            </div>
-            <h2 className="font-display text-[38px] text-[var(--sakhi-slate)]">
-              Everything a Bank Sakhi &amp; SHG needs
-            </h2>
+      {/* ─── Trust & DPDP Act 2023 Footer ─── */}
+      <footer className="border-t border-[#DFDBD0] bg-[#F2EFE8]">
+        <div className="mx-auto flex max-w-6xl flex-col justify-between gap-4 px-4 py-8 text-[12.5px] text-[#475467] md:flex-row md:items-center md:px-6">
+          <div className="flex items-center gap-2 font-semibold text-[#141A23]">
+            <ShieldCheck className="h-4 w-4 text-[#0F5E4E]" aria-hidden="true" />
+            <span>Sakhi CreditLink · Gujarat Pilot Prototype</span>
           </div>
-
-          <div className="mt-12 grid gap-6 md:grid-cols-3">
-            {[
-              {
-                icon: Fingerprint,
-                title: "Demand Diagnosis",
-                desc: "Structured intake separating Capex from Working Capital with 6–12 month sales-backed EMI & DSCR.",
-                color: "bg-[var(--sakhi-forest)]",
-              },
-              {
-                icon: Target,
-                title: "9-Scheme Gujarat Engine",
-                desc: "Deterministic matching across GLPC 0% Subvention, MMUY, CIF, VBY, PMFME & MUDRA with Apply + Bank Picker.",
-                color: "bg-[var(--sakhi-gold)]",
-              },
-              {
-                icon: FileCheck2,
-                title: "Verified Appraisal Pack",
-                desc: "Geo-tagged field proof, 3-bearer Quorum OTP, API Setu checks, and one-click printable PDF & JSON dossiers.",
-                color: "bg-[var(--sakhi-emerald)]",
-              },
-            ].map((feat, i) => (
-              <div
-                key={i}
-                className="rounded-3xl ios-glass p-8 transition-all hover:-translate-y-1 hover:shadow-xl"
-              >
-                <div className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl ${feat.color} shadow-lg`}>
-                  <feat.icon className="h-6 w-6 text-white" />
-                </div>
-                <h3 className="text-[19px] font-bold text-[var(--sakhi-slate)]">{feat.title}</h3>
-                <p className="mt-2.5 text-[14.5px] leading-relaxed text-[var(--sakhi-muted)]">{feat.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── How It Works ─── */}
-      <section id="how-it-works" className="py-16">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <div className="mb-4 inline-flex items-center gap-2 rounded-full ios-pill px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">
-              <MapPin className="h-3.5 w-3.5" />
-              4-Step Process
-            </div>
-            <h2 className="font-display text-[38px] text-[var(--sakhi-slate)]">
-              From SHG intake to bank branch
-            </h2>
-          </div>
-
-          <div className="mt-12 grid gap-5 md:grid-cols-4">
-            {[
-              { step: "01", title: "Verify LokOS ID", desc: "Auto-populate SHG identity & Panchasutra from GLPC snapshot.", icon: Sparkles },
-              { step: "02", title: "Sales-Backed EMI", desc: "Enter 6–12 month sales to compute natural EMI & lean-month DSCR.", icon: Shield },
-              { step: "03", title: "Match & Choose Bank", desc: "Apply under Absolute Match Gujarat/GLPC schemes & pick a bank.", icon: BarChart3 },
-              { step: "04", title: "Export Bank Pack", desc: "Print or download the verified dossier for branch appraisal.", icon: FileCheck2 },
-            ].map((s) => (
-              <div key={s.step} className="rounded-2xl ios-glass p-6">
-                <div className="mb-4 flex items-center justify-between">
-                  <span className="font-display text-[34px] text-[var(--sakhi-forest)]/25">{s.step}</span>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--sakhi-mint)]">
-                    <s.icon className="h-5 w-5 text-[var(--sakhi-forest)]" />
-                  </div>
-                </div>
-                <h3 className="text-[16.5px] font-bold text-[var(--sakhi-slate)]">{s.title}</h3>
-                <p className="mt-2 text-[13.5px] leading-relaxed text-[var(--sakhi-muted)]">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Impact Banner ─── */}
-      <section id="impact" className="py-16">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="overflow-hidden rounded-3xl ios-glass-dark p-10 md:p-14 relative">
-            <div className="relative z-10 grid gap-10 md:grid-cols-2 items-center">
-              <div>
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-[11.5px] font-semibold uppercase tracking-widest text-white/85">
-                  <Shield className="h-3.5 w-3.5" />
-                  SFIC 2026 · PS000311
-                </div>
-                <h2 className="font-display text-[34px] text-white leading-tight md:text-[40px]">
-                  Ready to assess your SHG&apos;s credit readiness?
-                </h2>
-                <p className="mt-4 text-[15.5px] leading-relaxed text-white/75">
-                  Start a live application in 2 minutes. Banks retain full sanction authority;
-                  Sakhi CreditLink ensures your group walks into the branch fully prepared.
-                </p>
-                <button
-                  onClick={onEnterPortal}
-                  className="mt-7 group flex items-center gap-2 rounded-2xl bg-white px-7 py-4 text-[15px] font-semibold text-[var(--sakhi-forest)] shadow-xl transition-all hover:-translate-y-0.5"
-                >
-                  Start Credit Application
-                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-                </button>
-              </div>
-
-              <div className="space-y-3">
-                <div className="flex items-center justify-end">
-                  <DemoBadge />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { val: "5", label: "Pilot Blocks (Simulated)", sub: "Anand & Kheda" },
-                    { val: "14+", label: "Bank Sakhis (Simulated)", sub: "Cluster facilitators" },
-                    { val: "29", label: "Sanctioned (Simulated)", sub: "Verified packs" },
-                    { val: "₹78L", label: "Disbursed (Simulated)", sub: "SHG enterprises" },
-                  ].map((m, i) => (
-                    <div key={i} className="rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-5">
-                      <div className="font-display text-[30px] text-white">{m.val}</div>
-                      <div className="mt-1 text-[13.5px] font-semibold text-white/90">{m.label}</div>
-                      <div className="text-[12px] text-white/55">{m.sub}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── Governance Footer ─── */}
-      <footer className="mt-8 border-t border-white/60 ios-glass">
-        <div className="mx-auto max-w-7xl px-6 py-10">
-          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--sakhi-forest)]">
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-white" fill="none" stroke="currentColor" strokeWidth="2">
-                  <path d="M12 2L2 7l10 5 10-5-10-5z" />
-                  <path d="M2 17l10 5 10-5" />
-                  <path d="M2 12l10 5 10-5" />
-                </svg>
-              </div>
-              <span className="text-[15px] font-bold text-[var(--sakhi-slate)]">Sakhi CreditLink</span>
-            </div>
-            <div className="flex flex-wrap gap-6 text-[13px] text-[var(--sakhi-muted)]">
-              <span>Banks retain sanction authority</span>
-              <span>•</span>
-              <span>Purpose-specific consent</span>
-              <span>•</span>
-              <span>No paid lender ranking</span>
-            </div>
+          <div className="flex flex-wrap items-center gap-4">
+            <span className="inline-flex items-center gap-1">
+              <CheckCircle2 className="h-3.5 w-3.5 text-[#047857]" /> Banks retain sanction authority
+            </span>
+            <span>Purpose-specific consent (DPDP Act 2023)</span>
+            <span>Zero paid lender ranking</span>
           </div>
         </div>
       </footer>

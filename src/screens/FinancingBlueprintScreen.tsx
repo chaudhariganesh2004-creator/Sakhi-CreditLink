@@ -117,7 +117,7 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
   const maxUnitsInChart = Math.max(...activeRows.map((r) => r.unitsSold), 1);
 
   return (
-    <div className="space-y-6 animate-fade-in-up" style={{ animationDuration: "0.35s" }}>
+    <div className="space-y-6 " >
       <SectionHeader
         eyebrow={shg.caseCode}
         title="Financing Blueprint & Sales-Backed EMI"
@@ -125,7 +125,7 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
         rightSlot={
           <button
             onClick={() => onNavigate("scheme-match")}
-            className="group flex items-center gap-1.5 rounded-xl bg-[var(--sakhi-forest)] px-4 py-2.5 text-[13px] font-semibold text-white"
+            className="group flex items-center gap-1.5 rounded-lg bg-[var(--sakhi-forest)] px-4 py-2.5 text-[13px] font-semibold text-white"
           >
             Scheme Match <ChevronRight className="h-4 w-4" />
           </button>
@@ -133,7 +133,7 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
       />
 
       {/* Last 6 to 12 Months Sales Report Section */}
-      <section className="rounded-2xl ios-glass p-6 space-y-5">
+      <section className="rounded-lg border border-[#DFDBD0] bg-white p-6 space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--sakhi-border)] pb-4">
           <div>
             <div className="flex items-center gap-2 text-[15px] font-bold text-[var(--sakhi-slate)]">
@@ -146,7 +146,7 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
-            <div className="flex items-center rounded-xl border border-[var(--sakhi-border)] bg-white p-1 text-[12.5px]">
+            <div className="flex items-center rounded-lg border border-[var(--sakhi-border)] bg-white p-1 text-[12.5px]">
               {([6, 12] as const).map((w) => (
                 <button
                   key={w}
@@ -164,7 +164,7 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
               ))}
             </div>
 
-            <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-[var(--sakhi-border)] bg-white px-3.5 py-2 text-[12.5px] font-semibold text-[var(--sakhi-slate)] hover:bg-[var(--sakhi-surface)]">
+            <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-[var(--sakhi-border)] bg-white px-3.5 py-2 text-[12.5px] font-semibold text-[var(--sakhi-slate)] hover:bg-[var(--sakhi-surface)]">
               <Upload className="h-3.5 w-3.5 text-[var(--sakhi-forest)]" />
               Fetch Sales CSV
               <input type="file" accept=".csv,.txt" onChange={handleCsvImport} className="hidden" />
@@ -186,7 +186,7 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
               <div
                 key={row.month}
                 className={cn(
-                  "rounded-xl border p-2.5 text-center transition-colors",
+                  "rounded-lg border p-2.5 text-center transition-colors",
                   isLean
                     ? "border-amber-200 bg-amber-50/70"
                     : isPeak
@@ -224,19 +224,19 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
 
         {/* Historical Summary Strip */}
         <div className="grid gap-3 sm:grid-cols-3 pt-1">
-          <div className="rounded-xl bg-white/80 border border-[var(--sakhi-border)] px-4 py-3 flex items-center justify-between">
+          <div className="rounded-lg bg-white/80 border border-[var(--sakhi-border)] px-4 py-3 flex items-center justify-between">
             <span className="text-[12.5px] text-[var(--sakhi-muted)]">Verified Avg Sales ({historyWindow}m)</span>
             <span className="font-mono text-[13.5px] font-bold text-[var(--sakhi-slate)]">
               {historicalStats.avgUnits} {ue.unitLabel}/mo ({formatINR(historicalStats.avgMargin)} margin)
             </span>
           </div>
-          <div className="rounded-xl bg-amber-50/80 border border-amber-200 px-4 py-3 flex items-center justify-between">
+          <div className="rounded-lg bg-amber-50/80 border border-amber-200 px-4 py-3 flex items-center justify-between">
             <span className="text-[12.5px] text-amber-800">Lean Month ({historicalStats.leanMonth.month})</span>
             <span className="font-mono text-[13.5px] font-bold text-amber-900">
               {formatINR(historicalStats.leanMargin)} ({leanMonthDscr.toFixed(2)}x EMI)
             </span>
           </div>
-          <div className="rounded-xl bg-emerald-50/80 border border-emerald-200 px-4 py-3 flex items-center justify-between">
+          <div className="rounded-lg bg-emerald-50/80 border border-emerald-200 px-4 py-3 flex items-center justify-between">
             <span className="text-[12.5px] text-emerald-800">Peak Month ({historicalStats.peakMonth.month})</span>
             <span className="font-mono text-[13.5px] font-bold text-emerald-900">
               {historicalStats.peakMonth.unitsSold} {ue.unitLabel}
@@ -247,7 +247,7 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
 
       {/* Scenario & Loan Terms Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center rounded-xl border border-[var(--sakhi-border)] bg-white p-1">
+        <div className="flex items-center rounded-lg border border-[var(--sakhi-border)] bg-white p-1">
           {(["conservative", "base", "optimistic"] as const).map((s) => (
             <button
               key={s}
@@ -255,7 +255,7 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
               className={cn(
                 "rounded-lg px-4 py-2 text-[13px] font-medium capitalize transition-all",
                 scenario === s
-                  ? "bg-[var(--sakhi-forest)] text-white shadow-sm"
+                  ? "bg-[var(--sakhi-forest)] text-white "
                   : "text-[var(--sakhi-muted)] hover:text-[var(--sakhi-slate)]"
               )}
             >
@@ -264,7 +264,7 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
           ))}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 rounded-xl ios-glass px-4 py-2 text-[12.5px]">
+        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-[#DFDBD0] bg-white px-4 py-2 text-[12.5px]">
           <label className="flex items-center gap-2">
             <span className="text-[var(--sakhi-muted)] font-medium">Rate (% p.a.):</span>
             <input
@@ -295,23 +295,23 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
 
       {/* Key metrics */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl ios-glass p-5">
+        <div className="rounded-lg border border-[#DFDBD0] bg-white p-5">
           <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">Projected Revenue</div>
           <div className="mt-2 text-[24px] font-bold text-[var(--sakhi-slate)] tabular-nums">{formatINR(monthlyRevenue)}</div>
           <div className="text-[12px] text-[var(--sakhi-muted)]">{projectedUnits} {ue.unitLabel}/mo</div>
         </div>
-        <div className="rounded-2xl ios-glass p-5">
+        <div className="rounded-lg border border-[#DFDBD0] bg-white p-5">
           <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">Projected Margin</div>
           <div className="mt-2 text-[24px] font-bold text-[var(--sakhi-forest)] tabular-nums">{formatINR(monthlyMargin)}</div>
           <div className="text-[12px] text-[var(--sakhi-muted)]">₹{marginPerUnit}/{ue.unitLabel} net margin</div>
         </div>
-        <div className="rounded-2xl ios-glass p-5">
+        <div className="rounded-lg border border-[#DFDBD0] bg-white p-5">
           <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">Natural Loan EMI</div>
           <div className="mt-2 text-[24px] font-bold text-[var(--sakhi-slate)] tabular-nums">{formatINR(illustrativeEMI)}</div>
           <div className="text-[12px] text-[var(--sakhi-muted)]">{annualRatePct}% p.a. / {tenorMonths} mo on {formatINR(externalNeed)}</div>
         </div>
         <div className={cn(
-          "rounded-2xl border p-5",
+          "rounded-lg border p-5",
           dscr >= 1.5 ? "border-emerald-200 bg-emerald-50" : dscr >= 1.2 ? "border-amber-200 bg-amber-50" : "border-red-200 bg-red-50"
         )}>
           <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">Post-Loan / Hist. DSCR</div>
@@ -326,7 +326,7 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
       </div>
 
       {/* Unit Economics */}
-      <div className="rounded-2xl ios-glass p-6">
+      <div className="rounded-lg border border-[#DFDBD0] bg-white p-6">
         <h3 className="flex items-center gap-2 text-[16px] font-bold text-[var(--sakhi-slate)] mb-5">
           <FileSpreadsheet className="h-4 w-4 text-[var(--sakhi-forest)]" />
           Unit Economics — {ue.primaryProduct}
@@ -353,7 +353,7 @@ export const FinancingBlueprintScreen: React.FC<Props> = ({ shg, onNavigate }) =
               </div>
             </div>
           </div>
-          <div className="space-y-3 rounded-xl bg-white/75 border border-[var(--sakhi-border)] p-5">
+          <div className="space-y-3 rounded-lg bg-white/75 border border-[var(--sakhi-border)] p-5">
             <div className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">
               <TrendingUp className="h-3.5 w-3.5 text-[var(--sakhi-forest)]" />
               Seasonality &amp; Repayment Fit

@@ -20,7 +20,7 @@ export const ProgrammeInsightsScreen: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6 animate-fade-in-up" style={{ animationDuration: "0.35s" }}>
+    <div className="space-y-6 " >
       <SectionHeader
         eyebrow="GLPC Pilot Evaluation & Bottleneck Intelligence"
         title="Programme Insights"
@@ -35,7 +35,7 @@ export const ProgrammeInsightsScreen: React.FC = () => {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         {/* Bottleneck Drivers */}
-        <section className="lg:col-span-6 rounded-2xl border border-[var(--sakhi-border)] bg-white p-6 space-y-4">
+        <section className="lg:col-span-6 rounded-lg border border-[var(--sakhi-border)] bg-white p-6 space-y-4">
           <div className="border-b border-[var(--sakhi-border)] pb-3.5">
             <h2 className="flex items-center gap-2 text-[16px] font-bold text-[var(--sakhi-slate)]">
               <BarChart3 className="h-4 w-4 text-amber-600" />
@@ -53,7 +53,7 @@ export const ProgrammeInsightsScreen: React.FC = () => {
                 </div>
                 <div className="h-2.5 w-full overflow-hidden rounded-full bg-[var(--sakhi-surface)]">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-amber-500 to-amber-600 transition-all duration-700"
+                    className="h-full rounded-full bg-[#B45309] transition-all duration-700"
                     style={{ width: `${b.share * 2.2}%` }}
                   />
                 </div>
@@ -63,7 +63,7 @@ export const ProgrammeInsightsScreen: React.FC = () => {
         </section>
 
         {/* Stage Duration Summary */}
-        <section className="lg:col-span-6 rounded-2xl border border-[var(--sakhi-border)] bg-white p-6 space-y-4">
+        <section className="lg:col-span-6 rounded-lg border border-[var(--sakhi-border)] bg-white p-6 space-y-4">
           <div className="border-b border-[var(--sakhi-border)] pb-3.5">
             <h2 className="text-[16px] font-bold text-[var(--sakhi-slate)]">
               Average Stage Duration (Days)
@@ -73,7 +73,7 @@ export const ProgrammeInsightsScreen: React.FC = () => {
             {FUNNEL_METRICS_DEMO.filter((f) => f.avgDays > 0).map((f) => (
               <div
                 key={f.stage}
-                className="flex items-center justify-between rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 py-2.5"
+                className="flex items-center justify-between rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 py-2.5"
               >
                 <span className="truncate pr-2 text-[var(--sakhi-slate)]">{f.stage}</span>
                 <span className="shrink-0 font-mono font-bold text-[var(--sakhi-forest)]">
@@ -86,7 +86,7 @@ export const ProgrammeInsightsScreen: React.FC = () => {
       </div>
 
       {/* Pilot Baseline / Endline Framework */}
-      <section className="overflow-hidden rounded-2xl border border-[var(--sakhi-border)] bg-white">
+      <section className="overflow-hidden rounded-lg border border-[var(--sakhi-border)] bg-white">
         <div className="border-b border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-6 py-4">
           <h2 className="text-[16px] font-bold text-[var(--sakhi-slate)]">
             GLPC Pilot Baseline &amp; Endline Measurement Protocol

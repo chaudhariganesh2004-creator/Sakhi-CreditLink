@@ -125,7 +125,7 @@ export const PostDisbursementGuardScreen: React.FC<PostDisbursementProps> = ({
   };
 
   return (
-    <div className="space-y-6 animate-fade-in-up" style={{ animationDuration: "0.35s" }}>
+    <div className="space-y-6 " >
       <SectionHeader
         eyebrow={`Post-Disbursement Guard · ${shg.caseCode}`}
         title="Repayment & 0% Subvention Guard"
@@ -137,7 +137,7 @@ export const PostDisbursementGuardScreen: React.FC<PostDisbursementProps> = ({
               <button
                 type="button"
                 onClick={handleActivateDisbursed}
-                className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--sakhi-forest)] px-4 py-2 text-[12.5px] font-semibold text-white shadow-sm hover:bg-[var(--sakhi-forest-deep)]"
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--sakhi-forest)] px-4 py-2 text-[12.5px] font-semibold text-white  hover:bg-[var(--sakhi-forest-deep)]"
               >
                 <Sparkles className="h-3.5 w-3.5" /> Activate Disbursed Tracking
               </button>
@@ -147,7 +147,7 @@ export const PostDisbursementGuardScreen: React.FC<PostDisbursementProps> = ({
       />
 
       {!isPostSanction && (
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-amber-200 bg-amber-50/80 px-5 py-3.5 text-[13px] text-amber-900">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50/80 px-5 py-3.5 text-[13px] text-amber-900">
           <span>
             <strong>{shg.shgName}</strong> is currently in <strong>{shg.stage}</strong>. Click{" "}
             <strong>Activate Disbursed Tracking</strong> to preview live repayment monitoring, or switch to a sanctioned case:
@@ -170,7 +170,7 @@ export const PostDisbursementGuardScreen: React.FC<PostDisbursementProps> = ({
       {/* 3 Core Guard Cards */}
       <div className="grid gap-4 md:grid-cols-3">
         {/* 1. Next EMI & 0% Subvention Guard */}
-        <div className="rounded-2xl ios-glass p-5 space-y-3">
+        <div className="rounded-lg border border-[#DFDBD0] bg-white p-5 space-y-3">
           <div className="flex items-center justify-between">
             <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[var(--sakhi-forest)]">
               <ShieldCheck className="h-4 w-4" /> 0% Subvention Guard
@@ -179,7 +179,7 @@ export const PostDisbursementGuardScreen: React.FC<PostDisbursementProps> = ({
               {onTimeStreak} Mo On-Time
             </span>
           </div>
-          <div className="font-display text-[32px] text-[var(--sakhi-slate)] tabular-nums">
+          <div className="font-serif font-semibold text-[32px] text-[var(--sakhi-slate)] tabular-nums">
             {formatINR(monthlyEmi)} <span className="font-sans text-[13px] font-normal text-[var(--sakhi-muted)]">/ mo EMI</span>
           </div>
           <div className="text-[12.5px] text-[var(--sakhi-muted)]">
@@ -189,7 +189,7 @@ export const PostDisbursementGuardScreen: React.FC<PostDisbursementProps> = ({
         </div>
 
         {/* 2. Actual vs Projected Sales (Lakhpati Didi) */}
-        <div className="rounded-2xl ios-glass p-5 space-y-3">
+        <div className="rounded-lg border border-[#DFDBD0] bg-white p-5 space-y-3">
           <div className="flex items-center justify-between">
             <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wider text-[var(--sakhi-muted)]">
               <TrendingUp className="h-4 w-4 text-[var(--sakhi-forest)]" /> Lakhpati Didi Pulse
@@ -201,7 +201,7 @@ export const PostDisbursementGuardScreen: React.FC<PostDisbursementProps> = ({
               {annualizedIncomePerMember >= 100000 ? "≥ ₹1L Target Met" : "Building Uplift"}
             </span>
           </div>
-          <div className="font-display text-[32px] text-[var(--sakhi-slate)] tabular-nums">
+          <div className="font-serif font-semibold text-[32px] text-[var(--sakhi-slate)] tabular-nums">
             {formatINR(actualMonthlySales)}
           </div>
           <div className="text-[12.5px] text-[var(--sakhi-muted)]">
@@ -213,7 +213,7 @@ export const PostDisbursementGuardScreen: React.FC<PostDisbursementProps> = ({
         {/* 3. Lean-Month Early Warning */}
         <div
           className={cn(
-            "rounded-2xl border p-5 space-y-3",
+            "rounded-lg border p-5 space-y-3",
             isLeanWarning
               ? "border-red-200 bg-red-50/85"
               : "border-emerald-200 bg-emerald-50/75"
@@ -245,7 +245,7 @@ export const PostDisbursementGuardScreen: React.FC<PostDisbursementProps> = ({
       </div>
 
       {/* Interactive Monthly Check-In Simulator */}
-      <section className="rounded-2xl ios-glass-strong p-6 space-y-5">
+      <section className="rounded-lg border border-[#DFDBD0] bg-white p-6 space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--sakhi-border)] pb-4">
           <div>
             <h2 className="flex items-center gap-2 text-[16px] font-bold text-[var(--sakhi-slate)]">
@@ -260,7 +260,7 @@ export const PostDisbursementGuardScreen: React.FC<PostDisbursementProps> = ({
           <button
             type="button"
             onClick={handleLogMonthlyPulse}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--sakhi-forest)] px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm hover:bg-[var(--sakhi-forest-deep)]"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--sakhi-forest)] px-4 py-2.5 text-[13px] font-semibold text-white  hover:bg-[var(--sakhi-forest-deep)]"
           >
             <CalendarCheck2 className="h-4 w-4" /> Log Monthly EMI &amp; Sales Pulse
           </button>
@@ -290,7 +290,7 @@ export const PostDisbursementGuardScreen: React.FC<PostDisbursementProps> = ({
         </div>
 
         {isLeanWarning && (
-          <div className="flex items-start gap-2.5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-900">
+          <div className="flex items-start gap-2.5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-[13px] text-red-900">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
             <div>
               <strong>Action Flagged for Bank Sakhi ({shg.bankSakhiName}):</strong> Actual margin ({formatINR(actualMonthlyMargin)}) is close to or below EMI ({formatINR(monthlyEmi)}). Recommend temporary bridge from SHG Corpus ({formatINR(shg.corpusBalance)}) or CLF CIF buffer before 05 Dec to prevent 0% subvention loss.
@@ -299,7 +299,7 @@ export const PostDisbursementGuardScreen: React.FC<PostDisbursementProps> = ({
         )}
 
         {/* Repayment & Sales Pulse History */}
-        <div className="overflow-x-auto rounded-xl border border-[var(--sakhi-border)] bg-white/80">
+        <div className="overflow-x-auto rounded-lg border border-[var(--sakhi-border)] bg-white/80">
           <table className="w-full text-left text-[13px]">
             <thead className="border-b border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] text-[11px] font-semibold uppercase tracking-wider text-[var(--sakhi-muted)]">
               <tr>

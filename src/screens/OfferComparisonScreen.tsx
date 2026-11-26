@@ -27,7 +27,7 @@ export const OfferComparisonScreen: React.FC<OfferComparisonProps> = ({
   const offers = getDemoOffersForCase(shg);
 
   return (
-    <div className="space-y-6 animate-fade-in-up" style={{ animationDuration: "0.35s" }}>
+    <div className="space-y-6 " >
       <SectionHeader
         eyebrow={`Offer Comparison · ${shg.caseCode}`}
         title="Regulated Lender Terms"
@@ -35,7 +35,7 @@ export const OfferComparisonScreen: React.FC<OfferComparisonProps> = ({
         rightSlot={
           <button
             onClick={() => onNavigate("application-pack")}
-            className="group inline-flex items-center gap-1.5 rounded-xl bg-[var(--sakhi-forest)] px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-all hover:bg-[var(--sakhi-forest-deep)]"
+            className="group inline-flex items-center gap-1.5 rounded-lg bg-[var(--sakhi-forest)] px-4 py-2.5 text-[13px] font-semibold text-white  transition-all hover:bg-[var(--sakhi-forest-deep)]"
           >
             Build Application Pack <ChevronRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </button>
@@ -49,7 +49,7 @@ export const OfferComparisonScreen: React.FC<OfferComparisonProps> = ({
       />
 
       {/* Side-by-side Aligned Comparison Matrix */}
-      <div className="overflow-hidden rounded-2xl border border-[var(--sakhi-border)] bg-white shadow-sm">
+      <div className="overflow-hidden rounded-lg border border-[var(--sakhi-border)] bg-white ">
         <div className="flex items-center justify-between border-b border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-6 py-4">
           <div className="flex items-center gap-2.5 text-[15px] font-bold text-[var(--sakhi-slate)]">
             <Scale className="h-4 w-4 text-[var(--sakhi-forest)]" />
@@ -137,9 +137,9 @@ export const OfferComparisonScreen: React.FC<OfferComparisonProps> = ({
                       <button
                         onClick={() => onSelectLender(o.id)}
                         className={cn(
-                          "inline-flex w-full items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-[13px] font-semibold transition-all",
+                          "inline-flex w-full items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-[13px] font-semibold transition-all",
                           selected
-                            ? "bg-[var(--sakhi-forest)] text-white shadow-sm"
+                            ? "bg-[var(--sakhi-forest)] text-white "
                             : "border border-[var(--sakhi-border)] bg-white text-[var(--sakhi-slate)] hover:border-[var(--sakhi-forest)]/30 hover:bg-[var(--sakhi-mint)]/30"
                         )}
                       >

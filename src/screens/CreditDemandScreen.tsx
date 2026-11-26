@@ -24,7 +24,7 @@ export const CreditDemandScreen: React.FC<Props> = ({
   embeddedInStepper = false,
   onStepNext,
 }) => {
-  const showGu = language === "en-gu";
+  const showGu = language === "gu";
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editLabel, setEditLabel] = useState("");
   const [editAmount, setEditAmount] = useState<number>(0);

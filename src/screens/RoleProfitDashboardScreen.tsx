@@ -7,8 +7,6 @@ import {
   CheckCircle2,
   Database,
   Landmark,
-  Shield,
-  Sparkles,
   TrendingUp,
   Upload,
   Users,
@@ -19,13 +17,13 @@ import {
   setLokOSAdapterMode,
   type LokOSAdapterMode,
 } from "@/lib/lokos-adapter";
-import {
-  ROLE_META,
-  type NavScreenId,
-  type SHGCase,
-  type UserRole,
+import type {
+  NavScreenId,
+  SHGCase,
+  UserRole,
 } from "@/data/sakhi-data";
-import { SectionHeader, StageChip } from "@/components/shared/ui-primitives";
+import { SectionHeader, SimulatedBadge, StageChip } from "@/components/shared/ui-primitives";
+import { Button } from "@/components/ui/button";
 import { cn, formatINR, formatINRCompact } from "@/lib/utils";
 
 interface RoleProfitDashboardProps {
@@ -38,8 +36,6 @@ interface RoleProfitDashboardProps {
 
 export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
   cases,
-  role,
-  onChangeRole,
   onSelectCase,
   onNavigate,
 }) => {
@@ -123,66 +119,29 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
   const currentPortalGrantedLsp = portfolioStats.grantedCount * flatBankLspFee;
   const currentPortalPipelineLsp = portfolioStats.totalCases * flatBankLspFee;
 
-  const roleCards: { id: UserRole; title: string; focus: string }[] = [
-    { id: "shg-leader", title: "SHG Leader", focus: "Applications, Granted Loans & Profit Flow" },
-    { id: "bank-sakhi", title: "Bank Sakhi", focus: "Cluster Facilitation & Field Queue" },
-    { id: "glpc-officer", title: "GLPC Officer", focus: "District B2G SaaS & Bottlenecks" },
-    { id: "bank-officer", title: "Bank Officer", focus: "Pre-Vetted PSL Packs & LSP ROI" },
-    { id: "admin", title: "Admin", focus: "Platform P&L & Unit Economics" },
-  ];
-
-  const meta = ROLE_META[role];
-
   return (
-    <div className="space-y-8 animate-fade-in-up" style={{ animationDuration: "0.35s" }}>
+    <div className="space-y-8">
       <SectionHeader
-        eyebrow={`Role Workspace · ${meta.userName}`}
-        title={`${meta.shortLabel} Dashboard & Profit Model`}
-        subtitle={meta.scopeNote}
+        eyebrow="District / State Official · Financial Viability"
+        title="Sustainability and Pilot Assumptions"
+        subtitle="B2G institutional license + flat-fee bank readiness assumptions (illustrative model for officials only; SHGs always pay ₹0)."
         rightSlot={
-          <button
-            onClick={() => onNavigate("shg-intake")}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--sakhi-forest)] px-4 py-2.5 text-[13px] font-semibold text-white shadow-sm hover:bg-[var(--sakhi-forest-deep)]"
-          >
-            <Sparkles className="h-4 w-4" /> + New SHG Application
-          </button>
+          <div className="flex items-center gap-2">
+            <SimulatedBadge />
+            <Button variant="secondary" onClick={() => onNavigate("command-centre")}>
+              Back to Command Centre
+            </Button>
+          </div>
         }
       />
 
-      {/* 5-Role Switcher Strip */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        {roleCards.map((rc) => {
-          const active = role === rc.id;
-          return (
-            <button
-              key={rc.id}
-              onClick={() => onChangeRole(rc.id)}
-              className={cn(
-                "rounded-2xl p-4 text-left transition-all",
-                active
-                  ? "ios-glass-dark text-white shadow-lg"
-                  : "ios-glass text-[var(--sakhi-slate)] hover:-translate-y-0.5"
-              )}
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[13.5px] font-bold">{rc.title}</span>
-                <Shield className={cn("h-4 w-4", active ? "text-emerald-300" : "text-[var(--sakhi-forest)]")} />
-              </div>
-              <div className={cn("mt-1.5 text-[11.5px] leading-snug", active ? "text-white/75" : "text-[var(--sakhi-muted)]")}>
-                {rc.focus}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
       {/* Full Application & Granted Loan Flow Summary */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl ios-glass p-5">
+        <div className="rounded-lg border border-[#DFDBD0] bg-white p-5">
           <div className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wider text-[var(--sakhi-muted)]">
             <Users className="h-4 w-4 text-[var(--sakhi-forest)]" /> Total Applications
           </div>
-          <div className="mt-2 font-display text-[34px] text-[var(--sakhi-slate)] tabular-nums">
+          <div className="mt-2 font-serif font-semibold text-[34px] text-[var(--sakhi-slate)] tabular-nums">
             {portfolioStats.totalCases}
           </div>
           <div className="mt-1 text-[12.5px] text-[var(--sakhi-muted)]">
@@ -190,11 +149,11 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
           </div>
         </div>
 
-        <div className="rounded-2xl ios-glass p-5">
+        <div className="rounded-lg border border-[#DFDBD0] bg-white p-5">
           <div className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wider text-[var(--sakhi-muted)]">
             <BadgeIndianRupee className="h-4 w-4 text-[var(--sakhi-forest)]" /> Total Credit Demand
           </div>
-          <div className="mt-2 font-display text-[34px] text-[var(--sakhi-slate)] tabular-nums">
+          <div className="mt-2 font-serif font-semibold text-[34px] text-[var(--sakhi-slate)] tabular-nums">
             {formatINRCompact(portfolioStats.totalExternalNeed)}
           </div>
           <div className="mt-1 text-[12.5px] text-[var(--sakhi-muted)]">
@@ -202,11 +161,11 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-emerald-200 bg-emerald-50/80 p-5">
+        <div className="rounded-lg border border-emerald-200 bg-emerald-50/80 p-5">
           <div className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wider text-emerald-700">
             <CheckCircle2 className="h-4 w-4" /> Granted / Sanctioned Loans
           </div>
-          <div className="mt-2 font-display text-[34px] text-emerald-800 tabular-nums">
+          <div className="mt-2 font-serif font-semibold text-[34px] text-emerald-800 tabular-nums">
             {formatINRCompact(portfolioStats.grantedLoanValue)}
           </div>
           <div className="mt-1 text-[12.5px] text-emerald-700">
@@ -214,11 +173,11 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-amber-200 bg-amber-50/80 p-5">
+        <div className="rounded-lg border border-amber-200 bg-amber-50/80 p-5">
           <div className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wider text-amber-800">
             <Landmark className="h-4 w-4" /> Live Portal LSP Revenue
           </div>
-          <div className="mt-2 font-display text-[34px] text-amber-900 tabular-nums">
+          <div className="mt-2 font-serif font-semibold text-[34px] text-amber-900 tabular-nums">
             {formatINR(currentPortalGrantedLsp)}
           </div>
           <div className="mt-1 text-[12.5px] text-amber-800">
@@ -228,7 +187,7 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
       </div>
 
       {/* End-to-End Flow + Applications & Granted Loans Table */}
-      <section className="overflow-hidden rounded-2xl ios-glass">
+      <section className="overflow-hidden rounded-lg border border-[#DFDBD0] bg-white">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--sakhi-border)] px-6 py-4">
           <div>
             <h2 className="text-[16px] font-bold text-[var(--sakhi-slate)]">
@@ -305,7 +264,7 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
       </section>
 
       {/* Phased LokOS Integration Adapter (Problem #2 Solution) */}
-      <section className="rounded-3xl ios-glass p-6 space-y-4">
+      <section className="rounded-lg border border-[#DFDBD0] bg-white p-6 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[var(--sakhi-border)] pb-4">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-[var(--sakhi-mint)] px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-forest)]">
@@ -319,7 +278,7 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center rounded-xl border border-[var(--sakhi-border)] bg-white p-1 text-[12.5px]">
+          <div className="flex items-center rounded-lg border border-[var(--sakhi-border)] bg-white p-1 text-[12.5px]">
             <button
               type="button"
               onClick={() => handleModeChange("cluster-snapshot")}
@@ -349,7 +308,7 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2.5">
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[var(--sakhi-border)] bg-white px-4 py-2 text-[12.5px] font-semibold text-[var(--sakhi-slate)] hover:bg-[var(--sakhi-surface)]">
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[var(--sakhi-border)] bg-white px-4 py-2 text-[12.5px] font-semibold text-[var(--sakhi-slate)] hover:bg-[var(--sakhi-surface)]">
               <Upload className="h-3.5 w-3.5 text-[var(--sakhi-forest)]" />
               Import GLPC LokOS CSV
               <input type="file" accept=".csv,.txt" onChange={handleCsvUpload} className="hidden" />
@@ -357,7 +316,7 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
             <button
               type="button"
               onClick={handleLoadSampleBlockCsv}
-              className="inline-flex items-center gap-1.5 rounded-xl bg-[var(--sakhi-mint)] px-4 py-2 text-[12.5px] font-semibold text-[var(--sakhi-forest)] hover:bg-[var(--sakhi-forest)] hover:text-white transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg bg-[var(--sakhi-mint)] px-4 py-2 text-[12.5px] font-semibold text-[var(--sakhi-forest)] hover:bg-[var(--sakhi-forest)] hover:text-white transition-colors"
             >
               + Sync Sample Block CSV
             </button>
@@ -370,13 +329,13 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
       </section>
 
       {/* Interactive Sakhi CreditLink Profit & Sustainability Calculator */}
-      <section className="rounded-3xl ios-glass-strong p-6 md:p-8 space-y-6">
+      <section className="rounded-lg border border-[#DFDBD0] bg-white p-6 md:p-8 space-y-6">
         <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--sakhi-border)] pb-5">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-[var(--sakhi-mint)] px-3 py-1 text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-forest)]">
               <Calculator className="h-3.5 w-3.5" /> Business Sustainability Model
             </div>
-            <h2 className="mt-2 font-display text-[26px] text-[var(--sakhi-slate)]">
+            <h2 className="mt-2 font-serif font-semibold text-[26px] text-[var(--sakhi-slate)]">
               Sakhi CreditLink Profit Calculator (B2G + Flat-Fee Bank LSP)
             </h2>
             <p className="mt-1 text-[13.5px] text-[var(--sakhi-muted)]">
@@ -384,9 +343,9 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
             </p>
           </div>
 
-          <div className="rounded-2xl ios-glass-dark px-5 py-3.5 text-right text-white">
+          <div className="rounded-lg bg-[#0F5E4E] text-white border border-[#0A4539] px-5 py-3.5 text-right text-white">
             <div className="text-[11px] uppercase tracking-widest text-white/70">Projected Annual Net Profit</div>
-            <div className="font-display text-[28px] tabular-nums">
+            <div className="font-serif font-semibold text-[28px] tabular-nums">
               {formatINR(annualNetProfit)}
             </div>
             <div className="text-[12px] text-emerald-300 font-semibold">
@@ -464,7 +423,7 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
           </div>
 
           {/* P&L Breakdown */}
-          <div className="lg:col-span-5 rounded-2xl border border-[var(--sakhi-border)] bg-white/80 p-6 space-y-4">
+          <div className="lg:col-span-5 rounded-lg border border-[var(--sakhi-border)] bg-white/80 p-6 space-y-4">
             <div className="flex items-center gap-2 text-[14px] font-bold text-[var(--sakhi-slate)] border-b border-[var(--sakhi-border)] pb-3">
               <TrendingUp className="h-4 w-4 text-[var(--sakhi-forest)]" />
               Annual P&amp;L Summary
@@ -495,7 +454,7 @@ export const RoleProfitDashboardScreen: React.FC<RoleProfitDashboardProps> = ({
               </div>
             </div>
 
-            <div className="rounded-xl bg-[var(--sakhi-mint)]/70 p-3.5 text-[12px] leading-relaxed text-[var(--sakhi-forest)]">
+            <div className="rounded-lg bg-[var(--sakhi-mint)]/70 p-3.5 text-[12px] leading-relaxed text-[var(--sakhi-forest)]">
               <Building2 className="mb-1 inline h-3.5 w-3.5 mr-1" />
               <strong>SHG Fee: ₹0.</strong> Unbiased alphabetical lender comparison is preserved because every bank pays the exact same flat readiness fee.
             </div>

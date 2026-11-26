@@ -135,7 +135,7 @@ export const ApplicationPackScreen: React.FC<ApplicationPackProps> = ({
   };
 
   return (
-    <div className="space-y-6 animate-fade-in-up" style={{ animationDuration: "0.35s" }}>
+    <div className="space-y-6 " >
       <SectionHeader
         eyebrow={`Application Pack · ${shg.caseCode}`}
         title="Application Pack & Timeline"
@@ -151,13 +151,13 @@ export const ApplicationPackScreen: React.FC<ApplicationPackProps> = ({
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
         {/* Target Dossier & Completeness */}
-        <section className="lg:col-span-7 rounded-2xl border border-[var(--sakhi-border)] bg-white p-6 space-y-5">
+        <section className="lg:col-span-7 rounded-lg border border-[var(--sakhi-border)] bg-white p-6 space-y-5">
           <div className="flex flex-wrap items-start justify-between gap-4 border-b border-[var(--sakhi-border)] pb-5">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-widest text-[var(--sakhi-muted)]">
                 Target Submission Dossier
               </div>
-              <h2 className="mt-1 font-display text-[24px] text-[var(--sakhi-slate)]">
+              <h2 className="mt-1 font-serif font-semibold text-[24px] text-[var(--sakhi-slate)]">
                 {chosenOffer.lenderName.replace(" (DEMO)", "")}
               </h2>
               <p className="mt-0.5 text-[13.5px] text-[var(--sakhi-muted)]">
@@ -195,19 +195,19 @@ export const ApplicationPackScreen: React.FC<ApplicationPackProps> = ({
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify-between rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-4 py-3 text-[13px]">
+              <div className="flex items-center justify-between rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-4 py-3 text-[13px]">
                 <span className="text-[var(--sakhi-slate)]">1. Capex &amp; Working Capital separated in Blueprint</span>
                 <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-emerald-700">
                   <CheckCircle2 className="h-4 w-4" /> Complete
                 </span>
               </div>
-              <div className="flex items-center justify-between rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-4 py-3 text-[13px]">
+              <div className="flex items-center justify-between rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-4 py-3 text-[13px]">
                 <span className="text-[var(--sakhi-slate)]">2. Purpose-specific SHG Consent Record active</span>
                 <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-emerald-700">
                   <CheckCircle2 className="h-4 w-4" /> {shg.consents.filter((c) => c.status === "Active").length} Active
                 </span>
               </div>
-              <div className="flex items-center justify-between rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-4 py-3 text-[13px]">
+              <div className="flex items-center justify-between rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-4 py-3 text-[13px]">
                 <span className="text-[var(--sakhi-slate)]">3. Mandatory Documents Verified</span>
                 {missingDocs.length === 0 ? (
                   <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-emerald-700">
@@ -226,32 +226,32 @@ export const ApplicationPackScreen: React.FC<ApplicationPackProps> = ({
           <div className="flex flex-wrap items-center gap-3 border-t border-[var(--sakhi-border)] pt-4">
             <button
               onClick={handlePreparePack}
-              className="inline-flex items-center gap-2 rounded-xl bg-[var(--sakhi-forest)] px-5 py-2.5 text-[13px] font-semibold text-white shadow-sm transition-all hover:bg-[var(--sakhi-forest-deep)]"
+              className="inline-flex items-center gap-2 rounded-lg bg-[var(--sakhi-forest)] px-5 py-2.5 text-[13px] font-semibold text-white  transition-all hover:bg-[var(--sakhi-forest-deep)]"
             >
               <FileCheck className="h-4 w-4" /> Prepare Handoff Pack
             </button>
             <button
               onClick={() => setShowPackModal(!showPackModal)}
-              className="inline-flex items-center gap-2 rounded-xl border border-[var(--sakhi-border)] bg-white px-4 py-2.5 text-[13px] font-medium text-[var(--sakhi-slate)] transition-colors hover:bg-[var(--sakhi-surface)]"
+              className="inline-flex items-center gap-2 rounded-lg border border-[var(--sakhi-border)] bg-white px-4 py-2.5 text-[13px] font-medium text-[var(--sakhi-slate)] transition-colors hover:bg-[var(--sakhi-surface)]"
             >
               {showPackModal ? "Hide Preview" : "Preview Summary"}
             </button>
             <button
               onClick={() => window.print()}
-              className="inline-flex items-center gap-2 rounded-xl border border-[var(--sakhi-border)] bg-white px-4 py-2.5 text-[13px] font-medium text-[var(--sakhi-slate)] transition-colors hover:bg-[var(--sakhi-surface)] no-print"
+              className="inline-flex items-center gap-2 rounded-lg border border-[var(--sakhi-border)] bg-white px-4 py-2.5 text-[13px] font-medium text-[var(--sakhi-slate)] transition-colors hover:bg-[var(--sakhi-surface)] no-print"
             >
               <Printer className="h-4 w-4 text-[var(--sakhi-forest)]" /> Print / Save PDF
             </button>
             <button
               onClick={handleDownloadPack}
-              className="inline-flex items-center gap-2 rounded-xl border border-[var(--sakhi-border)] bg-white px-4 py-2.5 text-[13px] font-medium text-[var(--sakhi-slate)] transition-colors hover:bg-[var(--sakhi-surface)] no-print"
+              className="inline-flex items-center gap-2 rounded-lg border border-[var(--sakhi-border)] bg-white px-4 py-2.5 text-[13px] font-medium text-[var(--sakhi-slate)] transition-colors hover:bg-[var(--sakhi-surface)] no-print"
             >
               <Download className="h-4 w-4 text-[var(--sakhi-forest)]" /> Download JSON
             </button>
           </div>
 
           {showPackModal && (
-            <div className="rounded-xl border border-[var(--sakhi-forest)]/20 bg-[var(--sakhi-mint)]/30 p-5 text-[13px] space-y-2">
+            <div className="rounded-lg border border-[var(--sakhi-forest)]/20 bg-[var(--sakhi-mint)]/30 p-5 text-[13px] space-y-2">
               <div className="flex items-center justify-between border-b border-[var(--sakhi-border)] pb-2.5">
                 <span className="font-mono text-[11px] font-semibold text-[var(--sakhi-forest)]">
                   DOSSIER PREVIEW · {shg.caseCode}
@@ -277,7 +277,7 @@ export const ApplicationPackScreen: React.FC<ApplicationPackProps> = ({
         </section>
 
         {/* Case Timeline */}
-        <section className="lg:col-span-5 rounded-2xl border border-[var(--sakhi-border)] bg-white p-6 space-y-4">
+        <section className="lg:col-span-5 rounded-lg border border-[var(--sakhi-border)] bg-white p-6 space-y-4">
           <h2 className="border-b border-[var(--sakhi-border)] pb-3.5 text-[16px] font-bold text-[var(--sakhi-slate)]">
             Case Timeline &amp; Ownership
           </h2>
@@ -299,7 +299,7 @@ export const ApplicationPackScreen: React.FC<ApplicationPackProps> = ({
 
       {/* Queries & Open Tasks Split */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        <section className="rounded-2xl border border-[var(--sakhi-border)] bg-white p-6 space-y-4">
+        <section className="rounded-lg border border-[var(--sakhi-border)] bg-white p-6 space-y-4">
           <h2 className="flex items-center gap-2 text-[15px] font-bold text-[var(--sakhi-slate)]">
             <MessageSquare className="h-4 w-4 text-amber-600" />
             Appraisal &amp; Pre-Pack Queries
@@ -309,7 +309,7 @@ export const ApplicationPackScreen: React.FC<ApplicationPackProps> = ({
               <p className="text-[13px] text-[var(--sakhi-muted)]">No queries raised on this case.</p>
             ) : (
               shg.queries.map((q) => (
-                <div key={q.id} className="rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 text-[13px]">
+                <div key={q.id} className="rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 text-[13px]">
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-semibold text-[var(--sakhi-slate)]">{q.raisedBy}</span>
                     <span
@@ -348,18 +348,18 @@ export const ApplicationPackScreen: React.FC<ApplicationPackProps> = ({
               value={newQueryText}
               onChange={(e) => setNewQueryText(e.target.value)}
               placeholder="Raise clarification or query..."
-              className="h-10 flex-1 rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[13px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
+              className="h-10 flex-1 rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] px-3.5 text-[13px] text-[var(--sakhi-slate)] focus:border-[var(--sakhi-forest)] focus:bg-white focus:outline-none"
             />
             <button
               type="submit"
-              className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-[var(--sakhi-forest)] px-4 text-[13px] font-semibold text-white hover:bg-[var(--sakhi-forest-deep)]"
+              className="inline-flex h-10 items-center gap-1.5 rounded-lg bg-[var(--sakhi-forest)] px-4 text-[13px] font-semibold text-white hover:bg-[var(--sakhi-forest-deep)]"
             >
               <Send className="h-3.5 w-3.5" /> Log
             </button>
           </form>
         </section>
 
-        <section className="rounded-2xl border border-[var(--sakhi-border)] bg-white p-6 space-y-4">
+        <section className="rounded-lg border border-[var(--sakhi-border)] bg-white p-6 space-y-4">
           <h2 className="text-[15px] font-bold text-[var(--sakhi-slate)]">
             Assigned Action Tasks
           </h2>
@@ -370,7 +370,7 @@ export const ApplicationPackScreen: React.FC<ApplicationPackProps> = ({
               shg.tasks.map((t) => (
                 <div
                   key={t.id}
-                  className="flex items-center justify-between gap-3 rounded-xl border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 text-[13px]"
+                  className="flex items-center justify-between gap-3 rounded-lg border border-[var(--sakhi-border)] bg-[var(--sakhi-surface)] p-4 text-[13px]"
                 >
                   <div>
                     <div className="font-medium text-[var(--sakhi-slate)]">{t.title}</div>
