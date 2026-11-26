@@ -1,4 +1,5 @@
 export type NavScreenId =
+  | "readiness-hub"
   | "shg-intake"
   | "cashflow-blueprint"
   | "bank-queue"
@@ -170,6 +171,8 @@ export interface SHGCase {
   queries: CaseQuery[];
   timeline: StatusEvent[];
   bottleneckReason?: string;
+  activeBookMonths?: number;
+  currentDose?: 1 | 2 | 3;
   isPrimaryDemo?: boolean;
 }
 
