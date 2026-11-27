@@ -21,10 +21,30 @@ import {
   saveCasesState,
 } from "@/lib/storage";
 import { resetLokOSSnapshotStorage } from "@/lib/lokos-adapter";
+import {
+  OpportunityExchangeProvider,
+  useOpportunityExchange,
+} from "@/context/OpportunityExchangeContext";
+import { FinancingProposalModal } from "@/components/exchange/FinancingProposalModal";
 import { SimulatedBadge } from "@/components/shared/ui-primitives";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
+const DualPathwayHomeScreen = lazy(() =>
+  import("@/screens/DualPathwayHomeScreen").then((m) => ({
+    default: m.DualPathwayHomeScreen,
+  }))
+);
+const OpportunityDiscoveryScreen = lazy(() =>
+  import("@/screens/OpportunityDiscoveryScreen").then((m) => ({
+    default: m.OpportunityDiscoveryScreen,
+  }))
+);
+const CollectiveProductionScreen = lazy(() =>
+  import("@/screens/CollectiveProductionScreen").then((m) => ({
+    default: m.CollectiveProductionScreen,
+  }))
+);
 const LandingPage = lazy(() =>
   import("@/screens/LandingPage").then((m) => ({ default: m.LandingPage }))
 );
@@ -86,7 +106,8 @@ const RoleProfitDashboardScreen = lazy(() =>
   }))
 );
 
-type AppView = "landing" | "portal";
+type AppView = "home" | "loan-landing" | "portal" | "exchange";
+type ExchangeScreenId = "opportunity-discovery" | "collective-production";
 
 interface RoleNavConfig {
   label: string;
@@ -135,13 +156,46 @@ const ROLE_CONFIGS: Record<PortalRole, RoleNavConfig> = {
   },
 };
 
-function parseHashRoute(): { view: AppView; role: PortalRole; screen: NavScreenId } {
+function parseHashRoute(): {
+  view: AppView;
+  role: PortalRole;
+  screen: NavScreenId;
+  exchangeScreen: ExchangeScreenId;
+} {
   if (typeof window === "undefined") {
-    return { view: "landing", role: "shg-sakhi", screen: "readiness-hub" };
+    return {
+      view: "home",
+      role: "shg-sakhi",
+      screen: "readiness-hub",
+      exchangeScreen: "opportunity-discovery",
+    };
   }
-  const raw = window.location.hash.replace(/^#\/?/, "").trim();
+  const hashRaw = window.location.hash.replace(/^#\/?/, "").trim();
+  const pathRaw = window.location.pathname.replace(/^\/+/, "").trim();
+  const raw = hashRaw || pathRaw;
   if (!raw) {
-    return { view: "landing", role: "shg-sakhi", screen: "readiness-hub" };
+    return {
+      view: "home",
+      role: "shg-sakhi",
+      screen: "readiness-hub",
+      exchangeScreen: "opportunity-discovery",
+    };
+  }
+  if (raw === "loan-portal") {
+    return {
+      view: "loan-landing",
+      role: "shg-sakhi",
+      screen: "readiness-hub",
+      exchangeScreen: "opportunity-discovery",
+    };
+  }
+  if (raw === "opportunity-discovery" || raw === "collective-production") {
+    return {
+      view: "exchange",
+      role: "shg-sakhi",
+      screen: "readiness-hub",
+      exchangeScreen: raw,
+    };
   }
   const [rolePart, screenPart] = raw.split("/");
   if (rolePart && rolePart in ROLE_CONFIGS) {
@@ -152,9 +206,15 @@ function parseHashRoute(): { view: AppView; role: PortalRole; screen: NavScreenI
       view: "portal",
       role: validRole,
       screen: allowed ? (screenPart as NavScreenId) : cfg.defaultScreen,
+      exchangeScreen: "opportunity-discovery",
     };
   }
-  return { view: "landing", role: "shg-sakhi", screen: "readiness-hub" };
+  return {
+    view: "home",
+    role: "shg-sakhi",
+    screen: "readiness-hub",
+    exchangeScreen: "opportunity-discovery",
+  };
 }
 
 function ScreenSkeleton() {
@@ -172,13 +232,17 @@ function ScreenSkeleton() {
   );
 }
 
-export function App() {
+function AppContent() {
   const initialRoute = useMemo(() => parseHashRoute(), []);
   const initialStored = useMemo(() => loadCasesState(), []);
+  const { openProposalModal, resetExchangeDemo } = useOpportunityExchange();
 
   const [appView, setAppView] = useState<AppView>(initialRoute.view);
   const [portalRole, setPortalRole] = useState<PortalRole>(initialRoute.role);
   const [screen, setScreen] = useState<NavScreenId>(initialRoute.screen);
+  const [exchangeScreen, setExchangeScreen] = useState<ExchangeScreenId>(
+    initialRoute.exchangeScreen
+  );
   const [cases, setCases] = useState<SHGCase[]>(initialStored.cases);
   const [activeCaseId, setActiveCaseId] = useState<string>(initialStored.activeCaseId);
   const [language, setLanguage] = useState<AppLanguage>("en");
@@ -197,11 +261,18 @@ export function App() {
 
   // Sync URL hash cleanly on state changes
   useEffect(() => {
-    const targetHash = appView === "landing" ? "#/" : `#/${portalRole}/${screen}`;
+    const targetHash =
+      appView === "home"
+        ? "#/"
+        : appView === "loan-landing"
+        ? "#/loan-portal"
+        : appView === "exchange"
+        ? `#/${exchangeScreen}`
+        : `#/${portalRole}/${screen}`;
     if (window.location.hash !== targetHash) {
       window.location.hash = targetHash;
     }
-  }, [appView, portalRole, screen]);
+  }, [appView, portalRole, screen, exchangeScreen]);
 
   // Support browser back / forward navigation
   useEffect(() => {
@@ -210,6 +281,7 @@ export function App() {
       setAppView(parsed.view);
       setPortalRole(parsed.role);
       setScreen(parsed.screen);
+      setExchangeScreen(parsed.exchangeScreen);
     };
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
@@ -288,7 +360,28 @@ export function App() {
     );
   }, [cases, globalSearch]);
 
-  if (appView === "landing") {
+  const handleOpenExchange = (nextScreen: ExchangeScreenId = "opportunity-discovery") => {
+    setExchangeScreen(nextScreen);
+    setAppView("exchange");
+    setShowSearch(false);
+    setShowCaseSwitcher(false);
+  };
+
+  if (appView === "home") {
+    return (
+      <Suspense fallback={<div className="min-h-screen bg-[#FAF8F4] p-6"><ScreenSkeleton /></div>}>
+        <DualPathwayHomeScreen
+          language={language}
+          onChangeLanguage={setLanguage}
+          onOpenLoanPortal={() => setAppView("loan-landing")}
+          onOpenRoleDirect={(targetRole) => handleRoleSwitch(targetRole)}
+          onOpenOpportunityExchange={() => handleOpenExchange("opportunity-discovery")}
+        />
+      </Suspense>
+    );
+  }
+
+  if (appView === "loan-landing") {
     return (
       <Suspense fallback={<div className="min-h-screen bg-[#FAF8F4] p-6"><ScreenSkeleton /></div>}>
         <LandingPage
@@ -299,8 +392,193 @@ export function App() {
           onUpdateCase={handleUpdateCase}
           onChangeLanguage={setLanguage}
           onEnterPortal={(targetRole) => handleRoleSwitch(targetRole ?? "shg-sakhi")}
+          onBackToHome={() => setAppView("home")}
         />
       </Suspense>
+    );
+  }
+
+  if (appView === "exchange") {
+    return (
+      <div className="app-shell-root min-h-screen bg-[#FAF8F4] text-[#141A23]">
+        {/* Top Bar matching Sakhi CreditLink design */}
+        <header className="sticky top-0 z-50 h-14 border-b border-[#DFDBD0] bg-white">
+          <div className="mx-auto flex h-14 max-w-[1320px] items-center justify-between gap-2 px-3 md:px-6">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <button
+                type="button"
+                onClick={() => setAppView("home")}
+                className="flex items-center gap-2 rounded-md p-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F5E4E]"
+                title="Back to Dual-Pathway Home"
+              >
+                <img
+                  src="/images/sakhi-logo.jpg"
+                  alt="Sakhi CreditLink logo"
+                  width={36}
+                  height={36}
+                  className="h-9 w-9 shrink-0 rounded-md border border-[#DFDBD0] bg-white object-contain p-0.5"
+                />
+                <span className="text-[14.5px] font-bold tracking-tight text-[#141A23] truncate">
+                  Sakhi CreditLink
+                </span>
+              </button>
+              <span className="hidden sm:inline-flex rounded-md border border-[#A7F3D0] bg-[#ECFDF5] px-2.5 py-0.5 text-[11px] font-semibold text-[#047857]">
+                Opportunity Exchange
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0">
+              <div
+                className="inline-flex items-center rounded-md border border-[#C9C3B4] bg-[#FAF8F4] p-0.5 text-[11.5px]"
+                role="group"
+                aria-label="Language"
+              >
+                <button
+                  type="button"
+                  onClick={() => setLanguage("en")}
+                  className={cn(
+                    "h-7 rounded px-2 font-semibold transition-colors duration-150",
+                    language === "en" ? "bg-[#0F5E4E] text-white" : "text-[#475467]"
+                  )}
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage("gu")}
+                  className={cn(
+                    "h-7 rounded px-2 font-semibold transition-colors duration-150",
+                    language === "gu" ? "bg-[#0F5E4E] text-white" : "text-[#475467]"
+                  )}
+                >
+                  ગુજ
+                </button>
+              </div>
+
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={resetExchangeDemo}
+                title="Reset Opportunity Exchange demo state"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                <span className="hidden md:inline">Reset</span>
+              </Button>
+
+              <Button
+                variant="tertiary"
+                size="sm"
+                onClick={() => setAppView("home")}
+              >
+                Home
+              </Button>
+            </div>
+          </div>
+        </header>
+
+        {/* Top Workflow Navigation (Existing Loan Portal + Two Opportunity Exchange entries) */}
+        <nav
+          aria-label="Opportunity Exchange navigation"
+          className="border-b border-[#DFDBD0] bg-[#F2EFE8]"
+        >
+          <div className="mx-auto flex max-w-[1320px] items-center justify-between gap-3 px-3 py-1.5 md:px-6">
+            <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+              <button
+                type="button"
+                onClick={() => handleOpenExchange("opportunity-discovery")}
+                className={cn(
+                  "min-h-[38px] shrink-0 rounded-md px-3 py-1.5 text-[12.5px] font-semibold transition-colors duration-150",
+                  exchangeScreen === "opportunity-discovery"
+                    ? "bg-[#0F5E4E] text-white"
+                    : "text-[#475467] hover:bg-white hover:text-[#141A23]"
+                )}
+              >
+                Opportunity Discovery
+              </button>
+              <button
+                type="button"
+                onClick={() => handleOpenExchange("collective-production")}
+                className={cn(
+                  "min-h-[38px] shrink-0 rounded-md px-3 py-1.5 text-[12.5px] font-semibold transition-colors duration-150",
+                  exchangeScreen === "collective-production"
+                    ? "bg-[#0F5E4E] text-white"
+                    : "text-[#475467] hover:bg-white hover:text-[#141A23]"
+                )}
+              >
+                Collective Production
+              </button>
+              <span className="mx-1 h-5 w-px bg-[#C9C3B4]" aria-hidden="true" />
+              <button
+                type="button"
+                onClick={() => handleRoleSwitch("shg-sakhi")}
+                className="min-h-[38px] shrink-0 rounded-md px-3 py-1.5 text-[12.5px] font-semibold text-[#475467] hover:bg-white hover:text-[#141A23]"
+              >
+                SHG Loan Portal
+              </button>
+            </div>
+            <div className="hidden sm:block shrink-0">
+              <SimulatedBadge compact label="Simulated demonstration data" />
+            </div>
+          </div>
+        </nav>
+
+        {/* Visual Sub-Header Step Indicator */}
+        <div className="border-b border-[#DFDBD0] bg-white no-print">
+          <div className="mx-auto flex max-w-[1320px] flex-wrap items-center gap-2 px-4 py-2.5 text-[12.5px] md:px-6">
+            <button
+              type="button"
+              onClick={() => handleOpenExchange("opportunity-discovery")}
+              className={cn(
+                "rounded-md px-2.5 py-1 font-semibold transition-colors",
+                exchangeScreen === "opportunity-discovery"
+                  ? "bg-[#ECFDF5] text-[#0F5E4E] border border-[#A7F3D0]"
+                  : "text-[#475467] hover:text-[#141A23]"
+              )}
+            >
+              1. Opportunity Discovery
+            </button>
+            <span className="text-[#C9C3B4]">→</span>
+            <button
+              type="button"
+              onClick={() => handleOpenExchange("collective-production")}
+              className={cn(
+                "rounded-md px-2.5 py-1 font-semibold transition-colors",
+                exchangeScreen === "collective-production"
+                  ? "bg-[#ECFDF5] text-[#0F5E4E] border border-[#A7F3D0]"
+                  : "text-[#475467] hover:text-[#141A23]"
+              )}
+            >
+              2. Collective Production
+            </button>
+            <span className="text-[#C9C3B4]">→</span>
+            <button
+              type="button"
+              onClick={openProposalModal}
+              className="rounded-md px-2.5 py-1 font-semibold text-[#B45309] hover:bg-[#FFFBEB]"
+            >
+              3. Financing Proposal
+            </button>
+          </div>
+        </div>
+
+        <main className="mx-auto max-w-[1320px] px-4 py-6 md:px-6 md:py-8">
+          <Suspense fallback={<ScreenSkeleton />}>
+            {exchangeScreen === "opportunity-discovery" ? (
+              <OpportunityDiscoveryScreen
+                onProceedToCollective={() =>
+                  handleOpenExchange("collective-production")
+                }
+              />
+            ) : (
+              <CollectiveProductionScreen
+                onBackToDiscovery={() =>
+                  handleOpenExchange("opportunity-discovery")
+                }
+              />
+            )}
+          </Suspense>
+        </main>
+      </div>
     );
   }
 
@@ -471,7 +749,7 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF8F4] text-[#141A23]">
+    <div className="app-shell-root min-h-screen bg-[#FAF8F4] text-[#141A23]">
       {/* ─── Single-Row 56px Header (strictly <=56px at 360px) ─── */}
       <header className="sticky top-0 z-50 h-14 border-b border-[#DFDBD0] bg-white">
         <div className="mx-auto flex h-14 max-w-[1320px] items-center justify-between gap-2 px-3 md:px-6">
@@ -479,9 +757,9 @@ export function App() {
           <div className="flex items-center gap-2 min-w-0">
             <button
               type="button"
-              onClick={() => setAppView("landing")}
+              onClick={() => setAppView("home")}
               className="flex items-center gap-2 rounded-md p-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F5E4E]"
-              title="Back to Landing Page"
+              title="Back to Dual-Pathway Home"
             >
               <img
                 src="/images/sakhi-logo.jpg"
@@ -586,10 +864,10 @@ export function App() {
 
             <button
               type="button"
-              onClick={() => setAppView("landing")}
+              onClick={() => setAppView("home")}
               className="hidden sm:inline-flex h-9 w-9 items-center justify-center rounded-md border border-[#C9C3B4] bg-white text-[#475467] hover:bg-[#FEF2F2] hover:text-[#B91C1C]"
-              aria-label="Exit to landing"
-              title="Back to landing"
+              aria-label="Exit to home"
+              title="Back to Dual-Pathway Home"
             >
               <LogOut className="h-3.5 w-3.5" />
             </button>
@@ -622,6 +900,21 @@ export function App() {
                 </button>
               );
             })}
+            <span className="mx-1 h-5 w-px shrink-0 bg-[#C9C3B4]" aria-hidden="true" />
+            <button
+              type="button"
+              onClick={() => handleOpenExchange("opportunity-discovery")}
+              className="min-h-[38px] shrink-0 rounded-md px-3 py-1.5 text-[12.5px] font-semibold text-[#0F5E4E] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F5E4E]"
+            >
+              Opportunity Discovery
+            </button>
+            <button
+              type="button"
+              onClick={() => handleOpenExchange("collective-production")}
+              className="min-h-[38px] shrink-0 rounded-md px-3 py-1.5 text-[12.5px] font-semibold text-[#0F5E4E] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F5E4E]"
+            >
+              Collective Production
+            </button>
           </div>
 
           {/* Active SHG Switcher & Simulated Pill */}
@@ -736,6 +1029,15 @@ export function App() {
         </div>
       )}
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <OpportunityExchangeProvider>
+      <AppContent />
+      <FinancingProposalModal />
+    </OpportunityExchangeProvider>
   );
 }
 

@@ -122,6 +122,9 @@
   .no-print {
     display: none !important;
   }
+  body.printing-proposal .app-shell-root {
+    display: none !important;
+  }
   main {
     padding-top: 0 !important;
     padding-bottom: 0 !important;

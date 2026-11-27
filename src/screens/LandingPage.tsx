@@ -37,6 +37,7 @@ interface LandingPageProps {
   onUpdateCase?: (updated: SHGCase) => void;
   onChangeLanguage: (lang: AppLanguage) => void;
   onEnterPortal: (targetRole?: PortalRole) => void;
+  onBackToHome?: () => void;
 }
 
 const SHG_GROUP_PHOTOS = [
@@ -97,6 +98,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onUpdateCase,
   onChangeLanguage,
   onEnterPortal,
+  onBackToHome,
 }) => {
   const isGu = language === "gu";
   const duplicatedPortals = [...GOVT_PORTALS, ...GOVT_PORTALS];
@@ -160,7 +162,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       {/* ─── Clean Single-Row Institutional Header ─── */}
       <header className="sticky top-0 z-40 border-b border-[#DFDBD0] bg-white">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 md:px-6">
-          <div className="flex items-center gap-2.5 min-w-0">
+          <button
+            type="button"
+            onClick={() => onBackToHome?.()}
+            className="flex items-center gap-2.5 min-w-0 rounded-md p-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F5E4E]"
+            title="Return to Dual-Pathway Home"
+          >
             <img
               src="/images/sakhi-logo.jpg"
               alt="Sakhi CreditLink logo"
@@ -176,7 +183,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
                 Gujarat · PS000311
               </span>
             </div>
-          </div>
+          </button>
 
           <div className="flex items-center gap-2 shrink-0">
             <div className="hidden sm:block">

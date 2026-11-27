@@ -62,7 +62,13 @@ export function StatusChip({
   );
 }
 
-export function SimulatedBadge({ compact = false }: { compact?: boolean }) {
+export function SimulatedBadge({
+  compact = false,
+  label = "Simulated data",
+}: {
+  compact?: boolean;
+  label?: string;
+}) {
   return (
     <span
       className={cn(
@@ -72,7 +78,7 @@ export function SimulatedBadge({ compact = false }: { compact?: boolean }) {
       title="Simulated sample data — not live bank or NRLM data"
     >
       <Info className="h-3 w-3 shrink-0" aria-hidden="true" />
-      {compact ? "Simulated data" : "Simulated data"}
+      {label}
     </span>
   );
 }
