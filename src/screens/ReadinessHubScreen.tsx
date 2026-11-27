@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   ArrowRight,
   BookOpen,
+  BrainCircuit,
   CheckCircle2,
   ChevronDown,
   ChevronUp,
@@ -12,7 +13,7 @@ import {
   Sparkles,
   Wrench,
 } from "lucide-react";
-import type { AppLanguage, NavScreenId, SHGCase } from "@/data/sakhi-data";
+import type { AltDataSignals, AppLanguage, NavScreenId, SHGCase } from "@/data/sakhi-data";
 import {
   DOSE_CONFIG,
   RBI_FIRST_DOSE_CITATION,
@@ -183,6 +184,20 @@ export const ReadinessHubScreen: React.FC<ReadinessHubScreenProps> = ({
       );
       onUpdateCase(updated);
     }
+  };
+
+  const handleToggleAltSignal = (key: keyof AltDataSignals) => {
+    const nextSignals: AltDataSignals = {
+      ...altCred.signals,
+      [key]: !altCred.signals[key],
+    };
+    const nextAlt = alternativeDataCredibility({ ...shg, altDataSignals: nextSignals });
+    onUpdateCase(
+      stampTimeline(
+        { ...shg, altDataSignals: nextSignals },
+        `Alt-data signal (${key}: ${nextSignals[key] ? "Connected" : "Off"}) -> ML credibility ${nextAlt.credibilityScore}/100`
+      )
+    );
   };
 
   const firstPendingFix = readiness.breakdown.find((item) => item.fixAction !== null);
@@ -427,6 +442,131 @@ export const ReadinessHubScreen: React.FC<ReadinessHubScreenProps> = ({
           </div>
         </Card>
       </div>
+
+      {/* Row 1B: Direct ML Alternative-Data Credibility (Zero extra clicks needed) */}
+      <Card className="p-5">
+        <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#ECE8DE] pb-3.5">
+          <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <BrainCircuit className="h-4 w-4 text-[#0F5E4E]" />
+              <h2 className="text-[15.5px] font-semibold text-[#141A23]">
+                {isGu
+                  ? "ML વૈકલ્પિક ડેટા વિશ્વસનીયતા (CIBIL વગર ક્રેડિબિલિટી)"
+                  : "SHG Credibility via Alternative Data (ML Signal)"}
+              </h2>
+              <span className="rounded bg-[#FEF3C7] px-2 py-0.5 text-[11px] font-medium text-[#B45309] border border-[#FDE68A]">
+                Illustrative ML · Decision Support Only
+              </span>
+            </div>
+            <p className="mt-1 text-[12.5px] text-[#475467]">
+              {isGu
+                ? "જ્યારે સભ્યો પાસે CIBIL રેકોર્ડ ન હોય ત્યારે પંચસૂત્ર, UPI, સહકારી સપ્લાય અને બચત વર્તણૂકથી પારદર્શક વિશ્વસનીયતા."
+                : "Uses non-bureau alternative data (internal lending velocity, UPI vendor receipts, co-op supply ledgers & savings cushion) when members lack formal credit history."}
+            </p>
+          </div>
+          <Button variant="tertiary" size="sm" onClick={() => onNavigate("alt-credibility")}>
+            {isGu ? "સંપૂર્ણ ML વિગત" : "Full ML View"}
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Button>
+        </div>
+
+        <div className="mt-4 grid gap-5 lg:grid-cols-12 items-start">
+          {/* Score + Top Feature Bars */}
+          <div className="space-y-3 lg:col-span-7">
+            <div className="flex flex-wrap items-baseline gap-3">
+              <span className="font-mono text-[32px] font-bold leading-none text-[#0F5E4E] tabular-nums">
+                {altCred.credibilityScore}
+              </span>
+              <span className="font-mono text-[14px] text-[#475467]">/ 100</span>
+              <StatusChip
+                tone={
+                  altCred.credibilityScore >= 78
+                    ? "success"
+                    : altCred.credibilityScore >= 58
+                    ? "warning"
+                    : "danger"
+                }
+              >
+                {isGu ? altCred.tierGu : altCred.tier}
+              </StatusChip>
+            </div>
+
+            <div className="grid gap-2.5 sm:grid-cols-2">
+              {altCred.features.map((feat) => (
+                <div
+                  key={feat.id}
+                  className="rounded-md border border-[#ECE8DE] bg-[#FAF8F4] px-3 py-2"
+                >
+                  <div className="flex items-center justify-between gap-2 text-[11.5px]">
+                    <span className="truncate font-medium text-[#141A23]">
+                      {isGu ? feat.labelGu : feat.label}
+                    </span>
+                    <span className="shrink-0 font-mono font-semibold text-[#0F5E4E] tabular-nums">
+                      {feat.sharePct}%
+                    </span>
+                  </div>
+                  <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-white border border-[#DFDBD0]">
+                    <div
+                      className="h-full rounded-full bg-[#0F5E4E]"
+                      style={{ width: `${Math.max(8, Math.round(feat.normalizedValue * 100))}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 4 Instant Consent Alt-Data Toggles */}
+          <div className="space-y-2 lg:col-span-5">
+            <div className="text-[11.5px] font-semibold uppercase tracking-wider text-[#475467]">
+              {isGu ? "વૈકલ્પિક ડેટા સિગ્નલ ટૉગલ કરો (૧-ક્લિક)" : "Toggle Alternative-Data Signals Live (DPDP Consent)"}
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
+              {(
+                [
+                  {
+                    key: "upiSupplierReceipts",
+                    label: isGu ? "UPI વેચાણ / સપ્લાયર રસીદ" : "UPI Sales & Supplier Receipts",
+                  },
+                  {
+                    key: "dairyOrCoopSupplySync",
+                    label: isGu ? "દૂધ મંડળી / સહકારી પાસબુક" : "Dairy / Co-op Supply Ledger",
+                  },
+                  {
+                    key: "utilityAndTelecomRegularity",
+                    label: isGu ? "વીજળી અને મોબાઇલ નિયમિતતા" : "Utility & Mobile Regularity",
+                  },
+                  {
+                    key: "geoTaggedWorkshopVerified",
+                    label: isGu ? "જિયો-ટેગ યુનિટ ચકાસણી" : "Geo-Tagged Enterprise Verification",
+                  },
+                ] as { key: keyof AltDataSignals; label: string }[]
+              ).map((sig) => {
+                const connected = altCred.signals[sig.key];
+                return (
+                  <button
+                    key={sig.key}
+                    type="button"
+                    onClick={() => handleToggleAltSignal(sig.key)}
+                    aria-pressed={connected}
+                    className={cn(
+                      "flex items-center justify-between rounded-md border px-3 py-2 text-left text-[12.5px] font-medium transition-colors",
+                      connected
+                        ? "border-[#0F5E4E] bg-[#ECFDF5] text-[#0F5E4E]"
+                        : "border-[#DFDBD0] bg-white text-[#475467] hover:bg-[#FAF8F4]"
+                    )}
+                  >
+                    <span>{sig.label}</span>
+                    <span className="font-mono text-[11px] font-semibold">
+                      {connected ? "Connected ✓" : "+ Connect"}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </Card>
 
       {/* Row 2: RBI Drawing Power Check + Books + Indicative Grade */}
       <Card className="p-5">
