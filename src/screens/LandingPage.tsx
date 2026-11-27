@@ -82,9 +82,13 @@ export const LandingPage: React.FC<LandingPageProps> = ({
       <header className="sticky top-0 z-40 border-b border-[#DFDBD0] bg-white">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 md:px-6">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#0F5E4E] text-white font-mono text-[12px] font-semibold">
-              SC
-            </div>
+            <img
+              src="/images/sakhi-logo.jpg"
+              alt="Sakhi CreditLink logo"
+              width={36}
+              height={36}
+              className="h-9 w-9 shrink-0 rounded-md border border-[#DFDBD0] bg-white object-contain p-0.5"
+            />
             <div className="truncate">
               <span className="text-[15px] font-bold tracking-tight text-[#141A23]">
                 Sakhi CreditLink

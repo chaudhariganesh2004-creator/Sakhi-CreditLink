@@ -463,9 +463,13 @@ export function App() {
               className="flex items-center gap-2 rounded-md p-1 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F5E4E]"
               title="Back to Landing Page"
             >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#0F5E4E] font-mono text-[12px] font-semibold text-white">
-                SC
-              </div>
+              <img
+                src="/images/sakhi-logo.jpg"
+                alt="Sakhi CreditLink logo"
+                width={36}
+                height={36}
+                className="h-9 w-9 shrink-0 rounded-md border border-[#DFDBD0] bg-white object-contain p-0.5"
+              />
               <span className="hidden lg:inline text-[14.5px] font-bold tracking-tight text-[#141A23]">
                 Sakhi CreditLink
               </span>
