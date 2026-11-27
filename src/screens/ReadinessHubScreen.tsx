@@ -16,6 +16,7 @@ import type { AppLanguage, NavScreenId, SHGCase } from "@/data/sakhi-data";
 import {
   DOSE_CONFIG,
   RBI_FIRST_DOSE_CITATION,
+  alternativeDataCredibility,
   booksCheck,
   drawingPowerFirstDose,
   estimateMonthlyMarginAndEmi,
@@ -50,6 +51,7 @@ export const ReadinessHubScreen: React.FC<ReadinessHubScreenProps> = ({
   const isGu = language === "gu";
 
   const readiness = readinessScore(shg);
+  const altCred = alternativeDataCredibility(shg);
   const books = booksCheck(shg);
   const grade = indicativeGrade(shg);
   const requestedINR = getCaseExternalNeed(shg);
@@ -312,6 +314,29 @@ export const ReadinessHubScreen: React.FC<ReadinessHubScreenProps> = ({
               ) : (
                 <ChevronDown className="h-4 w-4" />
               )}
+            </Button>
+          </div>
+
+          {/* Direct Link to Alternative-Data ML Credibility Option */}
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-md border border-[#DFDBD0] bg-[#FAF8F4] px-3.5 py-2.5 text-[12.5px]">
+            <div>
+              <span className="font-semibold text-[#141A23]">
+                {isGu ? "વૈકલ્પિક ડેટા ML વિશ્વસનીયતા:" : "Alt-Data Credibility (ML):"}
+              </span>{" "}
+              <span className="font-mono font-bold text-[#0F5E4E] tabular-nums">
+                {altCred.credibilityScore}/100
+              </span>{" "}
+              <span className="text-[#475467]">
+                ({isGu ? altCred.tierGu : altCred.tier} · Illustrative)
+              </span>
+            </div>
+            <Button
+              variant="tertiary"
+              size="sm"
+              onClick={() => onNavigate("alt-credibility")}
+            >
+              {isGu ? "ML વૈકલ્પિક ડેટા ખોલો" : "Explore Alt-Data ML"}
+              <ArrowRight className="h-3.5 w-3.5" />
             </Button>
           </div>
 

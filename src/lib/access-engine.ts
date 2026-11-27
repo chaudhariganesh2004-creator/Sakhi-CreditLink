@@ -1,4 +1,4 @@
-import type { SHGCase } from "../data/sakhi-data";
+import type { AltDataSignals, SHGCase } from "../data/sakhi-data";
 
 export const RBI_FIRST_DOSE_CITATION = "RBI Master Circular on SHG-BLP";
 
@@ -477,6 +477,229 @@ export function repeatLinkage(shg: SHGCase): RepeatLinkageResult {
     nextEligibleAmountINR,
     repaymentGatePassed,
     earliestEligibleDate,
+    isIllustrative: true,
+  };
+}
+
+export interface AltDataFeatureContribution {
+  id: string;
+  label: string;
+  labelGu: string;
+  source: string;
+  rawSummary: string;
+  weight: number;
+  normalizedValue: number;
+  contributionLogit: number;
+  sharePct: number;
+}
+
+export interface AltDataCredibilityResult {
+  credibilityScore: number;
+  probabilityPct: number;
+  tier: "High Credibility" | "Moderate Credibility" | "Needs More Alt-Data";
+  tierGu: string;
+  signals: AltDataSignals;
+  features: AltDataFeatureContribution[];
+  modelLabel: string;
+  disclaimer: string;
+  isIllustrative: true;
+}
+
+export function resolveAltDataSignals(
+  shg: SHGCase,
+  overrides?: Partial<AltDataSignals>
+): AltDataSignals {
+  const hasBuyerLedger = shg.buyerEvidence.some(
+    (b) => b.evidenceType === "Monthly Supply Ledger" || b.evidenceType === "Written Purchase Order"
+  );
+  const hasCoopChannel = shg.buyerEvidence.some(
+    (b) =>
+      b.channel === "FPO / Wholesale" ||
+      b.channel === "Local Retail Cooperative" ||
+      b.channel === "GLPC Saras / Catalogue"
+  );
+  const hasUtilityHabits =
+    shg.panchasutraChecks.regularMeetings && shg.panchasutraChecks.regularSavings;
+  const hasGeoStage =
+    shg.officeBearers.length > 0 &&
+    shg.officeBearers.every((ob) => ob.verified) &&
+    shg.stage !== "Demand identified";
+
+  return {
+    upiSupplierReceipts:
+      overrides?.upiSupplierReceipts ??
+      shg.altDataSignals?.upiSupplierReceipts ??
+      hasBuyerLedger,
+    dairyOrCoopSupplySync:
+      overrides?.dairyOrCoopSupplySync ??
+      shg.altDataSignals?.dairyOrCoopSupplySync ??
+      hasCoopChannel,
+    utilityAndTelecomRegularity:
+      overrides?.utilityAndTelecomRegularity ??
+      shg.altDataSignals?.utilityAndTelecomRegularity ??
+      hasUtilityHabits,
+    geoTaggedWorkshopVerified:
+      overrides?.geoTaggedWorkshopVerified ??
+      shg.altDataSignals?.geoTaggedWorkshopVerified ??
+      hasGeoStage,
+  };
+}
+
+/**
+ * Illustrative explainable logistic-weighted ML credibility index utilizing
+ * consent-based non-bureau alternative data (LokOS behavior, buyer/co-op supply
+ * ledgers, UPI digital receipts, utility regularity & geo-verification).
+ * Decision-support only — never substitutes bank appraisal or auto-approves loans.
+ */
+export function alternativeDataCredibility(
+  shg: SHGCase,
+  overrides?: Partial<AltDataSignals>
+): AltDataCredibilityResult {
+  const signals = resolveAltDataSignals(shg, overrides);
+  const { coverageRatio } = estimateMonthlyMarginAndEmi(shg);
+
+  const internalLendingVal =
+    (shg.panchasutraChecks.internalLending ? 0.5 : 0) +
+    (shg.panchasutraChecks.timelyRepayment ? 0.5 : 0);
+
+  const debtBase = Math.max(100000, shg.corpusBalance + shg.existingDebt);
+  const corpusDebtVal =
+    shg.corpusBalance > 0 ? Math.min(1, shg.corpusBalance / debtBase) : 0;
+
+  const verifiedBuyerCount = shg.buyerEvidence.filter(
+    (b) => b.provenance !== "Self-declared"
+  ).length;
+  const buyerOfftakeVal =
+    shg.buyerEvidence.length > 0
+      ? Math.min(1, 0.4 + verifiedBuyerCount * 0.35 + (shg.buyerEvidence.length > 1 ? 0.2 : 0))
+      : 0;
+
+  const digitalUpiCoopVal =
+    (signals.upiSupplierReceipts ? 0.55 : 0) +
+    (signals.dairyOrCoopSupplySync ? 0.45 : 0);
+
+  const cashflowResilienceVal =
+    coverageRatio >= 1.5 ? 1 : coverageRatio >= 1.2 ? 0.7 : 0.3;
+
+  const activeConsent = shg.consents.some((c) => c.status === "Active");
+  const consentGeoUtilVal =
+    (signals.utilityAndTelecomRegularity ? 0.4 : 0) +
+    (signals.geoTaggedWorkshopVerified ? 0.35 : 0) +
+    (activeConsent ? 0.25 : 0);
+
+  const rawFeatures = [
+    {
+      id: "internal-lending",
+      label: "Internal Lending & Recovery Velocity",
+      labelGu: "આંતરિક ધિરાણ અને વસૂલાત વેગ",
+      source: "LokOS Panchasutra Ledger",
+      rawSummary: `${shg.panchasutraChecks.internalLending ? "Active rotation" : "Low rotation"} · ${shg.panchasutraChecks.timelyRepayment ? "Timely internal recovery" : "Recovery pending"}`,
+      weight: 1.15,
+      normalizedValue: internalLendingVal,
+    },
+    {
+      id: "corpus-cushion",
+      label: "Savings Corpus vs. Existing Debt Cushion",
+      labelGu: "બચત કોર્પસ અને જૂના દેવાનું રક્ષણ",
+      source: "SHG Savings & Corpus Ledger",
+      rawSummary: `Corpus ₹${Math.round(shg.corpusBalance).toLocaleString("en-IN")} vs Debt ₹${Math.round(shg.existingDebt).toLocaleString("en-IN")}`,
+      weight: 0.85,
+      normalizedValue: corpusDebtVal,
+    },
+    {
+      id: "buyer-offtake",
+      label: "Buyer PO & Cooperative Supply Offtake",
+      labelGu: "ખરીદદાર ઓર્ડર અને સહકારી સપ્લાય રેકોર્ડ",
+      source: "Market Offtake Evidence",
+      rawSummary:
+        shg.buyerEvidence.length > 0
+          ? `${shg.buyerEvidence.length} buyer proof(s) (${verifiedBuyerCount} verified)`
+          : "No written buyer/co-op proof linked yet",
+      weight: 0.95,
+      normalizedValue: buyerOfftakeVal,
+    },
+    {
+      id: "digital-upi-coop",
+      label: "UPI Supplier Trail & Co-op Passbook Sync",
+      labelGu: "UPI ડિજિટલ ચુકવણી અને સહકારી પાસબુક",
+      source: "Consent Alt-Data Connector",
+      rawSummary:
+        signals.upiSupplierReceipts && signals.dairyOrCoopSupplySync
+          ? "UPI receipts + Co-op supply sync active"
+          : signals.upiSupplierReceipts
+          ? "UPI supplier trail active"
+          : signals.dairyOrCoopSupplySync
+          ? "Dairy/Co-op supply sync active"
+          : "Digital transaction trail not connected",
+      weight: 0.9,
+      normalizedValue: digitalUpiCoopVal,
+    },
+    {
+      id: "cashflow-stability",
+      label: "Seasonal Unit Margin & EMI Coverage",
+      labelGu: "મોસમી આવક સ્થિરતા અને હપ્તા ક્ષમતા",
+      source: "6–12m Enterprise Sales Ledger",
+      rawSummary: `${coverageRatio.toFixed(2)}× estimated EMI coverage`,
+      weight: 0.75,
+      normalizedValue: cashflowResilienceVal,
+    },
+    {
+      id: "consent-utility-geo",
+      label: "Utility Cadence, Geo-Proof & DPDP Consent",
+      labelGu: "વીજળી/મોબાઇલ નિયમિતતા અને જિયો-ચકાસણી",
+      source: "Field Geo-Tag & Utility Signal",
+      rawSummary: `${signals.utilityAndTelecomRegularity ? "Utility regular" : "No utility signal"} · ${signals.geoTaggedWorkshopVerified ? "Geo verified" : "Geo pending"}`,
+      weight: 0.65,
+      normalizedValue: consentGeoUtilVal,
+    },
+  ];
+
+  const intercept = -1.65;
+  const totalPositiveLogit = rawFeatures.reduce(
+    (sum, f) => sum + f.weight * f.normalizedValue,
+    0
+  );
+  const z = intercept + totalPositiveLogit;
+  const prob = 1 / (1 + Math.exp(-z));
+  const credibilityScore = Math.max(1, Math.min(99, Math.round(prob * 100)));
+
+  const features: AltDataFeatureContribution[] = rawFeatures.map((f) => {
+    const contributionLogit = Number((f.weight * f.normalizedValue).toFixed(3));
+    const sharePct =
+      totalPositiveLogit > 0
+        ? Math.round((contributionLogit / totalPositiveLogit) * 100)
+        : 0;
+    return {
+      ...f,
+      contributionLogit,
+      sharePct,
+    };
+  });
+
+  const tier: AltDataCredibilityResult["tier"] =
+    credibilityScore >= 78
+      ? "High Credibility"
+      : credibilityScore >= 58
+      ? "Moderate Credibility"
+      : "Needs More Alt-Data";
+
+  const tierGu =
+    credibilityScore >= 78
+      ? "ઉચ્ચ વૈકલ્પિક વિશ્વસનીયતા"
+      : credibilityScore >= 58
+      ? "મધ્યમ વિશ્વસનીયતા (વધુ પુરાવા ઉમેરો)"
+      : "ઓછો વૈકલ્પિક ડેટા — વધુ સંકેતો જોડો";
+
+  return {
+    credibilityScore,
+    probabilityPct: credibilityScore,
+    tier,
+    tierGu,
+    signals,
+    features,
+    modelLabel: "Explainable Logistic Feature Model (Illustrative ML)",
+    disclaimer:
+      "Illustrative ML decision-support signal using synthetic feature weights & consent-based alternative data. Not an automated loan approval or bureau score.",
     isIllustrative: true,
   };
 }

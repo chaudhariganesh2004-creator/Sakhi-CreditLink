@@ -2,6 +2,7 @@ import { SHG_CASES_DEMO } from "../data/sakhi-data.ts";
 import {
   DOSE_CONFIG,
   REASON_CODES,
+  alternativeDataCredibility,
   booksCheck,
   drawingPowerFirstDose,
   indicativeGrade,
@@ -70,6 +71,25 @@ assertEqual(
   "16 days > 14 SLA must breach"
 );
 assertEqual(repeatLinkage(ujjwal).nextDose, 2, "Ujjwal nextDose must be 2");
+
+// 8. Alternative-data ML credibility checks
+const altUjjwal = alternativeDataCredibility(ujjwal);
+const altSurbhiBase = alternativeDataCredibility(surbhi, {
+  upiSupplierReceipts: false,
+  dairyOrCoopSupplySync: false,
+});
+const altSurbhiBoosted = alternativeDataCredibility(surbhi, {
+  upiSupplierReceipts: true,
+  dairyOrCoopSupplySync: true,
+});
+assertOk(
+  altUjjwal.credibilityScore >= 75 && altUjjwal.features.length === 6,
+  "Ujjwal alt-data credibility must score high with 6 features"
+);
+assertOk(
+  altSurbhiBoosted.credibilityScore > altSurbhiBase.credibilityScore,
+  "Adding UPI & co-op alt-data signals must improve ML credibility score"
+);
 
 console.log(
   JSON.stringify(

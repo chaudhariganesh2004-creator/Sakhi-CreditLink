@@ -31,6 +31,11 @@ const LandingPage = lazy(() =>
 const ReadinessHubScreen = lazy(() =>
   import("@/screens/ReadinessHubScreen").then((m) => ({ default: m.ReadinessHubScreen }))
 );
+const AltDataCredibilityScreen = lazy(() =>
+  import("@/screens/AltDataCredibilityScreen").then((m) => ({
+    default: m.AltDataCredibilityScreen,
+  }))
+);
 const SHGIntakeScreen = lazy(() =>
   import("@/screens/SHGIntakeScreen").then((m) => ({ default: m.SHGIntakeScreen }))
 );
@@ -97,6 +102,7 @@ const ROLE_CONFIGS: Record<PortalRole, RoleNavConfig> = {
     defaultScreen: "readiness-hub",
     navItems: [
       { id: "readiness-hub", label: "Readiness Hub", labelGu: "તૈયારી હબ" },
+      { id: "alt-credibility", label: "Alt-Data ML", labelGu: "વૈકલ્પિક ડેટા ML" },
       { id: "shg-intake", label: "Intake", labelGu: "અરજી દાખલ" },
       { id: "finance-passport", label: "Finance Passport", labelGu: "ફાઇનાન્સ પાસપોર્ટ" },
       { id: "cashflow-blueprint", label: "Cash-flow blueprint", labelGu: "રોકડ પ્રવાહ" },
@@ -319,6 +325,16 @@ export function App() {
       case "readiness-hub":
         return (
           <ReadinessHubScreen
+            key={activeCase.id}
+            shg={activeCase}
+            language={language}
+            onUpdateCase={handleUpdateCase}
+            onNavigate={handleNavigate}
+          />
+        );
+      case "alt-credibility":
+        return (
+          <AltDataCredibilityScreen
             key={activeCase.id}
             shg={activeCase}
             language={language}

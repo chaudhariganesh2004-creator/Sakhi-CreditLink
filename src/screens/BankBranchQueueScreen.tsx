@@ -14,6 +14,7 @@ import type { AppLanguage, NavScreenId, SHGCase } from "@/data/sakhi-data";
 import {
   REASON_CODES,
   RBI_FIRST_DOSE_CITATION,
+  alternativeDataCredibility,
   booksCheck,
   drawingPowerFirstDose,
   estimateMonthlyMarginAndEmi,
@@ -51,6 +52,7 @@ const DecisionPanel: React.FC<{
   const eligibleINR = drawingPowerFirstDose(shg.corpusBalance);
   const gap = ticketGap(requestedINR, eligibleINR);
   const readiness = readinessScore(shg);
+  const altCred = alternativeDataCredibility(shg);
   const books = booksCheck(shg);
   const grade = indicativeGrade(shg);
   const sla = slaStatus(shg, shg.stage, slaDays);
@@ -281,6 +283,9 @@ const DecisionPanel: React.FC<{
         <span>
           <Scale className="mr-1.5 inline h-3.5 w-3.5 text-[#0F5E4E]" />
           {grade.disclaimer}
+        </span>
+        <span className="font-mono text-[#0F5E4E] font-semibold">
+          Alt-Data ML Signal: {altCred.credibilityScore}/100 ({altCred.tier} · Illustrative)
         </span>
         {gap.isUnderEligible && (
           <span className="font-medium text-[#B45309]">

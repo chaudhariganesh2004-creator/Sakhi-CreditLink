@@ -1,5 +1,6 @@
 export type NavScreenId =
   | "readiness-hub"
+  | "alt-credibility"
   | "shg-intake"
   | "cashflow-blueprint"
   | "bank-queue"
@@ -116,6 +117,13 @@ export interface BranchDecisionRecord {
   sanctionedAmountINR?: number;
 }
 
+export interface AltDataSignals {
+  upiSupplierReceipts: boolean;
+  dairyOrCoopSupplySync: boolean;
+  utilityAndTelecomRegularity: boolean;
+  geoTaggedWorkshopVerified: boolean;
+}
+
 export interface StatusEvent {
   id: string;
   stage: string;
@@ -182,6 +190,7 @@ export interface SHGCase {
   bottleneckReason?: string;
   branchDecision?: BranchDecisionRecord;
   ldmEscalated?: boolean;
+  altDataSignals?: AltDataSignals;
   activeBookMonths?: number;
   currentDose?: 1 | 2 | 3;
   isPrimaryDemo?: boolean;
