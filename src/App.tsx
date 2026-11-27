@@ -30,11 +30,6 @@ import { SimulatedBadge } from "@/components/shared/ui-primitives";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-const DualPathwayHomeScreen = lazy(() =>
-  import("@/screens/DualPathwayHomeScreen").then((m) => ({
-    default: m.DualPathwayHomeScreen,
-  }))
-);
 const OpportunityDiscoveryScreen = lazy(() =>
   import("@/screens/OpportunityDiscoveryScreen").then((m) => ({
     default: m.OpportunityDiscoveryScreen,
@@ -367,21 +362,7 @@ function AppContent() {
     setShowCaseSwitcher(false);
   };
 
-  if (appView === "home") {
-    return (
-      <Suspense fallback={<div className="min-h-screen bg-[#FAF8F4] p-6"><ScreenSkeleton /></div>}>
-        <DualPathwayHomeScreen
-          language={language}
-          onChangeLanguage={setLanguage}
-          onOpenLoanPortal={() => setAppView("loan-landing")}
-          onOpenRoleDirect={(targetRole) => handleRoleSwitch(targetRole)}
-          onOpenOpportunityExchange={() => handleOpenExchange("opportunity-discovery")}
-        />
-      </Suspense>
-    );
-  }
-
-  if (appView === "loan-landing") {
+  if (appView === "home" || appView === "loan-landing") {
     return (
       <Suspense fallback={<div className="min-h-screen bg-[#FAF8F4] p-6"><ScreenSkeleton /></div>}>
         <LandingPage
@@ -392,6 +373,7 @@ function AppContent() {
           onUpdateCase={handleUpdateCase}
           onChangeLanguage={setLanguage}
           onEnterPortal={(targetRole) => handleRoleSwitch(targetRole ?? "shg-sakhi")}
+          onOpenExchange={(nextScreen) => handleOpenExchange(nextScreen ?? "opportunity-discovery")}
           onBackToHome={() => setAppView("home")}
         />
       </Suspense>

@@ -4,11 +4,15 @@ import {
   ArrowRight,
   ArrowUpRight,
   BrainCircuit,
+  BriefcaseBusiness,
   CheckCircle2,
   ExternalLink,
   Globe,
+  Landmark,
+  Network,
   Scale,
   ShieldCheck,
+  Sparkles,
 } from "lucide-react";
 import {
   SHG_CASES_DEMO,
@@ -37,6 +41,7 @@ interface LandingPageProps {
   onUpdateCase?: (updated: SHGCase) => void;
   onChangeLanguage: (lang: AppLanguage) => void;
   onEnterPortal: (targetRole?: PortalRole) => void;
+  onOpenExchange: (screen?: "opportunity-discovery" | "collective-production") => void;
   onBackToHome?: () => void;
 }
 
@@ -98,6 +103,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({
   onUpdateCase,
   onChangeLanguage,
   onEnterPortal,
+  onOpenExchange,
   onBackToHome,
 }) => {
   const isGu = language === "gu";
@@ -215,6 +221,16 @@ export const LandingPage: React.FC<LandingPageProps> = ({
               </button>
             </div>
 
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => onOpenExchange("opportunity-discovery")}
+              className="hidden md:inline-flex border-[#0F5E4E] text-[#0F5E4E] hover:bg-[#ECFDF5]"
+            >
+              <BriefcaseBusiness className="h-3.5 w-3.5" />
+              {isGu ? "ઓપોર્ચ્યુનિટી પોર્ટલ" : "Opportunity Portal"}
+            </Button>
+
             <Button variant="primary" size="sm" onClick={() => onEnterPortal("shg-sakhi")}>
               {isGu ? "પોર્ટલ ખોલો" : "Open Live Demo"}
             </Button>
@@ -250,6 +266,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({
         onCtaClick={() => onEnterPortal("shg-sakhi")}
         secondaryActions={
           <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => onOpenExchange("opportunity-discovery")}
+              className="border-[#0F5E4E] bg-[#ECFDF5] text-[#0F5E4E] hover:bg-[#D1FAE5]"
+            >
+              <BriefcaseBusiness className="h-3.5 w-3.5" />
+              {isGu ? "ઓપોર્ચ્યુનિટી એક્સચેન્જ જુઓ" : "Explore Opportunity Exchange"}
+            </Button>
             <Button variant="secondary" size="sm" onClick={() => onEnterPortal("bank-branch")}>
               Enter as Bank Branch
             </Button>
@@ -259,6 +284,142 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
         }
       />
+
+      {/* ─── Exclusive Two-Pathway Showcase: Credit Portal + Sakhi Opportunity Exchange ─── */}
+      <section
+        id="exclusive-pathways"
+        className="border-t border-[#DFDBD0] bg-[#FAF8F4] py-14 md:py-16"
+      >
+        <div className="mx-auto max-w-6xl px-4 md:px-6 space-y-8">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-[#A7F3D0] bg-[#ECFDF5] px-3.5 py-1 text-[11.5px] font-semibold text-[#047857]">
+                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                Small Groups. Shared Strength. Bigger Opportunities.
+              </div>
+              <h2 className="font-serif text-[28px] md:text-[34px] font-semibold leading-tight text-[#141A23]">
+                {isGu
+                  ? "બે સંકલિત પોર્ટલ: ધિરાણ તૈયારી અને બજાર તકો"
+                  : "Explore Credit Linkage & Opportunity Exchange"}
+              </h2>
+              <p className="mt-1.5 text-[14.5px] leading-relaxed text-[#475467]">
+                {isGu
+                  ? "લોન અરજી માટે ક્રેડિટ પોર્ટલ વાપરો અથવા સખી મંડળોની ક્ષમતા જોડીને મોટા ખરીદદાર ઓર્ડર અને માંગ-આધારિત ધિરાણ મેળવો."
+                  : "Sakhi Opportunity Exchange transforms isolated Self-Help Groups into a coordinated production network—discovering buyer demand, pooling capacities, and linking financing to real orders."}
+              </p>
+            </div>
+            <SimulatedBadge label="Simulated demonstration data" />
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            {/* Pathway 1: Existing Loan Portal */}
+            <Card className="flex flex-col justify-between bg-white p-6 md:p-7 transition-colors hover:border-[#0F5E4E]">
+              <div className="space-y-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] text-[#0F5E4E]">
+                    <Landmark className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <span className="rounded-md border border-[#DFDBD0] bg-[#FAF8F4] px-2.5 py-1 text-[11px] font-semibold text-[#475467]">
+                    Core Credit Portal
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="font-serif text-[21px] font-semibold text-[#141A23]">
+                    {isGu
+                      ? "૧. SHG લોન અરજી અને ક્રેડિટ પોર્ટલ"
+                      : "SHG Loan Application & Credit Portal"}
+                  </h3>
+                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#475467]">
+                    Apply for SHG-Bank linkage loans, verify LokOS &amp; RBI 6× corpus eligibility, match 9 Gujarat schemes, and track branch SLAs.
+                  </p>
+                </div>
+
+                <ul className="space-y-2 border-t border-[#ECE8DE] pt-3.5 text-[13px] text-[#141A23]">
+                  {[
+                    "RBI 6× Drawing Power & Readiness Hub",
+                    "Bank Branch Appraisal Queue & Standardized Reason Codes",
+                    "GLPC District Command Centre & 0% Subvention Guard",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#0F5E4E]" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="mt-6 space-y-2.5 border-t border-[#ECE8DE] pt-4">
+                <Button
+                  variant="secondary"
+                  className="w-full"
+                  onClick={() => onEnterPortal("shg-sakhi")}
+                >
+                  {isGu ? "લોન પોર્ટલ ખોલો" : "Proceed to Loan Application Portal"}
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </Card>
+
+            {/* Pathway 2: Exclusive New Sakhi Opportunity Exchange */}
+            <Card className="flex flex-col justify-between border-[#0F5E4E] bg-[#ECFDF5]/40 p-6 md:p-7">
+              <div className="space-y-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#0F5E4E] text-white">
+                    <BriefcaseBusiness className="h-5 w-5" aria-hidden="true" />
+                  </div>
+                  <span className="rounded-md border border-[#FDE68A] bg-[#FFFBEB] px-2.5 py-1 text-[11px] font-bold tracking-wide text-[#B45309]">
+                    EXCLUSIVE · NEW INNOVATION
+                  </span>
+                </div>
+
+                <div>
+                  <h3 className="font-serif text-[21px] font-semibold text-[#141A23]">
+                    {isGu
+                      ? "૨. સખી ઓપોર્ચ્યુનિટી એક્સચેન્જ અને કન્સલ્ટન્સી"
+                      : "Sakhi Opportunity Exchange & Consultancy"}
+                  </h3>
+                  <p className="mt-1.5 text-[13.5px] leading-relaxed text-[#475467]">
+                    Explore verified buyer demand (Millet Snacks, School Uniforms, Dairy), combine 5 SHGs into one production network, and generate a demand-backed financing proposal.
+                  </p>
+                </div>
+
+                <ul className="space-y-2 border-t border-[#A7F3D0] pt-3.5 text-[13px] text-[#141A23]">
+                  {[
+                    "Buyer Opportunity Discovery + Rule-Based SHG Matching (40/30/15/15)",
+                    "Dynamic 5-SHG Capacity Pooling & Shared-Machinery Bottleneck Alerts",
+                    "Live What-If Simulator & Printable Financing Proposal PDF",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2">
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-[#047857]" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="mt-6 grid gap-2.5 sm:grid-cols-2 border-t border-[#A7F3D0] pt-4">
+                <Button
+                  variant="primary"
+                  className="w-full"
+                  onClick={() => onOpenExchange("opportunity-discovery")}
+                >
+                  {isGu ? "તકો શોધો" : "Explore Opportunities"}
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="secondary"
+                  className="w-full"
+                  onClick={() => onOpenExchange("collective-production")}
+                >
+                  <Network className="h-4 w-4 text-[#0F5E4E]" />
+                  {isGu ? "સંયુક્ત ઉત્પાદન" : "Collective Production"}
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
 
       {/* ─── Place Application & Check Individual SHG Creditworthiness ─── */}
       <section
