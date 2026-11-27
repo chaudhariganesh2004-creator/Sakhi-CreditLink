@@ -1,19 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import {
+  ArrowRight,
   ArrowUpRight,
+  BrainCircuit,
   CheckCircle2,
   ExternalLink,
   Globe,
+  MapPin,
+  ReceiptIndianRupee,
+  Scale,
   ShieldCheck,
+  Smartphone,
+  Store,
 } from "lucide-react";
-import type { AppLanguage, PortalRole } from "@/data/sakhi-data";
+import {
+  SHG_CASES_DEMO,
+  type AltDataSignals,
+  type AppLanguage,
+  type PortalRole,
+  type SHGCase,
+} from "@/data/sakhi-data";
+import {
+  RBI_FIRST_DOSE_CITATION,
+  alternativeDataCredibility,
+  drawingPowerFirstDose,
+  getCaseExternalNeed,
+} from "@/lib/access-engine";
 import { AnimatedMarqueeHero } from "@/components/ui/hero-3";
 import { Button } from "@/components/ui/button";
-import { Card, SimulatedBadge } from "@/components/ui/primitives";
+import { Card, SimulatedBadge, StatusChip } from "@/components/ui/primitives";
+import { cn, formatINR } from "@/lib/utils";
 
 interface LandingPageProps {
   language: AppLanguage;
+  cases?: SHGCase[];
+  activeCaseId?: string;
+  onSelectCase?: (caseId: string) => void;
+  onUpdateCase?: (updated: SHGCase) => void;
   onChangeLanguage: (lang: AppLanguage) => void;
   onEnterPortal: (targetRole?: PortalRole) => void;
 }
@@ -70,11 +94,52 @@ const GOVT_PORTALS = [
 
 export const LandingPage: React.FC<LandingPageProps> = ({
   language,
+  cases = SHG_CASES_DEMO,
+  activeCaseId,
+  onSelectCase,
+  onUpdateCase,
   onChangeLanguage,
   onEnterPortal,
 }) => {
   const isGu = language === "gu";
   const duplicatedPortals = [...GOVT_PORTALS, ...GOVT_PORTALS];
+
+  const [fallbackSelectedId, setFallbackSelectedId] = useState<string>(cases[0]?.id ?? "");
+  const [localSignalsById, setLocalSignalsById] = useState<Record<string, AltDataSignals>>({});
+
+  const currentId = activeCaseId || fallbackSelectedId || cases[0]?.id;
+  const rawCase = cases.find((c) => c.id === currentId) ?? cases[0];
+  const selectedCase: SHGCase = localSignalsById[rawCase.id]
+    ? { ...rawCase, altDataSignals: localSignalsById[rawCase.id] }
+    : rawCase;
+
+  const ml = alternativeDataCredibility(selectedCase);
+  const eligibleINR = drawingPowerFirstDose(selectedCase.corpusBalance);
+  const requestedINR = getCaseExternalNeed(selectedCase);
+
+  const handleSelectShg = (id: string) => {
+    setFallbackSelectedId(id);
+    onSelectCase?.(id);
+  };
+
+  const handleToggleAltSignal = (key: keyof AltDataSignals) => {
+    const nextSignals: AltDataSignals = {
+      ...ml.signals,
+      [key]: !ml.signals[key],
+    };
+    setLocalSignalsById((prev) => ({ ...prev, [selectedCase.id]: nextSignals }));
+    onUpdateCase?.({
+      ...selectedCase,
+      altDataSignals: nextSignals,
+    });
+  };
+
+  const scoreTone =
+    ml.credibilityScore >= 78
+      ? "success"
+      : ml.credibilityScore >= 58
+      ? "warning"
+      : "danger";
 
   return (
     <div className="min-h-screen bg-[#FAF8F4] text-[#141A23]">
@@ -173,6 +238,286 @@ export const LandingPage: React.FC<LandingPageProps> = ({
           </div>
         }
       />
+
+      {/* ─── Direct Home Screen Feature: Instant ML Alternative-Data Credit Score ─── */}
+      <section
+        id="alt-data-credit-score"
+        className="border-t border-[#DFDBD0] bg-[#FAF8F4] py-12"
+      >
+        <div className="mx-auto max-w-6xl px-4 md:px-6 space-y-6">
+          {/* Section Header */}
+          <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-2xl">
+              <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-md border border-[#A7F3D0] bg-[#ECFDF5] px-3 py-1 text-[11.5px] font-semibold text-[#047857]">
+                <BrainCircuit className="h-3.5 w-3.5" aria-hidden="true" />
+                {isGu
+                  ? "CIBIL વગર વૈકલ્પિક ડેટા ML ક્રેડિટ વિશ્વસનીયતા"
+                  : "Instant ML Credit Credibility via Alternative Data · Zero CIBIL Required"}
+              </div>
+              <h2 className="font-serif text-[28px] md:text-[32px] font-semibold leading-tight text-[#141A23]">
+                {isGu
+                  ? "સખી મંડળનો વૈકલ્પિક ડેટા ક્રેડિટ સ્કોર તરત જુઓ"
+                  : "Direct SHG Credit Score from Alternative Data"}
+              </h2>
+              <p className="mt-1.5 text-[14px] leading-relaxed text-[#475467]">
+                {isGu
+                  ? "કોઈ પણ સખી મંડળ પસંદ કરો અને UPI રસીદ, સહકારી સપ્લાય, વીજળી બિલ અને પંચસૂત્ર જેવા વૈકલ્પિક ડેટાથી વિશ્વસનીયતા સ્કોર અને RBI ૬× મર્યાદા તરત તપાસો."
+                  : "Select any Sakhi Mandal and toggle consent-based rural alternative data signals to compute an explainable ML credibility index alongside RBI 6× corpus eligibility."}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <SimulatedBadge />
+            </div>
+          </div>
+
+          {/* SHG Group Quick-Select Bar */}
+          <div
+            className="flex flex-wrap items-center gap-2"
+            role="group"
+            aria-label="Select SHG to inspect alternative-data credit score"
+          >
+            {cases.map((c) => {
+              const isActive = c.id === selectedCase.id;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => handleSelectShg(c.id)}
+                  className={cn(
+                    "min-h-[40px] rounded-md border px-3.5 py-2 text-left text-[12.5px] font-semibold transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F5E4E]",
+                    isActive
+                      ? "border-[#0F5E4E] bg-[#0F5E4E] text-white"
+                      : "border-[#DFDBD0] bg-white text-[#141A23] hover:bg-[#F2EFE8]"
+                  )}
+                >
+                  <span>{isGu ? c.shgNameGu : c.shgName}</span>
+                  <span
+                    className={cn(
+                      "ml-2 font-mono text-[11px]",
+                      isActive ? "text-[#D1FAE5]" : "text-[#475467]"
+                    )}
+                  >
+                    ({c.district})
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Main Structured 2-Column Credibility Workbench */}
+          <div className="grid gap-5 lg:grid-cols-12">
+            {/* Left: ML Score + Eligibility KPIs + 6 Explainable Feature Weights */}
+            <Card className="p-5 md:p-6 lg:col-span-7 space-y-5">
+              {/* Top Metric Strip */}
+              <div className="grid gap-4 sm:grid-cols-3 border-b border-[#ECE8DE] pb-5">
+                <div className="sm:col-span-2">
+                  <div className="text-[11px] font-semibold uppercase tracking-wider text-[#475467]">
+                    {isGu ? "ML વૈકલ્પિક ડેટા ક્રેડિટ સ્કોર" : "ML Alt-Data Credit Score"}
+                  </div>
+                  <div className="mt-1.5 flex flex-wrap items-baseline gap-2.5">
+                    <span className="font-mono text-[42px] font-bold leading-none text-[#0F5E4E] tabular-nums">
+                      {ml.credibilityScore}
+                    </span>
+                    <span className="font-mono text-[16px] text-[#475467]">/ 100</span>
+                    <StatusChip tone={scoreTone}>
+                      {isGu ? ml.tierGu : ml.tier}
+                    </StatusChip>
+                  </div>
+                  <div className="mt-1.5 text-[12px] text-[#475467]">
+                    {ml.modelLabel} · {selectedCase.village}, {selectedCase.district}
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-[#A7F3D0] bg-[#ECFDF5] p-3.5">
+                  <div className="flex items-center gap-1 text-[10.5px] font-semibold uppercase tracking-wider text-[#047857]">
+                    <Scale className="h-3.5 w-3.5" />
+                    {isGu ? "RBI ૬× પાત્રતા" : "RBI 6× Limit"}
+                  </div>
+                  <div className="mt-1 font-mono text-[20px] font-bold text-[#047857] tabular-nums">
+                    {formatINR(eligibleINR)}
+                  </div>
+                  <div className="mt-0.5 text-[11px] text-[#047857] tabular-nums">
+                    Asked: {formatINR(requestedINR)}
+                  </div>
+                </div>
+              </div>
+
+              {/* 6 Transparent ML Features */}
+              <div>
+                <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+                  <h3 className="text-[14px] font-semibold text-[#141A23]">
+                    {isGu
+                      ? "૬ વૈકલ્પિક ડેટા પરિબળોનું યોગદાન (પારદર્શક ML)"
+                      : "How This Score Is Calculated (6 Non-Bureau Alt-Data Features)"}
+                  </h3>
+                  <span className="font-mono text-[11.5px] text-[#475467]">
+                    Zero Black Box
+                  </span>
+                </div>
+
+                <div className="space-y-2.5">
+                  {ml.features.map((feat) => {
+                    const pct = Math.max(8, Math.round(feat.normalizedValue * 100));
+                    return (
+                      <div
+                        key={feat.id}
+                        className="rounded-md border border-[#ECE8DE] bg-[#FAF8F4] px-3.5 py-2.5"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2 text-[12.5px]">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="font-semibold text-[#141A23]">
+                              {isGu ? feat.labelGu : feat.label}
+                            </span>
+                            <span className="rounded bg-white px-1.5 py-0.5 text-[10.5px] text-[#475467] border border-[#DFDBD0]">
+                              {feat.source}
+                            </span>
+                          </div>
+                          <span className="font-mono text-[12px] font-semibold text-[#0F5E4E] tabular-nums">
+                            {feat.sharePct}% share (w={feat.weight})
+                          </span>
+                        </div>
+                        <div className="mt-2 flex items-center gap-3">
+                          <div className="h-2 flex-1 overflow-hidden rounded-full bg-white border border-[#DFDBD0]">
+                            <div
+                              className={cn(
+                                "h-full rounded-full transition-all duration-150",
+                                feat.normalizedValue >= 0.7
+                                  ? "bg-[#0F5E4E]"
+                                  : feat.normalizedValue >= 0.35
+                                  ? "bg-[#B45309]"
+                                  : "bg-[#B91C1C]"
+                              )}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                          <span className="w-44 truncate text-right text-[11px] text-[#475467]">
+                            {feat.rawSummary}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </Card>
+
+            {/* Right: Interactive Consent Alt-Data Switches + Action Box */}
+            <Card className="p-5 md:p-6 lg:col-span-5 flex flex-col justify-between space-y-5">
+              <div className="space-y-3.5">
+                <div className="border-b border-[#ECE8DE] pb-3">
+                  <h3 className="text-[15px] font-semibold text-[#141A23]">
+                    {isGu
+                      ? "તમારો વૈકલ્પિક ડેટા જોડો (DPDP સંમતિ)"
+                      : "Connect Alternative Data Signals Live"}
+                  </h3>
+                  <p className="mt-1 text-[12.5px] text-[#475467]">
+                    {isGu
+                      ? "સંમતિ આધારિત ડેટા સ્ત્રોત ચાલુ કરીને સ્કોરમાં તરત ફેરફાર જુઓ."
+                      : "Toggle any signal below to test real-time ML credibility uplift before visiting a bank branch."}
+                  </p>
+                </div>
+
+                <div className="space-y-2.5">
+                  {(
+                    [
+                      {
+                        key: "upiSupplierReceipts",
+                        title: isGu ? "UPI વેચાણ અને સપ્લાયર રસીદ" : "UPI Sales & Supplier Receipts",
+                        sub: isGu ? "માસિક ડિજિટલ રોકડ પ્રવાહ પુરાવો" : "Consistent digital inflow & vendor bills",
+                        icon: ReceiptIndianRupee,
+                      },
+                      {
+                        key: "dairyOrCoopSupplySync",
+                        title: isGu ? "દૂધ મંડળી / સહકારી પાસબુક" : "Dairy / Co-op Supply Passbook",
+                        sub: isGu ? "સહકારી મંડળી અથવા FPO સપ્લાય રેકોર્ડ" : "Verified bulk delivery cadence",
+                        icon: Store,
+                      },
+                      {
+                        key: "utilityAndTelecomRegularity",
+                        title: isGu ? "વીજળી બિલ અને મોબાઇલ નિયમિતતા" : "Utility & Mobile Cadence",
+                        sub: isGu ? "સમયસર બિલ અને બેઠક હાજરી" : "On-time unit bills & meeting discipline",
+                        icon: Smartphone,
+                      },
+                      {
+                        key: "geoTaggedWorkshopVerified",
+                        title: isGu ? "જિયો-ટેગ યુનિટ ચકાસણી" : "Geo-Tagged Enterprise Proof",
+                        sub: isGu ? "સ્થળ ચકાસણી અને મશીનરી ફોટો" : "Physical unit & stock photo verified",
+                        icon: MapPin,
+                      },
+                    ] as {
+                      key: keyof AltDataSignals;
+                      title: string;
+                      sub: string;
+                      icon: React.ComponentType<{ className?: string }>;
+                    }[]
+                  ).map((sig) => {
+                    const active = ml.signals[sig.key];
+                    const Icon = sig.icon;
+                    return (
+                      <button
+                        key={sig.key}
+                        type="button"
+                        onClick={() => handleToggleAltSignal(sig.key)}
+                        aria-pressed={active}
+                        className={cn(
+                          "w-full rounded-lg border p-3 text-left transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0F5E4E]",
+                          active
+                            ? "border-[#0F5E4E] bg-[#ECFDF5]"
+                            : "border-[#DFDBD0] bg-[#FAF8F4] hover:bg-white"
+                        )}
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="flex items-start gap-2.5">
+                            <Icon
+                              className={cn(
+                                "mt-0.5 h-4 w-4 shrink-0",
+                                active ? "text-[#0F5E4E]" : "text-[#475467]"
+                              )}
+                            />
+                            <div>
+                              <div className="text-[13px] font-semibold text-[#141A23]">
+                                {sig.title}
+                              </div>
+                              <div className="text-[11.5px] text-[#475467]">{sig.sub}</div>
+                            </div>
+                          </div>
+                          <span
+                            className={cn(
+                              "shrink-0 rounded px-2 py-0.5 font-mono text-[11px] font-semibold",
+                              active
+                                ? "bg-[#0F5E4E] text-white"
+                                : "border border-[#C9C3B4] bg-white text-[#475467]"
+                            )}
+                          >
+                            {active ? "Connected ✓" : "+ Add"}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="space-y-3 border-t border-[#ECE8DE] pt-4">
+                <p className="text-[11.5px] leading-relaxed text-[#475467]">
+                  <ShieldCheck className="mr-1 inline h-3.5 w-3.5 text-[#0F5E4E]" />
+                  <strong>{RBI_FIRST_DOSE_CITATION}:</strong> Decision-support signal only (Illustrative ML). Banks retain full sanction authority.
+                </p>
+                <Button
+                  variant="primary"
+                  className="w-full"
+                  onClick={() => onEnterPortal("shg-sakhi")}
+                >
+                  {isGu
+                    ? `${selectedCase.shgNameGu} નો સંપૂર્ણ રિપોર્ટ ખોલો`
+                    : `Open Full Readiness & Loan Pack for ${selectedCase.shgName.split(" ")[0]}`}
+                  <ArrowRight className="h-4 w-4" />
+                </Button>
+              </div>
+            </Card>
+          </div>
+        </div>
+      </section>
 
       {/* ─── Government Websites / Official Portals (Transformed to Tilted Marquee Style) ─── */}
       <section id="govt-portals" className="border-t border-[#DFDBD0] bg-white overflow-hidden py-14">

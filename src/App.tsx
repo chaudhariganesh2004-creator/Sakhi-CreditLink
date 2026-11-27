@@ -293,6 +293,10 @@ export function App() {
       <Suspense fallback={<div className="min-h-screen bg-[#FAF8F4] p-6"><ScreenSkeleton /></div>}>
         <LandingPage
           language={language}
+          cases={cases}
+          activeCaseId={activeCaseId}
+          onSelectCase={(id) => setActiveCaseId(id)}
+          onUpdateCase={handleUpdateCase}
           onChangeLanguage={setLanguage}
           onEnterPortal={(targetRole) => handleRoleSwitch(targetRole ?? "shg-sakhi")}
         />
